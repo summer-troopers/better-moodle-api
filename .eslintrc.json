@@ -1,6 +1,12 @@
 {
     "extends": "airbnb-base",
     "rules": {
-      "no-use-before-define": "off"
+      "linebreak-style": [
+        "off",
+        "windows"
+      ],
+      "no-unused-vars": "warn",
+      "global-require": "warn",
+      "no-use-before-define": "warn"
     }
 }
