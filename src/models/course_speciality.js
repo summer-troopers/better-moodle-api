@@ -1,9 +1,11 @@
-module.exports = (sequelize, DataTypes) => {
+'use strict';
+
+module.exports = function defineCourseSpeciality(sequelize, DataTypes) {
   const CourseSpeciality = sequelize.define('CourseSpeciality', {
     name: {
       type: DataTypes.STRING,
     },
-    idSpecialities: {
+    idSpeciality: {
       type: DataTypes.INTEGER,
       field: 'id_speciality',
       foreignKey: true,
@@ -18,9 +20,9 @@ module.exports = (sequelize, DataTypes) => {
     tableName: 'courses_specialities',
     timestamps: false,
   });
-  CourseSpeciality.associate = (models) => {
+  CourseSpeciality.associate = function associateCourseSpeciality(models) {
     CourseSpeciality.hasMany(models.Speciality, {
-      foreignKey: 'idSpecialities',
+      foreignKey: 'idSpeciality',
     });
     CourseSpeciality.hasMany(models.Course, {
       foreignKey: 'idCourse',

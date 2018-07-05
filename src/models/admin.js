@@ -1,4 +1,6 @@
-module.exports = (sequelize, DataTypes) => {
+'use strict';
+
+module.exports = function defineAdmin(sequelize, DataTypes) {
   const Admin = sequelize.define('Admin', {
     firstName: {
       type: DataTypes.STRING,
@@ -20,7 +22,8 @@ module.exports = (sequelize, DataTypes) => {
     tableName: 'admins',
     timestamps: false,
   });
-  Admin.associate = (models) => {
+  // eslint-disable-next-line no-unused-vars
+  Admin.associate = function associateAdmin(models) {
     // associations can be defined here
   };
   return Admin;

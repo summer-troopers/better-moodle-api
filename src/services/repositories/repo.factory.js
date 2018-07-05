@@ -1,1 +1,5 @@
-module.exports = connection => require('./sql.repo')(connection);
+'use strict';
+
+module.exports = function getRepository(connection) {
+  return require('./sql.repo')(connection); // eslint-disable-line global-require
+};

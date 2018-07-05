@@ -1,5 +1,7 @@
-module.exports = (sequelize) => {
-  require('../../models/index')(sequelize);
+'use strict';
+
+module.exports = function getSQLRepository(sequelize) {
+  require('../../models/index')(sequelize); // eslint-disable-line global-require
   const { Admin } = sequelize.models;
 
   function list() {

@@ -1,8 +1,10 @@
+'use strict';
+
 const Sequelize = require('sequelize');
 
-module.exports = (uri) => {
+module.exports = function getSQLConnector(uri) {
   return {
-    connect,
+    connect, // eslint-disable-line no-use-before-define
   };
 
   async function connect() {

@@ -1,3 +1,5 @@
+'use strict';
+
 module.exports = {
   mysql: process.env.MYSQL_URI || 'mysql://localhost:3306/moodle',
   sendgridApiKey: process.env.SENDGRID_API_KEY,

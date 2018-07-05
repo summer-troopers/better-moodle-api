@@ -1,6 +1,7 @@
+'use strict';
+
 const appRoot = require('app-root-path');
 const winston = require('winston');
-const config = require('config');
 const SendGridTransport = require('./sendgrid.transport');
 
 const opt = {
@@ -34,6 +35,7 @@ const logger = winston.createLogger({
 });
 
 logger.stream = {
+  // eslint-disable-next-line no-unused-vars
   write(message, encoding) {
     logger.log('info', message);
   },

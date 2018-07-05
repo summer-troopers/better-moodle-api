@@ -1,12 +1,13 @@
+'use strict';
 
 module.exports = {
-  up: (queryInterface, Sequelize) => {
+  // eslint-disable-next-line no-unused-vars
+  up(queryInterface, Sequelize) {
     return queryInterface.bulkInsert('teachers', [{
       first_name: 'FirstSeedname',
     }], {});
   },
 
-  down: (queryInterface, Sequelize) => {
-    return queryInterface.bulkDelete('teachers', null, {});
-  },
+  // eslint-disable-next-line no-unused-vars
+  down(queryInterface, Sequelize) { return queryInterface.bulkDelete('teachers', null, {}); },
 };

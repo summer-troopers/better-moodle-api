@@ -1,3 +1,6 @@
+'use strict';
+
 const config = require('config');
 
-module.exports = () => require('./sql.connector')(config.mysql);
+// eslint-disable-next-line global-require
+module.exports = function getConnector() { require('./sql.connector')(config.mysql); };

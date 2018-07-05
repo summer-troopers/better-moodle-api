@@ -1,11 +1,13 @@
+'use strict';
+
 const express = require('express');
 
-module.exports = (repo) => {
+module.exports = function createRoute(repo) {
   const router = express.Router();
 
   router.route('/')
-    .get(list)
-    .post(add);
+    .get(list) // eslint-disable-line no-use-before-define
+    .post(add); // eslint-disable-line no-use-before-define
 
   async function list(req, res) {
     const result = await repo.list();

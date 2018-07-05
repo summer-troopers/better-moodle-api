@@ -1,15 +1,16 @@
 const config = require('config');
 const connFactory = require('./src//services/connectors/connector.factory');
+const winston = require('./src/services/winston/winston');
 
 connFactory()
   .connect()
   .then((connection) => {
-    const app = require('./src/app')(connection);
+    const app = require('./src/app')(connection); // eslint-disable-line global-require
 
     const { port } = config;
 
     app.listen(port, () => {
-      console.log(`Server started on: ${port}`);
+      winston.info(`Server started on: ${port}`);
     });
   })
-  .catch(console.error);
+  .catch(winston.error);

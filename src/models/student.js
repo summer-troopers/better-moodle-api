@@ -1,5 +1,6 @@
+'use strict';
 
-module.exports = (sequelize, DataTypes) => {
+module.exports = function defineStudent(sequelize, DataTypes) {
   const Student = sequelize.define('Student', {
     id: {
       allowNull: false,
@@ -22,7 +23,7 @@ module.exports = (sequelize, DataTypes) => {
     tableName: 'students',
     timestamps: false,
   });
-  Student.associate = (models) => {
+  Student.associate = function associateStudent(models) {
     Student.belongsTo(models.Group, { foreignKey: 'idGroup' });
   };
   return Student;

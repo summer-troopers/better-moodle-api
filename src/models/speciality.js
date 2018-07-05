@@ -1,6 +1,7 @@
+'use strict';
 
-module.exports = (sequelize, DataTypes) => {
-  const Specialities = sequelize.define('Speciality', {
+module.exports = function defineSpeciality(sequelize, DataTypes) {
+  const Speciality = sequelize.define('Speciality', {
     id: {
       allowNull: false,
       autoIncrement: true,
@@ -15,10 +16,10 @@ module.exports = (sequelize, DataTypes) => {
     tableName: 'specialities',
     timestamps: false,
   });
-  Specialities.associate = (models) => {
-    Specialities.hasMany(models.Group, {
-      foreignKey: 'idSpecialities',
+  Speciality.associate = function associateSpeciality(models) {
+    Speciality.hasMany(models.Group, {
+      foreignKey: 'idSpeciality',
     });
   };
-  return Specialities;
+  return Speciality;
 };

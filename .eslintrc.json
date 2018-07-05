@@ -8,6 +8,11 @@
       "no-unused-vars": "warn",
       "global-require": "warn",
       "no-use-before-define": "warn",
-      "arrow-body-style": "off"
+      "arrow-body-style": "off",
+      "strict": "off",
+      "complexity": [
+        "error",
+        4
+      ]
     }
 }
