@@ -20,7 +20,7 @@ module.exports = function defineTeacher(sequelize, DataTypes) {
       type: DataTypes.STRING,
     },
     phoneNumber: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.STRING,
       field: 'phone_number',
     },
     email: DataTypes.STRING,

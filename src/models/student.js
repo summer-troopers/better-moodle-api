@@ -11,7 +11,7 @@ module.exports = function defineStudent(sequelize, DataTypes) {
     firstName: { type: DataTypes.STRING, field: 'first_name' },
     lastName: { type: DataTypes.STRING, field: 'last_name' },
     password: { type: DataTypes.STRING },
-    phoneNumber: { type: DataTypes.INTEGER, field: 'phone_number' },
+    phoneNumber: { type: DataTypes.STRING, field: 'phone_number' },
     email: DataTypes.STRING,
     idGroup: {
       type: DataTypes.INTEGER,

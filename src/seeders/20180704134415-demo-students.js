@@ -1,14 +1,24 @@
-'use strict';
+const faker = require('faker');
 
 module.exports = {
-  // eslint-disable-next-line no-unused-vars
-  up(queryInterface, Sequelize) {
-    return queryInterface.bulkInsert('students', [{
-      first_name: 'FirstSeed',
-      id_group: '1',
-    }], {});
-  },
-
+  // eslint-disable-next-line no-unused-vars, no-use-before-define
+  up(queryInterface, Sequelize) { return queryInterface.bulkInsert('students', generate50Students(), {}); },
   // eslint-disable-next-line no-unused-vars
   down(queryInterface, Sequelize) { return queryInterface.bulkDelete('students', null, {}); },
 };
+
+
+function generate50Students() {
+  const students = [];
+  for (let i = 1; i <= 50; i += 1) {
+    students.push({
+      first_name: faker.name.firstName(),
+      last_name: faker.name.lastName(),
+      email: faker.internet.email(),
+      password: faker.internet.password(8, 16),
+      phone_number: faker.phone.phoneNumberFormat(0),
+      id_group: faker.random.number(10) + 1,
+    });
+  }
+  return students;
+}
