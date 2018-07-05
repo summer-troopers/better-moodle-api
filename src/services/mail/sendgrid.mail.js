@@ -1,24 +1,22 @@
 'use strict';
 
+const winston = require('winston');
 const sgMail = require('@sendgrid/mail');
 const config = require('config');
+const { createMessage } = require('../../helpers/util');
 
-module.exports = class SendGridMail {
-  constructor(options) {
-    this.mailServer = sgMail;
-    this.mailServer.setApiKey(config.sendgridApiKey);
-    this.destMails = (options && options.destMails) || config.errorEmails;
-  }
+sgMail.setApiKey(config.sendgridApiKey);
 
-  send(msg, callback) {
-    this.destMails.forEach((mail) => {
-      const message = {
-        to: mail,
-        from: 'server@windows.com',
-        subject: 'Server Error',
-        text: 'You have an error',
-      };
-      this.mailServer.send(message, callback);
+module.exports = {
+  send(msg, destMails, callback) {
+    const promises = [];
+    destMails.forEach((mail) => {
+      const message = createMessage(mail, 'server@windows.com', 'Server error',
+        msg);
+      promises.push(sgMail.send(message));
     });
-  }
+    Promise.all(promises)
+      .then(callback)
+      .catch(winston.error);
+  },
 };

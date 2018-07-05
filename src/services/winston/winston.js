@@ -21,7 +21,7 @@ const opt = {
     colorize: true,
   },
   sendgrid: {
-    level: 'info',
+    level: 'error',
   },
 };
 
