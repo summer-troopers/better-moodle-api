@@ -3,8 +3,9 @@
 module.exports = {
   mysql: process.env.MYSQL_URI || 'mysql://localhost:3306/moodle',
   sendgridApiKey: process.env.SENDGRID_API_KEY,
-  port: process.env.PORT || 3000,
-  errorEmails: process.env.ERROR_EMAILS,
+  port: process.env.PORT || 80,
+  host: process.env.HOST || '0.0.0.0',
+  errorEmails: process.env.ERROR_EMAILS || '',
 
   development: {
     username: process.env.SEQUELIZE_USER || 'root',

@@ -7,10 +7,10 @@ connFactory()
   .then((connection) => {
     const app = require('./src/app')(connection); // eslint-disable-line global-require
 
-    const { port } = config;
+    const { port, host } = config;
 
-    app.listen(port, () => {
-      winston.info(`Server started on: ${port}`);
+    app.listen(port, host, () => {
+      winston.info(`Server started on: ${port}, host: ${host}`);
     });
   })
   .catch(winston.error);
