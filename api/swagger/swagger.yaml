@@ -1,0 +1,607 @@
+swagger: "2.0"
+info:
+  description: "Moodle App"
+  version: "1.0.0"
+  title: "Moodle App"
+host: "localhost:80"
+schemes:
+- "http"
+paths:
+  /api/v1/admins: 
+    get:
+      summary: "Get all admins"
+      produces:
+      - "application/json"
+      responses:
+        200:
+          description: "success"
+          schema:
+            type: "string"
+        400:
+          description: "error"
+    post:
+      summary: "Add an admin in the DB."
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        required: true
+        schema:
+          $ref: "#/definitions/Admin"
+      responses:
+        200:
+          description: "success"
+        400:
+          description: "error"
+  /api/v1/teachers: 
+    get:
+      summary: "Get all teachers"
+      produces:
+      - "application/json"
+      responses:
+        200:
+          description: "success"
+          schema:
+            type: "string"
+        400:
+          description: "error"
+    post:
+      summary: "Add a teacher in the DB."
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        required: true
+        schema:
+          $ref: "#/definitions/Teacher"
+      responses:
+        200:
+          description: "success"
+        400:
+          description: "error"
+  /api/v1/students: 
+    get:
+      summary: "Get all students"
+      produces:
+      - "application/json"
+      responses:
+        200:
+          description: "success"
+          schema:
+            type: "string"
+        400:
+          description: "error"
+    post:
+      summary: "Add a student in the DB."
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        required: true
+        schema:
+          $ref: "#/definitions/Student"
+      responses:
+        200:
+          description: "success"
+        400:
+          description: "error"
+  /api/v1/courses: 
+    get:
+      summary: "Get all courses"
+      produces:
+      - "application/json"
+      responses:
+        200:
+          description: "success"
+          schema:
+            type: "string"
+        400:
+          description: "error"
+    post:
+      summary: "Add a course in the DB."
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        required: true
+        schema:
+          $ref: "#/definitions/Course"
+      responses:
+        200:
+          description: "success"
+        400:
+          description: "error"
+  /api/v1/groups: 
+    get:
+      summary: "Get all groups"
+      produces:
+      - "application/json"
+      responses:
+        200:
+          description: "success"
+          schema:
+            type: "string"
+        400:
+          description: "error"
+    post:
+      summary: "Add a group in the DB."
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        required: true
+        schema:
+          $ref: "#/definitions/Group"
+      responses:
+        200:
+          description: "success"
+        400:
+          description: "error"
+  /api/v1/specialities: 
+    get:
+      summary: "Get all specialities"
+      produces:
+      - "application/json"
+      responses:
+        200:
+          description: "success"
+          schema:
+            type: "string"
+        400:
+          description: "error"
+    post:
+      summary: "Add a group in the DB."
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        required: true
+        schema:
+          $ref: "#/definitions/Speciality"
+      responses:
+        200:
+          description: "success"
+        400:
+          description: "error"
+  /api/v1/admins/{id}: 
+    get:
+      summary: "Get admin by id."
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "ID of the admin."
+        required: true
+        type: "integer"
+      responses:
+        200:
+          description: "success"
+          schema:
+            type: "string"
+        400:
+          description: "error"
+    delete:
+      summary: "Delete an admin."
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "ID of the Admin to be deleted."
+        required: true
+        type: "integer"
+      responses:
+        200:
+          description: "success"
+        400:
+          description: "error"
+    put:
+      summary: "Update the data  of an admin."
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        required: true
+        type: "integer"
+      - name: "body"
+        in: "body"
+        required: true
+        schema:
+          $ref: "#/definitions/Admin"
+      responses:
+        400:
+          description: "Invalid ID supplied"
+        404:
+          description: "Admin not found"
+        405:
+          description: "Validation exception"
+  /api/v1/teachers/{id}: 
+    get:
+      summary: "Get a teacher"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "ID of the teacher."
+        required: true
+        type: "integer"
+      responses:
+        200:
+          description: "success"
+          schema:
+            type: "string"
+        400:
+          description: "error"
+    delete:
+      summary: "Delete a teacher."
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "ID of the teacher to be deleted."
+        required: true
+        type: "integer"
+      responses:
+        200:
+          description: "success"
+        400:
+          description: "error"
+    put:
+      summary: "Update the data  of an teacher."
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        required: true
+        type: "integer"
+      - name: "body"
+        in: "body"
+        required: true
+        schema:
+          $ref: "#/definitions/Teacher"
+      responses:
+        400:
+          description: "Invalid ID supplied"
+        404:
+          description: "Teacher not found"
+        405:
+          description: "Validation exception"
+  /api/v1/students/{id}: 
+    get:
+      summary: "Get all students"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "ID of the student to be deleted."
+        required: true
+        type: "integer"
+      responses:
+        200:
+          description: "success"
+          schema:
+            type: "string"
+        400:
+          description: "error"
+    delete:
+      summary: "Delete a student."
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "ID of the student to be deleted."
+        required: true
+        type: "integer"
+      responses:
+        200:
+          description: "success"
+        400:
+          description: "error"
+    put:
+      summary: "Update the data  of an student."
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        required: true
+        type: "integer"
+      - name: "body"
+        in: "body"
+        required: true
+        schema:
+          $ref: "#/definitions/Student"
+      responses:
+        400:
+          description: "Invalid ID supplied"
+        404:
+          description: "Student not found"
+        405:
+          description: "Validation exception"
+  /api/v1/courses/{id}: 
+    get:
+      summary: "Get all courses"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "ID of the course to be deleted."
+        required: true
+        type: "integer"
+      responses:
+        200:
+          description: "success"
+          schema:
+            type: "string"
+        400:
+          description: "error"
+    delete:
+      summary: "Delete a course."
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "ID of the course to be deleted."
+        required: true
+        type: "integer"
+      responses:
+        200:
+          description: "success"
+        400:
+          description: "error"
+    put:
+      summary: "Update the data  of an course."
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        required: true
+        type: "integer"
+      - name: "body"
+        in: "body"
+        required: true
+        schema:
+          $ref: "#/definitions/Course"
+      responses:
+        400:
+          description: "Invalid ID supplied"
+        404:
+          description: "Course not found"
+        405:
+          description: "Validation exception"
+  /api/v1/groups/{id}: 
+    get:
+      summary: "Get a group"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "ID of the group to be deleted."
+        required: true
+        type: "integer"
+      responses:
+        200:
+          description: "success"
+          schema:
+            type: "string"
+        400:
+          description: "error"
+    delete:
+      summary: "Delete a group."
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "ID of the group to be deleted."
+        required: true
+        type: "integer"
+      responses:
+        200:
+          description: "success"
+        400:
+          description: "error"
+    put:
+      summary: "Update the data  of a group."
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        required: true
+        type: "integer"
+      - name: "body"
+        in: "body"
+        required: true
+        schema:
+          $ref: "#/definitions/Group"
+      responses:
+        400:
+          description: "Invalid ID supplied"
+        404:
+          description: "Group not found"
+        405:
+          description: "Validation exception"
+  /api/v1/specialities/{id}: 
+    get:
+      summary: "Get all specialities"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "ID of the speciality to be deleted."
+        required: true
+        type: "integer"
+      responses:
+        200:
+          description: "success"
+          schema:
+            type: "string"
+        400:
+          description: "error"
+    delete:
+      summary: "Delete a speciality."
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "ID of the speciality to be deleted."
+        required: true
+        type: "integer"
+      responses:
+        200:
+          description: "success"
+        400:
+          description: "error"
+    put:
+      summary: "Update the data  of a speciality."
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        required: true
+        type: "integer"
+      - name: "body"
+        in: "body"
+        required: true
+        schema:
+          $ref: "#/definitions/Speciality"
+      responses:
+        400:
+          description: "Invalid ID supplied"
+        404:
+          description: "Speciality not found"
+        405:
+          description: "Validation exception"
+definitions:
+  Admin:
+    type: "object"
+    required:
+    - "firstName"
+    - "lastName"
+    - "email"
+    - "password"
+    - "phoneNumber"
+    properties:
+      firstName:
+        type: "string"
+      lastName:
+        type: "string"
+      email:
+        type: "string"
+        format: "email"
+      password:
+        type: "string"
+      phoneNumber:
+        type: "string"
+  Teacher:
+    type: "object"
+    required:
+    - "firstName"
+    - "lastName"
+    - "email"
+    - "password"
+    - "phoneNumber"
+    properties:
+      firstName:
+        type: "string"
+      lastName:
+        type: "string"
+      email:
+        type: "string"
+        format: "email"
+      password:
+        type: "string"
+      phoneNumber:
+        type: "string"
+  Student:
+    type: "object"
+    required:
+    - "firstName"
+    - "lastName"
+    - "email"
+    - "password"
+    - "phoneNumber"
+    - "idGroup"
+    properties:
+      firstName:
+        type: "string"
+      lastName:
+        type: "string"
+      email:
+        type: "string"
+        format: "email"
+      password:
+        type: "string"
+      phoneNumber:
+        type: "string"
+      idGroup:
+        type: "integer"
+  Course:
+    type: "object"
+    required:
+    - "name"
+    properties:
+      name:
+        type: "string"
+  Group:
+    type: "object"
+    required:
+    - "name"
+    - "idSpeciality"
+    properties:
+      name:
+        type: "string"
+      idSpeciality:
+        type: "integer"
+  Speciality:
+    type: "object"
+    required:
+    - "name"
+    properties:
+      name:
+        type: "string"
