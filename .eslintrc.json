@@ -7,12 +7,13 @@
       ],
       "no-unused-vars": "warn",
       "global-require": "warn",
-      "no-use-before-define": "warn",
+      "no-use-before-define": "off",
       "arrow-body-style": "off",
       "strict": "off",
       "complexity": [
         "error",
         4
-      ]
+      ],
+      "no-useless-escape" : "off"
     }
 }

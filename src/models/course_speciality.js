@@ -2,9 +2,6 @@
 
 module.exports = function defineCourseSpeciality(sequelize, DataTypes) {
   const CourseSpeciality = sequelize.define('CourseSpeciality', {
-    name: {
-      type: DataTypes.STRING,
-    },
     idSpeciality: {
       type: DataTypes.INTEGER,
       field: 'id_speciality',
@@ -22,10 +19,10 @@ module.exports = function defineCourseSpeciality(sequelize, DataTypes) {
   });
   CourseSpeciality.associate = function associateCourseSpeciality(models) {
     CourseSpeciality.hasMany(models.Speciality, {
-      foreignKey: 'idSpeciality',
+      foreignKey: 'id',
     });
     CourseSpeciality.hasMany(models.Course, {
-      foreignKey: 'idCourse',
+      foreignKey: 'id',
     });
   };
   return CourseSpeciality;

@@ -20,8 +20,8 @@ module.exports = function defineGroup(sequelize, DataTypes) {
     timestamps: false,
   });
   Group.associate = function associateGroup(models) {
-    Group.hasMany(models.Student, { foreignKey: 'idGroup' });
-    Group.belongsTo(models.Speciality, { foreignKey: 'idSpeciality' });
+    Group.hasMany(models.Student, { foreignKey: 'id' });
+    Group.belongsTo(models.Speciality, { foreignKey: 'id' });
   };
   return Group;
 };

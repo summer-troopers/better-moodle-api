@@ -18,7 +18,7 @@ module.exports = function defineSpeciality(sequelize, DataTypes) {
   });
   Speciality.associate = function associateSpeciality(models) {
     Speciality.hasMany(models.Group, {
-      foreignKey: 'idSpeciality',
+      foreignKey: 'id',
     });
   };
   return Speciality;
