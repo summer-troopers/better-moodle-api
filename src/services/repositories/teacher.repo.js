@@ -1,7 +1,5 @@
 'use strict';
 
-const util = require('../../helpers/util');
-
 module.exports = function getTeacherRepository(sequelize) {
   const { Teacher } = sequelize.models;
 
@@ -17,15 +15,9 @@ module.exports = function getTeacherRepository(sequelize) {
     return result;
   }
 
-  function add(form) {
+  async function add(form) {
     try {
-      const result = Teacher.create({
-        firstName: form.firstName,
-        lastName: form.lastName,
-        email: form.email,
-        password: form.password,
-        phoneNumber: form.phoneNumber,
-      });
+      const result = await Teacher.create(form);
       return result;
     } catch (err) {
       return { error: err.message };
@@ -33,16 +25,10 @@ module.exports = function getTeacherRepository(sequelize) {
   }
 
 
-  function update(id, form) {
+  async function update(id, form) {
     if (id === undefined) return { error: 'Teacher ID not recieved' };
     try {
-      const result = Teacher.update({
-        firstName: form.firstName,
-        lastName: form.lastName,
-        email: form.email,
-        password: form.password,
-        phoneNumber: form.phoneNumber,
-      }, {
+      const result = await Teacher.update(form, {
         where: { id },
       });
       return result;

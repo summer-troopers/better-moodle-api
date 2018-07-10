@@ -39,6 +39,7 @@ module.exports = function defineTeacher(sequelize, DataTypes) {
     email: {
       type: DataTypes.STRING,
       field: 'email',
+      unique: true,
       validate: {
         isEmail: true,
       },
