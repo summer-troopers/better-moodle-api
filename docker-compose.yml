@@ -1,15 +1,20 @@
 version: '3'
 services:
   db:
+    container_name: student_moodle_db
     image: mysql:5.7
     ports:
       - 3306:3306
     environment:
       - MYSQL_ROOT_PASSWORD=parola
   node:
+    container_name: student_moodle
     build: .
     ports:
-      - 80:80
+      - 80:8080
     tty: true
-    volumes:
-      - .:/usr/src/app
+    links:
+        - db
+    environment:
+      - MYSQL_URI=mysql://root:parola@db:3306/moodle
+      - PORT=8080
