@@ -1,9 +1,5 @@
 const bcrypt = require('bcrypt');
 
-module.exports = {
-  crypt: bcryptPassword,
-  compare: comparePassword,
-};
 function bcryptPassword(password, callback) {
   bcrypt.genSalt(10, (err, salt) => {
     if (err) return callback(err);
@@ -17,3 +13,8 @@ function comparePassword(plainPass, hash, callback) {
     return err == null ? callback(null, isPasswordMatch) : callback(err);
   });
 }
+
+module.exports = {
+  crypt: bcryptPassword,
+  compare: comparePassword,
+};

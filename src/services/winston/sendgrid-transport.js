@@ -2,7 +2,7 @@
 
 const winston = require('winston');
 const config = require('config');
-const sendGridMail = require('../mail/sendgrid.mail');
+const sendGridMail = require('../mail/sendgrid-mail');
 
 
 module.exports = class SendGridTransport extends winston.Transport {
@@ -10,12 +10,12 @@ module.exports = class SendGridTransport extends winston.Transport {
     super(options);
     this.name = 'SendGridLogger';
     this.mailServer = sendGridMail;
-    this.destMails = (options && options.destMails)
+    this.destinationEmails = (options && options.destinationEmails)
       || config.errorEmails.split(';');
   }
 
 
   log(level, msg, meta, callback) {
-    this.mailServer.send(msg, this.destMails, callback);
+    this.mailServer.send(msg, this.destinationEmails, callback);
   }
 };

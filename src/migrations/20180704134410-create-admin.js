@@ -4,7 +4,6 @@ module.exports = {
   up(queryInterface, Sequelize) {
     return queryInterface.createTable('admins', {
       id: {
-        allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER,
@@ -12,16 +11,21 @@ module.exports = {
       firstName: {
         type: Sequelize.STRING,
         field: 'first_name',
+        allowNull: false,
       },
       lastName: {
         type: Sequelize.STRING,
         field: 'last_name',
+        allowNull: false,
       },
       email: {
         type: Sequelize.STRING,
+        allowNull: false,
+        unique: true,
       },
       password: {
         type: Sequelize.STRING,
+        allowNull: false,
       },
       phoneNumber: {
         type: Sequelize.STRING,

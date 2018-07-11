@@ -1,54 +1,73 @@
 'use strict';
 
 const express = require('express');
+const errors = require('@feathersjs/errors');
 
-module.exports = function createRoute(repo) {
+module.exports = function createRoute(repository) {
   const router = express.Router();
 
   router.route('/')
-    .get(list)
-    .post(add);
+    .get(list) // eslint-disable-line no-use-before-define
+    .post(add); // eslint-disable-line no-use-before-define
 
   router.route('/:id')
-    .get(view)
-    .put(update)
-    .delete(remove);
+    .get(view) // eslint-disable-line no-use-before-define
+    .put(update) // eslint-disable-line no-use-before-define
+    .delete(remove); // eslint-disable-line no-use-before-define
 
-  async function list(req, res) {
-    const result = await repo.list();
-    res.json(result);
+  function list(request, response, next) {
+    repository.list()
+      .then((result) => {
+        response.json(result);
+      })
+      .catch(next);
   }
 
-  async function view(req, res) {
-    const result = await repo.view(req.params.id);
-    if (result.error !== undefined) {
-      res.status(404).json(result);
-    } else {
-      res.json(result);
-    }
+  function view(request, response, next) {
+    if (!request.params.id) throw new errors.BadRequest('ID_NOT_RECEIVED');
+    repository.view(request.params.id)
+      .then((result) => {
+        response.json(result);
+      })
+      .catch((error) => {
+        if (error.message === 'ID_NOT_FOUND') return next(new errors.NotFound(error.message));
+        return next(new errors.BadRequest(error.message));
+      });
   }
 
-  async function add(req, res) {
-    const result = await repo.add(req.body);
-    res.json(result);
+  function add(request, response, next) {
+    repository.add(request.body)
+      .then((result) => {
+        response.json(result);
+      })
+      .catch((error) => {
+        if (error.message === 'ID_NOT_FOUND') return next(new errors.NotFound(error.message));
+        return next(new errors.BadRequest(error.message));
+      });
   }
 
-  async function remove(req, res) {
-    const result = await repo.remove(req.params.id);
-    if (result.error !== undefined) {
-      res.status(404).json(result);
-    } else {
-      res.json(result);
-    }
+  function remove(request, response, next) {
+    if (!request.params.id) throw new errors.BadRequest('ID_NOT_RECEIVED');
+    repository.remove(request.params.id)
+      .then((result) => {
+        response.json(result);
+      })
+      .catch((error) => {
+        if (error.message === 'ID_NOT_FOUND') return next(new errors.NotFound(error.message));
+        return next(new errors.BadRequest(error.message));
+      });
   }
 
-  async function update(req, res) {
-    const result = await repo.update(req.params.id, req.body);
-    if (result.error !== undefined) {
-      res.status(404).json(result);
-    } else {
-      res.json(result);
-    }
+  function update(request, response, next) {
+    if (!request.params.id) throw new errors.BadRequest('ID_NOT_RECEIVED');
+    repository.update(request.params.id, request.body)
+      .then((result) => {
+        response.json(result);
+      })
+      .catch((error) => {
+        if (error.message === 'ID_NOT_FOUND') return next(new errors.NotFound(error.message));
+        return next(new errors.BadRequest(error.message));
+      });
   }
 
   return router;

@@ -8,10 +8,14 @@ module.exports = function defineGroup(sequelize, DataTypes) {
       primaryKey: true,
       type: DataTypes.INTEGER,
     },
-    name: { type: DataTypes.STRING },
-    idSpeciality: {
+    name: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    idSpecialty: {
       type: DataTypes.INTEGER,
-      field: 'id_speciality',
+      field: 'id_specialty',
+      allowNull: false,
       foreignKey: true,
     },
 
@@ -21,7 +25,7 @@ module.exports = function defineGroup(sequelize, DataTypes) {
   });
   Group.associate = function associateGroup(models) {
     Group.hasMany(models.Student, { foreignKey: 'id' });
-    Group.belongsTo(models.Speciality, { foreignKey: 'id' });
+    Group.belongsTo(models.Specialty, { foreignKey: 'id' });
   };
   return Group;
 };

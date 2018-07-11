@@ -4,19 +4,20 @@ module.exports = {
   up(queryInterface, Sequelize) {
     return queryInterface.createTable('groups', {
       id: {
-        allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER,
       },
       name: {
         type: Sequelize.STRING,
+        allowNull: false,
       },
-      idSpecialities: {
+      idSpecialty: {
         type: Sequelize.INTEGER,
-        field: 'id_speciality',
+        field: 'id_specialty',
+        allowNull: false,
         references: {
-          model: 'specialities',
+          model: 'specialties',
           key: 'id',
         },
       },

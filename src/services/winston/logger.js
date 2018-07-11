@@ -2,7 +2,7 @@
 
 const appRoot = require('app-root-path');
 const winston = require('winston');
-const SendGridTransport = require('./sendgrid.transport');
+const SendGridTransport = require('./sendgrid-transport');
 
 const opt = {
   file: {

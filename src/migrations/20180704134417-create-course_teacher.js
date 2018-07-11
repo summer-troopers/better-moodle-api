@@ -5,6 +5,7 @@ module.exports = {
     return queryInterface.createTable('courses_teachers', {
       idCourse: {
         type: Sequelize.INTEGER,
+        allowNull: false,
         primaryKey: true,
         field: 'id_course',
         references: {
@@ -14,6 +15,7 @@ module.exports = {
       },
       idTeacher: {
         type: Sequelize.INTEGER,
+        allowNull: false,
         primaryKey: true,
         field: 'id_teacher',
         references: {

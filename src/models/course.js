@@ -13,6 +13,7 @@ module.exports = function defineCourse(sequelize, DataTypes) {
       validate: {
         len: [1, 50],
       },
+      allowNull: false,
     },
   }, {
     tableName: 'courses',

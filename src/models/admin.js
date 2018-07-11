@@ -14,6 +14,7 @@ module.exports = function defineAdmin(sequelize, DataTypes) {
       validate: {
         len: [1, 50],
       },
+      allowNull: false,
     },
     lastName: {
       type: DataTypes.STRING,
@@ -21,9 +22,11 @@ module.exports = function defineAdmin(sequelize, DataTypes) {
       validate: {
         len: [1, 50],
       },
+      allowNull: false,
     },
     password: {
       type: DataTypes.STRING,
+      allowNull: false,
       validate: {
         len: [8, 16],
       },
@@ -43,6 +46,7 @@ module.exports = function defineAdmin(sequelize, DataTypes) {
       validate: {
         isEmail: true,
       },
+      allowNull: false,
     },
   }, {
     tableName: 'admins',

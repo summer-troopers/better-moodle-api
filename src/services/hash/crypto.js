@@ -1,10 +1,5 @@
 const crypto = require('crypto');
 
-module.exports = {
-  crypt: cryptoPassword,
-  compare: comparePassword,
-};
-
 function cryptoPassword(password, callback) {
   return crypto.pbkdf2(password, 'salt', 100000, 64, 'sha512', (err, derivedKey) => {
     if (err) throw err;
@@ -19,3 +14,8 @@ function comparePassword(password, hash) {
   if (newHash === hash) return true;
   return false;
 }
+
+module.exports = {
+  crypt: cryptoPassword,
+  compare: comparePassword,
+};

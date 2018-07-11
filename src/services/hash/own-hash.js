@@ -1,6 +1,6 @@
 module.exports = {
-  crypt: getHash,
-  compare: comparePassword,
+  crypt: getHash, // eslint-disable-line no-use-before-define
+  compare: comparePassword, // eslint-disable-line no-use-before-define
 };
 
 /* eslint-disable */
@@ -87,7 +87,7 @@ function getHash(pass) {
     return temp;
   }());
 
-  async function devideSection() {
+  async function divideSection() {
     let row1 = temp[0];
     let row5 = temp[4];
     let row9 = temp[8];
@@ -181,7 +181,7 @@ function getHash(pass) {
       }
     }
   }
-  devideSection();
+  divideSection();
 
   async function mostImportantDigit() {
     function shiftZero(row) {

@@ -8,9 +8,9 @@ const { createMessage } = require('../../helpers/util');
 sgMail.setApiKey(config.sendgridApiKey);
 
 module.exports = {
-  send(msg, destMails, callback) {
+  send(msg, destinationEmails, callback) {
     const promises = [];
-    destMails.forEach((mail) => {
+    destinationEmails.forEach((mail) => {
       const message = createMessage(mail, 'server@windows.com', 'Server error',
         msg);
       promises.push(sgMail.send(message));

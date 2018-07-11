@@ -15,4 +15,11 @@ module.exports = {
     host: process.env.SEQUELIZE_HOST || 'localhost',
     dialect: process.env.SEQUELIZE_DIALECT || 'mysql',
   },
+
+  jwtconf: {
+    secret: 'supersecret',
+    time: {
+      expiresIn: 86400,
+    },
+  },
 };

@@ -11,6 +11,7 @@ module.exports = function defineStudent(sequelize, DataTypes) {
     firstName: {
       type: DataTypes.STRING,
       field: 'first_name',
+      allowNull: false,
       validate: {
         len: [1, 50],
       },
@@ -18,12 +19,14 @@ module.exports = function defineStudent(sequelize, DataTypes) {
     lastName: {
       type: DataTypes.STRING,
       field: 'last_name',
+      allowNull: false,
       validate: {
         len: [1, 50],
       },
     },
     password: {
       type: DataTypes.STRING,
+      allowNull: false,
       validate: {
         len: [8, 16],
       },
@@ -39,6 +42,7 @@ module.exports = function defineStudent(sequelize, DataTypes) {
     email: {
       type: DataTypes.STRING,
       field: 'email',
+      allowNull: false,
       unique: true,
       validate: {
         isEmail: true,
@@ -46,6 +50,7 @@ module.exports = function defineStudent(sequelize, DataTypes) {
     },
     idGroup: {
       type: DataTypes.INTEGER,
+      allowNull: false,
       field: 'id_group',
       foreignKey: true,
     },

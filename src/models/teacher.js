@@ -11,6 +11,7 @@ module.exports = function defineTeacher(sequelize, DataTypes) {
     firstName: {
       type: DataTypes.STRING,
       field: 'first_name',
+      allowNull: false,
       validate: {
         len: [1, 50],
       },
@@ -18,12 +19,14 @@ module.exports = function defineTeacher(sequelize, DataTypes) {
     lastName: {
       type: DataTypes.STRING,
       field: 'last_name',
+      allowNull: false,
       validate: {
         len: [1, 50],
       },
     },
     password: {
       type: DataTypes.STRING,
+      allowNull: false,
       validate: {
         len: [8, 16],
       },
@@ -40,6 +43,7 @@ module.exports = function defineTeacher(sequelize, DataTypes) {
       type: DataTypes.STRING,
       field: 'email',
       unique: true,
+      allowNull: false,
       validate: {
         isEmail: true,
       },

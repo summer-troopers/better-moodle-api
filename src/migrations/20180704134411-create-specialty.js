@@ -2,9 +2,8 @@
 
 module.exports = {
   up(queryInterface, Sequelize) {
-    return queryInterface.createTable('specialities', {
+    return queryInterface.createTable('specialties', {
       id: {
-        allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER,
@@ -12,9 +11,10 @@ module.exports = {
       name: {
         type: Sequelize.STRING,
         field: 'name',
+        allowNull: false,
       },
     });
   },
   // eslint-disable-next-line no-unused-vars
-  down(queryInterface, Sequelize) { return queryInterface.dropTable('specialities'); },
+  down(queryInterface, Sequelize) { return queryInterface.dropTable('specialties'); },
 };

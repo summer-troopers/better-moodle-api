@@ -1,6 +1,6 @@
 const config = require('config');
-const createConnection = require('./src//services/connectors/connector.factory');
-const winston = require('./src/services/winston/winston');
+const createConnection = require('./src//services/connectors/connector-factory');
+const logger = require('./src/services/winston/logger');
 
 createConnection()
   .connect()
@@ -10,7 +10,7 @@ createConnection()
     const { port, host } = config;
 
     app.listen(port, host, () => {
-      winston.info(`Server started on: ${port}, host: ${host}`);
+      logger.info(`Server started on: ${port}, host: ${host}`);
     });
   })
-  .catch(winston.error);
+  .catch(logger.error);
