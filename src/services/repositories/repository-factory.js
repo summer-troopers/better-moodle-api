@@ -6,31 +6,27 @@ module.exports = function createRepository(model) {
   }
 
   async function view(id) {
-    const result = await model.findOne({ where: { id } });
-    if (!result) throw new Error('ID_NOT_FOUND');
-
-    return result;
+    return model.findOne({ where: { id } });
   }
 
   function add(form) {
     return model.create(form);
   }
 
-
-  async function update(id, form) {
-    const result = await model.update(form, {
-      where: { id },
-    });
-    if (result[0] === 0) throw new Error('ID_NOT_FOUND');
-
-    return result;
+  async function exists(id) {
+    const result = await model.findById(id);
+    if (result) return true;
+    return false;
   }
 
-  async function remove(id) {
-    const result = await model.destroy({ where: { id } });
-    if (!result) throw new Error('ID_NOT_FOUND');
+  async function update(id, form) {
+    return model.update(form, {
+      where: { id },
+    });
+  }
 
-    return result;
+  function remove(id) {
+    return model.destroy({ where: { id } });
   }
 
   return {
@@ -39,5 +35,6 @@ module.exports = function createRepository(model) {
     add,
     update,
     remove,
+    exists,
   };
 };

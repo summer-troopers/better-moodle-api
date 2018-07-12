@@ -10,10 +10,22 @@ module.exports = function createRoute(repository) {
     .get(list) // eslint-disable-line no-use-before-define
     .post(add); // eslint-disable-line no-use-before-define
 
+  router.param('id', validateId); // eslint-disable-line no-use-before-define
+
   router.route('/:id')
     .get(view) // eslint-disable-line no-use-before-define
     .put(update) // eslint-disable-line no-use-before-define
     .delete(remove); // eslint-disable-line no-use-before-define
+
+  function validateId(request, response, next, id) {
+    if (!id) return next(new errors.BadRequest('ID_NOT_RECEIVED'));
+    return repository.exists(id)
+      .then((result) => {
+        if (!result) return next(new errors.NotFound('ID_NOT_FOUND'));
+        return next();
+      })
+      .catch(next);
+  }
 
   function list(request, response, next) {
     repository.list()
@@ -24,15 +36,11 @@ module.exports = function createRoute(repository) {
   }
 
   function view(request, response, next) {
-    if (!request.params.id) throw new errors.BadRequest('ID_NOT_RECEIVED');
     repository.view(request.params.id)
       .then((result) => {
         response.json(result);
       })
-      .catch((error) => {
-        if (error.message === 'ID_NOT_FOUND') return next(new errors.NotFound(error.message));
-        return next(new errors.BadRequest(error.message));
-      });
+      .catch(next);
   }
 
   function add(request, response, next) {
@@ -40,34 +48,23 @@ module.exports = function createRoute(repository) {
       .then((result) => {
         response.json(result);
       })
-      .catch((error) => {
-        if (error.message === 'ID_NOT_FOUND') return next(new errors.NotFound(error.message));
-        return next(new errors.BadRequest(error.message));
-      });
+      .catch(next);
   }
 
   function remove(request, response, next) {
-    if (!request.params.id) throw new errors.BadRequest('ID_NOT_RECEIVED');
     repository.remove(request.params.id)
       .then((result) => {
         response.json(result);
       })
-      .catch((error) => {
-        if (error.message === 'ID_NOT_FOUND') return next(new errors.NotFound(error.message));
-        return next(new errors.BadRequest(error.message));
-      });
+      .catch(next);
   }
 
   function update(request, response, next) {
-    if (!request.params.id) throw new errors.BadRequest('ID_NOT_RECEIVED');
     repository.update(request.params.id, request.body)
       .then((result) => {
         response.json(result);
       })
-      .catch((error) => {
-        if (error.message === 'ID_NOT_FOUND') return next(new errors.NotFound(error.message));
-        return next(new errors.BadRequest(error.message));
-      });
+      .catch(next);
   }
 
   return router;
