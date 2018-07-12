@@ -2,11 +2,25 @@
 
 const roles = require('../helpers/constants/roles');
 
-module.exports = function getAuthenticationRepository(sequelize) {
+module.exports = function getUserRepository(sequelize) {
   const { Teacher, Admin, Student } = sequelize.models;
 
   function selectUserDB(user, model) {
     return model.findOne({ where: { email: user.email, password: user.password } });
+  }
+
+  async function exists(id, role) { // eslint-disable-line complexity
+    if (role === roles.STUDENT) {
+      const result = await Student.findById(id);
+      if (result) return true;
+    } else if (role === roles.TEACHER) {
+      const result = await Teacher.findById(id);
+      if (result) return true;
+    } else if (role === roles.ADMIN) {
+      const result = await Admin.findById(id);
+      if (result) return true;
+    }
+    return false;
   }
 
   async function returnUser(form) {
@@ -24,5 +38,6 @@ module.exports = function getAuthenticationRepository(sequelize) {
 
   return {
     returnUser,
+    exists,
   };
 };

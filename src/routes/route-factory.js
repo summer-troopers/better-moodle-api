@@ -4,7 +4,7 @@ const express = require('express');
 const errors = require('@feathersjs/errors');
 const hashFactory = require('../helpers/hash/hash-factory')();
 
-module.exports = function createRoute(repository) {
+module.exports = function createRoute(repository, createPermissions) {
   const router = express.Router();
 
   router.route('/')
@@ -30,13 +30,13 @@ module.exports = function createRoute(repository) {
 
   async function hashPassword(request, response, next) {
     if (!request.body.password) return next();
-    const hashedPassword = await hashFactory.encrypt(request.body.password);
-    request.body.password = hashedPassword;
+    request.body.password = await hashFactory.encrypt(request.body.password);
     return next();
   }
 
-  function list(request, response, next) {
-    repository.list()
+  async function list(request, response, next) {
+    if (!createPermissions[request.token.role].read) return next(new errors.Forbidden());
+    return repository.list()
       .then((result) => {
         response.json(result);
       })
@@ -44,7 +44,8 @@ module.exports = function createRoute(repository) {
   }
 
   function view(request, response, next) {
-    repository.view(request.params.id)
+    if (!createPermissions[request.token.role].read) return next(new errors.Forbidden());
+    return repository.view(request.params.id)
       .then((result) => {
         response.json(result);
       })
@@ -52,7 +53,8 @@ module.exports = function createRoute(repository) {
   }
 
   function add(request, response, next) {
-    repository.add(request.body)
+    if (!createPermissions[request.token.role].write) return next(new errors.Forbidden());
+    return repository.add(request.body)
       .then((result) => {
         response.json(result);
       })
@@ -60,7 +62,8 @@ module.exports = function createRoute(repository) {
   }
 
   function remove(request, response, next) {
-    repository.remove(request.params.id)
+    if (!createPermissions[request.token.role].write) return next(new errors.Forbidden());
+    return repository.remove(request.params.id)
       .then((result) => {
         response.json(result);
       })
@@ -68,7 +71,8 @@ module.exports = function createRoute(repository) {
   }
 
   function update(request, response, next) {
-    repository.update(request.params.id, request.body)
+    if (!createPermissions[request.token.role].write) return next(new errors.Forbidden());
+    return repository.update(request.params.id, request.body)
       .then((result) => {
         response.json(result);
       })
