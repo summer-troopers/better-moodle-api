@@ -2,6 +2,7 @@
 
 const express = require('express');
 const bodyParser = require('body-parser');
+const cors = require('cors');
 
 const morgan = require('morgan');
 const winston = require('../src/services/winston/winston');
@@ -21,6 +22,7 @@ module.exports = function getApp(connection) {
   const groupRepo = createRepository(connection.models.Group);
   const specialityRepo = createRepository(connection.models.Speciality);
 
+  app.use(cors());
   app.use(bodyParser.json());
   app.use(bodyParser.urlencoded({ extended: true }));
 

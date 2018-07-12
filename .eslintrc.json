@@ -1,19 +1,33 @@
 {
-    "extends": "airbnb-base",
-    "rules": {
-      "linebreak-style": [
-        "off",
-        "windows"
-      ],
-      "no-unused-vars": "warn",
-      "global-require": "warn",
-      "no-use-before-define": "off",
-      "arrow-body-style": "off",
-      "strict": "off",
-      "complexity": [
-        "error",
-        4
-      ],
-      "no-useless-escape" : "off"
-    }
+  "plugins": [
+    "spellcheck"
+  ],
+  "extends": "airbnb-base",
+  "rules": {
+    "spellcheck/spell-checker": [
+      1,
+      {
+        "comments": true,
+        "strings": true,
+        "identifiers": true,
+        "lang": "en_US",
+        "minLength": 3
+      }
+    ],
+    "linebreak-style": [
+      "off",
+      "windows"
+    ],
+    "no-unused-vars": "warn",
+    "global-require": "warn",
+    "no-use-before-define": "warn",
+    "no-useless-escape": "warn",
+    "no-undef": "off",
+    "arrow-body-style": "off",
+    "strict": "off",
+    "complexity": [
+      "error",
+      4
+    ]
+  }
 }
