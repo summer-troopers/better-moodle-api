@@ -11,6 +11,13 @@ module.exports = {
 
 function generate50Teachers() {
   const teachers = [];
+  teachers.push({
+    first_name: 'teacher',
+    last_name: 'teacher',
+    email: 'teacher@email.com',
+    password: 'teacher',
+    phone_number: '689-689-0681',
+  });
   for (let i = 1; i <= 50; i += 1) {
     teachers.push({
       first_name: faker.name.firstName(),

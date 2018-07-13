@@ -11,6 +11,9 @@ module.exports = {
 
 function generate50Specialties() {
   const specialties = [];
+  specialties.push({
+    name: 'Developer',
+  });
   for (let i = 1; i <= 50; i += 1) {
     specialties.push({
       name: faker.name.jobDescriptor(),

@@ -133,7 +133,7 @@ paths:
           description: "success"
           schema:
             type: "string"
-        400:
+        404:
           description: "error"
     post:
       summary: "Add a group in the DB."
@@ -162,7 +162,7 @@ paths:
           description: "success"
           schema:
             type: "string"
-        400:
+        404:
           description: "error"
     post:
       summary: "Add a group in the DB."
@@ -197,7 +197,7 @@ paths:
           description: "success"
           schema:
             type: "string"
-        400:
+        404:
           description: "error"
     delete:
       summary: "Delete an admin."
@@ -253,7 +253,7 @@ paths:
           description: "success"
           schema:
             type: "string"
-        400:
+        404:
           description: "error"
     delete:
       summary: "Delete a teacher."
@@ -309,7 +309,7 @@ paths:
           description: "success"
           schema:
             type: "string"
-        400:
+        404:
           description: "error"
     delete:
       summary: "Delete a student."
@@ -365,7 +365,7 @@ paths:
           description: "success"
           schema:
             type: "string"
-        400:
+        404:
           description: "error"
     delete:
       summary: "Delete a course."
@@ -421,7 +421,7 @@ paths:
           description: "success"
           schema:
             type: "string"
-        400:
+        404:
           description: "error"
     delete:
       summary: "Delete a group."
@@ -477,7 +477,7 @@ paths:
           description: "success"
           schema:
             type: "string"
-        400:
+        404:
           description: "error"
     delete:
       summary: "Delete a speciality."

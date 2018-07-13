@@ -10,6 +10,14 @@ module.exports = {
 
 function generate50Students() {
   const students = [];
+  students.push({
+    first_name: 'student',
+    last_name: 'student',
+    email: 'student@email.com',
+    password: 'student',
+    phone_number: '689-689-0688',
+    id_group: '1',
+  });
   for (let i = 1; i <= 50; i += 1) {
     students.push({
       first_name: faker.name.firstName(),

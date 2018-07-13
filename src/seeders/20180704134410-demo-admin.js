@@ -11,6 +11,13 @@ module.exports = {
 
 function generate50Admins() {
   const admins = [];
+  admins.push({
+    first_name: 'admin',
+    last_name: 'admin',
+    email: 'admin@moodle.com',
+    password: 'admin',
+    phone_number: '000-581-5483',
+  });
   for (let i = 1; i <= 50; i += 1) {
     admins.push({
       first_name: faker.name.firstName(),

@@ -11,6 +11,7 @@ module.exports = {
 
 function generate50Courses() {
   const courses = [];
+  courses.push({ name: 'Artificial Intelligence' });
   for (let i = 1; i <= 50; i += 1) {
     courses.push({ name: faker.name.jobArea() });
   }
