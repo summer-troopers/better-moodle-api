@@ -1,6 +1,5 @@
 swagger: "2.0"
 info:
-  description: "Moodle App"
   version: "1.0.0"
   title: "Moodle App"
 host: "localhost:80"
@@ -162,7 +161,7 @@ paths:
           description: "success"
           schema:
             type: "string"
-        404:
+        400:
           description: "error"
     post:
       summary: "Add a group in the DB."
@@ -212,7 +211,7 @@ paths:
       responses:
         200:
           description: "success"
-        400:
+        404:
           description: "error"
     put:
       summary: "Update the data  of an admin."
@@ -268,7 +267,7 @@ paths:
       responses:
         200:
           description: "success"
-        400:
+        404:
           description: "error"
     put:
       summary: "Update the data  of an teacher."
@@ -324,7 +323,7 @@ paths:
       responses:
         200:
           description: "success"
-        400:
+        404:
           description: "error"
     put:
       summary: "Update the data  of an student."
@@ -436,7 +435,7 @@ paths:
       responses:
         200:
           description: "success"
-        400:
+        404:
           description: "error"
     put:
       summary: "Update the data  of a group."
@@ -492,7 +491,7 @@ paths:
       responses:
         200:
           description: "success"
-        400:
+        404:
           description: "error"
     put:
       summary: "Update the data  of a speciality."
