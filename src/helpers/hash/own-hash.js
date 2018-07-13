@@ -1,5 +1,5 @@
 module.exports = {
-  crypt: getHash, // eslint-disable-line no-use-before-define
+  encrypt: getHash, // eslint-disable-line no-use-before-define
   compare: comparePassword, // eslint-disable-line no-use-before-define
 };
 

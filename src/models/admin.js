@@ -27,9 +27,6 @@ module.exports = function defineAdmin(sequelize, DataTypes) {
     password: {
       type: DataTypes.STRING,
       allowNull: false,
-      validate: {
-        len: [8, 16],
-      },
     },
     phoneNumber: {
       type: DataTypes.STRING,

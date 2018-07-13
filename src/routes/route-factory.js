@@ -2,19 +2,20 @@
 
 const express = require('express');
 const errors = require('@feathersjs/errors');
+const hashFactory = require('../helpers/hash/hash-factory')();
 
 module.exports = function createRoute(repository) {
   const router = express.Router();
 
   router.route('/')
     .get(list) // eslint-disable-line no-use-before-define
-    .post(add); // eslint-disable-line no-use-before-define
+    .post(hashPassword, add); // eslint-disable-line no-use-before-define
 
   router.param('id', validateId); // eslint-disable-line no-use-before-define
 
   router.route('/:id')
     .get(view) // eslint-disable-line no-use-before-define
-    .put(update) // eslint-disable-line no-use-before-define
+    .put(hashPassword, update) // eslint-disable-line no-use-before-define
     .delete(remove); // eslint-disable-line no-use-before-define
 
   function validateId(request, response, next, id) {
@@ -25,6 +26,13 @@ module.exports = function createRoute(repository) {
         return next();
       })
       .catch(next);
+  }
+
+  async function hashPassword(request, response, next) {
+    if (!request.body.password) return next();
+    const hashedPassword = await hashFactory.encrypt(request.body.password);
+    request.body.password = hashedPassword;
+    return next();
   }
 
   function list(request, response, next) {

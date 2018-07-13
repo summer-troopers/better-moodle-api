@@ -47,7 +47,7 @@ module.exports = function getApp(connection) {
    app.use((err, request, response, next) => {
     const error = err;
     error.code = err.code || 400;
-    return response.status(error.code).json(error.message);
+    return response.status(error.code).json(error);
   });
 
   return app;

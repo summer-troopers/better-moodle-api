@@ -7,7 +7,11 @@ module.exports = {
   host: process.env.HOST || '0.0.0.0',
   errorEmails: process.env.ERROR_EMAILS || '',
   hashModule: process.env.CRYPTO_ALG || 'OWN_HASH',
+<<<<<<< HEAD
   debug_logger: process.env.DEBUG_LOGGER || false,
+=======
+  salt: process.env.SALT || 'salt',
+>>>>>>> the passwords will be hashed when inserted in the db
 
   development: {
     username: process.env.SEQUELIZE_USER || 'root',

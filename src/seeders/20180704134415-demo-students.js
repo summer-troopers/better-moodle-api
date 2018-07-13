@@ -1,20 +1,21 @@
 const faker = require('faker');
+const hashFactory = require('../helpers/hash/hash-factory')();
 
 module.exports = {
   // eslint-disable-next-line no-unused-vars, no-use-before-define
-  up(queryInterface, Sequelize) { return queryInterface.bulkInsert('students', generate50Students(), {}); },
+  async up(queryInterface, Sequelize) { return queryInterface.bulkInsert('students', generate50Students(), {}); },
   // eslint-disable-next-line no-unused-vars
   down(queryInterface, Sequelize) { return queryInterface.bulkDelete('students', null, {}); },
 };
 
 
-function generate50Students() {
+async function generate50Students() {
   const students = [];
   students.push({
     first_name: 'student',
     last_name: 'student',
     email: 'student@email.com',
-    password: 'student',
+    password: await hashFactory.encrypt('student'),
     phone_number: '689-689-0688',
     id_group: '1',
   });
@@ -23,7 +24,7 @@ function generate50Students() {
       first_name: faker.name.firstName(),
       last_name: faker.name.lastName(),
       email: faker.internet.email(),
-      password: faker.internet.password(8, 16),
+      password: faker.random.alphaNumeric(60),
       phone_number: faker.phone.phoneNumberFormat(0),
       id_group: faker.random.number(10) + 1,
     });
