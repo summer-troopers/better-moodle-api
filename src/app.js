@@ -59,3 +59,8 @@ module.exports = function getApp(connection) {
 
   return app;
 };
+
+function permission(string) {
+  const admin;
+  
+}

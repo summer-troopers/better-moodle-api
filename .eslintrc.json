@@ -62,6 +62,7 @@
     "no-undef": "off",
     "arrow-body-style": "off",
     "strict": "off",
+    "max-len": "off",
     "complexity": [
       "error",
       4
