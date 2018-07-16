@@ -1,3 +1,5 @@
+'use strict';
+
 const config = require('config');
 const createConnection = require('./src//services/connectors/connector-factory');
 const logger = require('./src/services/winston/logger');
