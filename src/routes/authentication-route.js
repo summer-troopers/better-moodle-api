@@ -5,7 +5,7 @@ const jwt = require('jsonwebtoken');
 const config = require('config');
 
 module.exports = function createUserRoute(connection) {
-  const repository = require('../services/repositories/user-repository')(connection); // eslint-disable-line global-require
+  const repository = require('../repositories/user-repository')(connection); // eslint-disable-line global-require
 
   const router = express.Router();
 

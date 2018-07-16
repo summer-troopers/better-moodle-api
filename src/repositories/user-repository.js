@@ -1,6 +1,6 @@
 'use strict';
 
-const roles = require('../../helpers/constants/roles');
+const roles = require('../helpers/constants/roles');
 
 module.exports = function getAuthenticationRepository(sequelize) {
   const { Teacher, Admin, Student } = sequelize.models;
