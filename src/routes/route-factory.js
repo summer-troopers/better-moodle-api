@@ -31,7 +31,12 @@ module.exports = function createRoute(repository) {
   function list(request, response, next) {
     repository.list(request.query)
       .then((result) => {
-        response.json(result);
+        response.json({
+          total: result.length,
+          limit: request.query.limit,
+          offset: request.query.offset,
+          data: result,
+        });
       })
       .catch(next);
   }

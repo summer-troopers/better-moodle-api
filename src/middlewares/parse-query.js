@@ -8,4 +8,4 @@ module.exports = function parseQueryParams(request, response, next) {
   if (!request.query.contains) request.query.contains = '';
 
   next();
-}
+};
