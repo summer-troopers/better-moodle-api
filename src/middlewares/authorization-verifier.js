@@ -11,10 +11,11 @@ module.exports = function createAuthorizationVerifier(userRepository) {
 
   // eslint-disable-next-line complexity
   function extractAuthorizationToken(request, response, next) {
-    const token = request.headers.token || request.json.token || request.body.token;
+    const token = request.headers.token || request.body.token;
     if (!token) return next(new errors.Forbidden());
     try {
       request.token = jwt.verify(token, config.jwtconf.secret);
+      if (typeof request.token.user === 'object' || !request.token.role) throw new errors.Forbidden();
     } catch (err) {
       return next(new errors.Forbidden());
     }
