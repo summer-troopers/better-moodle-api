@@ -9,7 +9,7 @@ const logger = require('../src/services/winston/logger');
 
 const importModels = require('./models/import');
 const createRoute = require('./routes/route-factory');
-const createRepository = require('./services/repositories/repository-factory');
+const createRepository = require('./repositories/repository-factory');
 
 
 module.exports = function getApp(connection) {
