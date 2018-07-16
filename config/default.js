@@ -7,6 +7,7 @@ module.exports = {
   host: process.env.HOST || '0.0.0.0',
   errorEmails: process.env.ERROR_EMAILS || '',
   hashModule: process.env.CRYPTO_ALG || 'OWN_HASH',
+  debug: process.env.DEBUG || false,
 
   development: {
     username: process.env.SEQUELIZE_USER || 'root',
