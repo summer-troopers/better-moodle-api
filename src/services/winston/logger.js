@@ -4,7 +4,7 @@
 
 const config = require('config');
 
-if (config.debug) {
+if (config.debug_logger) {
   module.exports = console;
 } else {
   const winston = require('winston');
