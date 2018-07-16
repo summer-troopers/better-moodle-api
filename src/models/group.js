@@ -11,6 +11,9 @@ module.exports = function defineGroup(sequelize, DataTypes) {
     name: {
       type: DataTypes.STRING,
       allowNull: false,
+      validate: {
+        len: [1, 50],
+      },
     },
     idSpecialty: {
       type: DataTypes.INTEGER,

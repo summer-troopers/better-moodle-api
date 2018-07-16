@@ -47,7 +47,9 @@
           "util",
           "msg",
           "maxsize",
-          "param"
+          "param",
+          "middlewares",
+          "verifier"
 
         ]
       }
