@@ -3,6 +3,7 @@
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const express = require('express');
+const roles = require('./helpers/constants/roles');
 
 const morgan = require('morgan');
 const swaggerUi = require('swagger-ui-express');
@@ -59,8 +60,3 @@ module.exports = function getApp(connection) {
 
   return app;
 };
-
-function permission(string) {
-  const admin;
-  
-}
