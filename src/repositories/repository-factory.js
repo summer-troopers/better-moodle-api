@@ -1,8 +1,21 @@
 'use strict';
 
+const Sequelize = require('sequelize');
+
+const { Op } = Sequelize;
+
 module.exports = function createRepository(model) {
-  function list() {
-    return model.findAll({});
+  function list(queryParams) {
+    const { limit, offset, contains } = queryParams;
+    return model.findAll({
+      offset,
+      limit,
+      where: {
+        name: {
+          [Op.like]: [`%${contains}%`],
+        },
+      },
+    });
   }
 
   async function view(id) {

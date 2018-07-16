@@ -3,11 +3,12 @@
 const express = require('express');
 const errors = require('@feathersjs/errors');
 
+
 module.exports = function createRoute(repository) {
   const router = express.Router();
 
   router.route('/')
-    .get(list) // eslint-disable-line no-use-before-define
+    .get(parseQueryParams, list) // eslint-disable-line no-use-before-define
     .post(add); // eslint-disable-line no-use-before-define
 
   router.param('id', validateId); // eslint-disable-line no-use-before-define
@@ -27,8 +28,20 @@ module.exports = function createRoute(repository) {
       .catch(next);
   }
 
+  function parseQueryParams(request, response, next) {
+    if (!request.query.limit) request.query.limit = '50';
+    request.query.limit = parseInt(request.query.limit, 10);
+
+    if (!request.query.offset) request.query.offset = '0';
+    request.query.offset = parseInt(request.query.offset, 10);
+
+    if (!request.query.contains) request.query.contains = '';
+
+    next();
+  }
+
   function list(request, response, next) {
-    repository.list()
+    repository.list(request.query)
       .then((result) => {
         response.json(result);
       })
