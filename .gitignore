@@ -5,3 +5,4 @@ logs/
 .vs/
 _ttd_log_/
 rebuild-db.sh
+labs/

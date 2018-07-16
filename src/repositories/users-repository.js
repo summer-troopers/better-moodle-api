@@ -1,12 +1,13 @@
 'use strict';
 
+const { Op } = require('sequelize');
 const roles = require('../helpers/constants/roles');
 
-module.exports = function getUserRepository(sequelize) {
-  const { Teacher, Admin, Student } = sequelize.models;
+module.exports = function getUserRepository(models) {
+  const { Teacher, Admin, Student } = models;
 
   function selectUserDB(user, model) {
-    return model.findOne({ where: { email: user.email } });
+    return model.findOne({ where: { email: { [Op.eq]: user.email }, password: { [Op.eq]: user.password } } });
   }
 
   async function exists(id, role) { // eslint-disable-line complexity
