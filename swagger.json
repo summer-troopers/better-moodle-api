@@ -4,7 +4,7 @@
     "version": "1.0.0",
     "title": "Moodle App"
   },
-  "host": "10.177.106.10:80",
+  "host": "localhost",
   "schemes": [
     "http"
   ],
@@ -14,6 +14,24 @@
         "summary": "Get all admins",
         "produces": [
           "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "offset",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Nr. of items to skip before starting to collect results"
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Nr. of items to return"
+          }
         ],
         "responses": {
           "200": {
@@ -61,6 +79,24 @@
         "produces": [
           "application/json"
         ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "offset",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Nr. of items to skip before starting to collect results"
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Nr. of items to return"
+          }
+        ],
         "responses": {
           "200": {
             "description": "success",
@@ -106,6 +142,24 @@
         "summary": "Get all students",
         "produces": [
           "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "offset",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Nr. of items to skip before starting to collect results"
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Nr. of items to return"
+          }
         ],
         "responses": {
           "200": {
@@ -153,6 +207,32 @@
         "produces": [
           "application/json"
         ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "offset",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Nr. of items to skip before starting to collect results"
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Nr. of items to return"
+          },
+          {
+            "in": "query",
+            "name": "contains",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Part of the name to be searched for"
+          }
+        ],
         "responses": {
           "200": {
             "description": "success",
@@ -199,6 +279,32 @@
         "produces": [
           "application/json"
         ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "offset",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Nr. of items to skip before starting to collect results"
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Nr. of items to return"
+          },
+          {
+            "in": "query",
+            "name": "contains",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Part of the name to be searched for"
+          }
+        ],
         "responses": {
           "200": {
             "description": "success",
@@ -239,11 +345,37 @@
         }
       }
     },
-    "/api/v1/specialities": {
+    "/api/v1/specialties": {
       "get": {
-        "summary": "Get all specialities",
+        "summary": "Get all specialties",
         "produces": [
           "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "offset",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Nr. of items to skip before starting to collect results"
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Nr. of items to return"
+          },
+          {
+            "in": "query",
+            "name": "contains",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Part of the name to be searched for"
+          }
         ],
         "responses": {
           "200": {
@@ -271,7 +403,7 @@
             "name": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/Speciality"
+              "$ref": "#/definitions/Specialty"
             }
           }
         ],
@@ -720,9 +852,9 @@
         }
       }
     },
-    "/api/v1/specialities/{id}": {
+    "/api/v1/specialties/{id}": {
       "get": {
-        "summary": "Get all specialities",
+        "summary": "Get all specialties",
         "produces": [
           "application/json"
         ],
@@ -730,7 +862,7 @@
           {
             "name": "id",
             "in": "path",
-            "description": "ID of the speciality to be deleted.",
+            "description": "ID of the specialty to be deleted.",
             "required": true,
             "type": "integer"
           }
@@ -748,7 +880,7 @@
         }
       },
       "delete": {
-        "summary": "Delete a speciality.",
+        "summary": "Delete a specialty.",
         "produces": [
           "application/json"
         ],
@@ -756,7 +888,7 @@
           {
             "name": "id",
             "in": "path",
-            "description": "ID of the speciality to be deleted.",
+            "description": "ID of the specialty to be deleted.",
             "required": true,
             "type": "integer"
           }
@@ -771,7 +903,7 @@
         }
       },
       "put": {
-        "summary": "Update the data  of a speciality.",
+        "summary": "Update the data  of a specialty.",
         "consumes": [
           "application/json"
         ],
@@ -790,7 +922,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/Speciality"
+              "$ref": "#/definitions/Specialty"
             }
           }
         ],
@@ -923,7 +1055,7 @@
         }
       }
     },
-    "Speciality": {
+    "Specialty": {
       "type": "object",
       "required": [
         "name"
