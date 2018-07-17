@@ -31,7 +31,7 @@ describe('util', () => {
       to: 'to', from: 'from', subject: 'subject', text: 'text',
     });
   });
-  it('Permissions is validity', () => {
+  it('Should validate a permission', () => {
     const result = util.permissions('crud|r|r|');
     assert.deepStrictEqual(result, truePermissions);
   });
