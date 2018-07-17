@@ -13,11 +13,12 @@ module.exports = {
 
 async function generate50Teachers() {
   const teachers = [];
+  const hash = await hashFactory.encrypt('teacher');
   teachers.push({
     first_name: 'teacher',
     last_name: 'teacher',
     email: 'teacher@email.com',
-    password: await hashFactory.encrypt('teacher'),
+    password: await hash.toString('hex'),
     phone_number: '689-689-0681',
   });
   for (let i = 1; i <= 50; i += 1) {

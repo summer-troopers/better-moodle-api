@@ -6,7 +6,7 @@ module.exports = function getUserRepository(sequelize) {
   const { Teacher, Admin, Student } = sequelize.models;
 
   function selectUserDB(user, model) {
-    return model.findOne({ where: { email: user.email, password: user.password } });
+    return model.findOne({ where: { email: user.email } });
   }
 
   async function exists(id, role) { // eslint-disable-line complexity

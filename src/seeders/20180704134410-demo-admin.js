@@ -12,11 +12,12 @@ module.exports = {
 
 async function generate50Admins() {
   const admins = [];
+  const hash = await hashFactory.encrypt('admin');
   admins.push({
     first_name: 'admin',
     last_name: 'admin',
     email: 'admin@moodle.com',
-    password: await hashFactory.encrypt('admin'), // 'admin' - original password
+    password: await hash.toString('hex'), // 'admin' - original password
     phone_number: '000-581-5483',
   });
   for (let i = 1; i <= 50; i += 1) {
