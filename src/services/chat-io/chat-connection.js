@@ -1,19 +1,8 @@
 
-module.exports = function chat(req, res) {
-  const express = require('express');
-
-  const app = express();
-  const server = require('http').createServer(app);
-
-  const io = require('socket.io').listen(server);
-
+module.exports = function chat(io) {
   users = [];
   connections = [];
-
-  res.sendFile(`${__dirname}/index.html`);
-
-
-  io.sockets.on('connection', (socket) => {
+  io.on('connection', (socket) => {
     connections.push(socket);
     console.log('Connected: %s sockets connected', connections.length);
 
@@ -22,8 +11,8 @@ module.exports = function chat(req, res) {
       users.splice(users.indexOf(socket.username), 1);
       updateUsernames();
       connections.splice(connections.indexOf(socket), 1);
-      
-      console.log('Disconnected: %s sockets connected',connections.length);
+
+      console.log('Disconnected: %s sockets connected', connections.length);
     });
     // Send Message
     socket.on('send message', (data) => {
@@ -43,4 +32,4 @@ module.exports = function chat(req, res) {
       io.sockets.emit('get users', users);
     }
   });
-}
+};
