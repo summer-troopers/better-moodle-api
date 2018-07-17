@@ -258,7 +258,7 @@
         }
       },
       "post": {
-        "summary": "Add a group in the DB.",
+        "summary": "Add a speciality in the DB.",
         "consumes": [
           "application/json"
         ],
@@ -287,7 +287,7 @@
     },
     "/api/v1/admins/{id}": {
       "get": {
-        "summary": "Get admin by id.",
+        "summary": "Get an admin by id.",
         "produces": [
           "application/json"
         ],
@@ -295,7 +295,7 @@
           {
             "name": "id",
             "in": "path",
-            "description": "ID of the admin.",
+            "description": "Get the admin by ID.",
             "required": true,
             "type": "integer"
           }
@@ -313,7 +313,7 @@
         }
       },
       "delete": {
-        "summary": "Delete an admin.",
+        "summary": "Delete an admin by ID.",
         "produces": [
           "application/json"
         ],
@@ -336,7 +336,7 @@
         }
       },
       "put": {
-        "summary": "Update the data  of an admin.",
+        "summary": "Update the data of an admin.",
         "consumes": [
           "application/json"
         ],
@@ -382,7 +382,7 @@
           {
             "name": "id",
             "in": "path",
-            "description": "ID of the teacher.",
+            "description": "Get the teacher by ID.",
             "required": true,
             "type": "integer"
           }
@@ -400,7 +400,7 @@
         }
       },
       "delete": {
-        "summary": "Delete a teacher.",
+        "summary": "Delete a teacher by ID.",
         "produces": [
           "application/json"
         ],
@@ -423,7 +423,7 @@
         }
       },
       "put": {
-        "summary": "Update the data  of an teacher.",
+        "summary": "Update the data of an teacher.",
         "consumes": [
           "application/json"
         ],
@@ -461,7 +461,7 @@
     },
     "/api/v1/students/{id}": {
       "get": {
-        "summary": "Get all students",
+        "summary": "Get a student by ID.",
         "produces": [
           "application/json"
         ],
@@ -469,7 +469,7 @@
           {
             "name": "id",
             "in": "path",
-            "description": "ID of the student to be deleted.",
+            "description": "Get the student by ID.",
             "required": true,
             "type": "integer"
           }
@@ -487,7 +487,7 @@
         }
       },
       "delete": {
-        "summary": "Delete a student.",
+        "summary": "Delete a student by ID.",
         "produces": [
           "application/json"
         ],
@@ -510,7 +510,7 @@
         }
       },
       "put": {
-        "summary": "Update the data  of an student.",
+        "summary": "Update the data of an student.",
         "consumes": [
           "application/json"
         ],
@@ -548,7 +548,7 @@
     },
     "/api/v1/courses/{id}": {
       "get": {
-        "summary": "Get all courses",
+        "summary": "Get a course by ID.",
         "produces": [
           "application/json"
         ],
@@ -556,7 +556,7 @@
           {
             "name": "id",
             "in": "path",
-            "description": "ID of the course to be deleted.",
+            "description": "Get the course by ID.",
             "required": true,
             "type": "integer"
           }
@@ -574,7 +574,7 @@
         }
       },
       "delete": {
-        "summary": "Delete a course.",
+        "summary": "Delete a course by ID.",
         "produces": [
           "application/json"
         ],
@@ -597,7 +597,7 @@
         }
       },
       "put": {
-        "summary": "Update the data  of an course.",
+        "summary": "Update the data of an course.",
         "consumes": [
           "application/json"
         ],
@@ -635,7 +635,7 @@
     },
     "/api/v1/groups/{id}": {
       "get": {
-        "summary": "Get a group",
+        "summary": "Get a group by ID.",
         "produces": [
           "application/json"
         ],
@@ -643,7 +643,7 @@
           {
             "name": "id",
             "in": "path",
-            "description": "ID of the group to be deleted.",
+            "description": "Get the group by ID..",
             "required": true,
             "type": "integer"
           }
@@ -661,7 +661,7 @@
         }
       },
       "delete": {
-        "summary": "Delete a group.",
+        "summary": "Delete a group by ID.",
         "produces": [
           "application/json"
         ],
@@ -684,7 +684,7 @@
         }
       },
       "put": {
-        "summary": "Update the data  of a group.",
+        "summary": "Update the data of a group by ID.",
         "consumes": [
           "application/json"
         ],
@@ -722,7 +722,7 @@
     },
     "/api/v1/specialities/{id}": {
       "get": {
-        "summary": "Get all specialities",
+        "summary": "Get a speciality by ID.",
         "produces": [
           "application/json"
         ],
@@ -730,7 +730,7 @@
           {
             "name": "id",
             "in": "path",
-            "description": "ID of the speciality to be deleted.",
+            "description": "Get the speciality by ID.",
             "required": true,
             "type": "integer"
           }
@@ -748,7 +748,7 @@
         }
       },
       "delete": {
-        "summary": "Delete a speciality.",
+        "summary": "Delete a speciality by ID.",
         "produces": [
           "application/json"
         ],
@@ -771,7 +771,7 @@
         }
       },
       "put": {
-        "summary": "Update the data  of a speciality.",
+        "summary": "Update the data of a speciality by ID.",
         "consumes": [
           "application/json"
         ],
