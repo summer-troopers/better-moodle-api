@@ -11,11 +11,12 @@ module.exports = {
 
 async function generate50Students() {
   const students = [];
+  const hash = await hashFactory.encrypt('student');
   students.push({
     first_name: 'student',
     last_name: 'student',
     email: 'student@email.com',
-    password: await hashFactory.encrypt('student'),
+    password: await hash.toString('hex'),
     phone_number: '689-689-0688',
     id_group: '1',
   });
