@@ -6,7 +6,7 @@ module.exports = {
   port: process.env.PORT || 80,
   host: process.env.HOST || '0.0.0.0',
   errorEmails: process.env.ERROR_EMAILS || '',
-  hashModule: process.env.CRYPTO_ALG || 'OWN_HASH',
+  hashModule: process.env.CRYPTO_ALG || 'CRYPTO',
   debug_logger: process.env.DEBUG_LOGGER || false,
   salt: process.env.SALT || 'salt',
 
