@@ -6,7 +6,7 @@ module.exports = function getUserRepository(sequelize) {
   const { Teacher, Admin, Student } = sequelize.models;
 
   function selectUserDB(user, model) {
-    return model.findOne({ where: { email: user.email, password: user.password } });
+    return model.findOne({ where: { email: user.email } });
   }
 
   async function exists(id, role) { // eslint-disable-line complexity
@@ -23,21 +23,21 @@ module.exports = function getUserRepository(sequelize) {
     return false;
   }
 
-  async function returnUser(form) {
+  async function getUser(form) {
     const student = await selectUserDB(form, Student);
-    if (student) return { role: roles.STUDENT, user: student };
+    if (student) return [roles.STUDENT, student.dataValues];
 
     const teacher = await selectUserDB(form, Teacher);
-    if (teacher) return { role: roles.TEACHER, user: teacher };
+    if (teacher) return [roles.TEACHER, teacher.dataValues];
 
     const admin = await selectUserDB(form, Admin);
-    if (admin) return { role: roles.ADMIN, user: admin };
+    if (admin) return [roles.ADMIN, admin.dataValues];
 
     return null;
   }
 
   return {
-    returnUser,
+    getUser,
     exists,
   };
 };
