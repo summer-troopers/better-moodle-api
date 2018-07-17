@@ -11,7 +11,7 @@ const ENCRYPTED_TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYWRtaW
 const userRepository = {
   exists(id, role) {
     return new Promise((resolve, reject) => {
-      resolve(id === 1 && role === roles.STUDENT);
+      resolve(id === 1 && role === roles.ADMIN);
     });
   },
 };
