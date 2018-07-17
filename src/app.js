@@ -49,6 +49,7 @@ module.exports = function getApp(connection) {
   app.use('/api/v1/courses', createRoute(courseRepository, permissions('crud|r|r|')));
   app.use('/api/v1/groups', createRoute(groupRepository, permissions('crud|r|r|')));
   app.use('/api/v1/specialties', createRoute(specialtyRepository, permissions('crud|r|r|')));
+  app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
   // eslint-disable-next-line no-unused-vars
   app.use((err, request, response, next) => {
