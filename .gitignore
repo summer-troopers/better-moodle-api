@@ -3,3 +3,5 @@ node_modules/
 logs/
 .idea/
 .vs/
+_ttd_log_/
+rebuild-db.sh
