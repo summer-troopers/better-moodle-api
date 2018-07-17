@@ -6,7 +6,7 @@ module.exports = function chat(io) {
     connections.push(socket);
     console.log('Connected: %s sockets connected', connections.length);
 
-    // Disconnect
+
     socket.on('disconnect', () => {
       users.splice(users.indexOf(socket.username), 1);
       updateUsernames();
@@ -14,13 +14,12 @@ module.exports = function chat(io) {
 
       console.log('Disconnected: %s sockets connected', connections.length);
     });
-    // Send Message
+
     socket.on('send message', (data) => {
       console.log(data);
       io.sockets.emit('new message', { msg: data, user: socket.username });
     });
 
-    // New User
     socket.on('new user', (data, callback) => {
       callback(true);
       socket.username = data;
@@ -28,7 +27,7 @@ module.exports = function chat(io) {
       updateUsernames();
     });
 
-    function updateUsernames() {
+    updateUsernames = () => {
       io.sockets.emit('get users', users);
     }
   });
