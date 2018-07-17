@@ -3,7 +3,6 @@
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const express = require('express');
-const roles = require('./helpers/constants/roles');
 
 const morgan = require('morgan');
 const swaggerUi = require('swagger-ui-express');
@@ -16,7 +15,7 @@ const createAuthenticationRoute = require('./routes/authentication-route');
 
 const createRepository = require('./repositories/repository-factory');
 const createUserRepository = require('./repositories/user-repository');
-const { createPermissions } = require('./helpers/util');
+const { permissions } = require('./helpers/util');
 const createAuthorizationVerifier = require('./middlewares/authorization-verifier');
 
 module.exports = function getApp(connection) {
@@ -44,12 +43,12 @@ module.exports = function getApp(connection) {
 
   app.use(createAuthorizationVerifier(userRepository).validateUser);
 
-  app.use('/api/v1/admins', createRoute(adminRepository, createPermissions(true, false, false, true, false, false)));
-  app.use('/api/v1/teachers', createRoute(teacherRepository, createPermissions(true, true, true, true, false, false)));
-  app.use('/api/v1/students', createRoute(studentRepository, createPermissions(true, true, true, true, false, false)));
-  app.use('/api/v1/courses', createRoute(courseRepository, createPermissions(true, true, true, true, false, false)));
-  app.use('/api/v1/groups', createRoute(groupRepository, createPermissions(true, true, true, true, false, false)));
-  app.use('/api/v1/specialties', createRoute(specialtyRepository, createPermissions(true, true, true, true, false, false)));
+  app.use('/api/v1/admins', createRoute(adminRepository, permissions('crud|||')));
+  app.use('/api/v1/teachers', createRoute(teacherRepository, permissions('crud|r|r|')));
+  app.use('/api/v1/students', createRoute(studentRepository, permissions('crud|r|r|')));
+  app.use('/api/v1/courses', createRoute(courseRepository, permissions('crud|r|r|')));
+  app.use('/api/v1/groups', createRoute(groupRepository, permissions('crud|r|r|')));
+  app.use('/api/v1/specialties', createRoute(specialtyRepository, permissions('crud|r|r|')));
 
   // eslint-disable-next-line no-unused-vars
   app.use((err, request, response, next) => {

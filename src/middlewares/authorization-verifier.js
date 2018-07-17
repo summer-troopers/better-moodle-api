@@ -4,8 +4,8 @@ const config = require('config');
 
 module.exports = function createAuthorizationVerifier(userRepository) {
   return {
-    validateUserToken: extractAuthorizationToken,
-    validateUserTokenDb: verifyUserId,
+    validateToken: extractAuthorizationToken,
+    verifierId: verifyUserId,
     validateUser: [extractAuthorizationToken, verifyUserId],
   };
 

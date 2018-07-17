@@ -53,7 +53,7 @@ module.exports = function createRoute(repository, createPermissions) {
   }
 
   function add(request, response, next) {
-    if (!createPermissions[request.token.role].write) return next(new errors.Forbidden());
+    if (!createPermissions[request.token.role].create) return next(new errors.Forbidden());
     return repository.add(request.body)
       .then((result) => {
         response.json(result);
@@ -62,7 +62,7 @@ module.exports = function createRoute(repository, createPermissions) {
   }
 
   function remove(request, response, next) {
-    if (!createPermissions[request.token.role].write) return next(new errors.Forbidden());
+    if (!createPermissions[request.token.role].delete) return next(new errors.Forbidden());
     return repository.remove(request.params.id)
       .then((result) => {
         response.json(result);
@@ -71,7 +71,7 @@ module.exports = function createRoute(repository, createPermissions) {
   }
 
   function update(request, response, next) {
-    if (!createPermissions[request.token.role].write) return next(new errors.Forbidden());
+    if (!createPermissions[request.token.role].update) return next(new errors.Forbidden());
     return repository.update(request.params.id, request.body)
       .then((result) => {
         response.json(result);

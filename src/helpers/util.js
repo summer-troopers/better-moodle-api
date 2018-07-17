@@ -10,24 +10,35 @@ function createMessage(to, from, subject, text) {
   return message;
 }
 
-function createPermissions(adminsRead, teachersRead, studentsRead, adminsWrite, teachersWrite, studentsWrite) {
+function divisionString(string) {
+  const [admin, teacher, student] = string.split('|');
+
   return {
-    admin: {
-      read: adminsRead,
-      write: adminsWrite,
-    },
-    teacher: {
-      read: teachersRead,
-      write: teachersWrite,
-    },
-    student: {
-      read: studentsRead,
-      write: studentsWrite,
-    },
+    admin,
+    teacher,
+    student,
+  };
+}
+
+function getPermission(permissions) {
+  return {
+    create: permissions.includes('c'),
+    read: permissions.includes('r'),
+    update: permissions.includes('u'),
+    delete: permissions.includes('d'),
+  };
+}
+
+function createPermissions(permissions) {
+  const users = divisionString(permissions);
+  return {
+    admin: getPermission(users.admin),
+    teacher: getPermission(users.teacher),
+    student: getPermission(users.student),
   };
 }
 
 module.exports = {
   createMessage,
-  createPermissions,
+  permissions: createPermissions,
 };
