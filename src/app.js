@@ -43,8 +43,8 @@ module.exports = function getApp(connection) {
   app.use('/api/v1/specialties', createRoute(specialtyRepository));
   app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
-   // eslint-disable-next-line no-unused-vars
-   app.use((err, request, response, next) => {
+  // eslint-disable-next-line no-unused-vars
+  app.use((err, request, response, next) => {
     const error = err;
     error.code = err.code || 400;
     return response.status(error.code).json(error.message);
