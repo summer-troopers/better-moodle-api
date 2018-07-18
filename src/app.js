@@ -31,7 +31,11 @@ module.exports = function getApp(connection) {
 
   const userRepository = createUserRepository(connection);
 
+  const labsRepository = require('./repositories/labs-repository')();
+
   const authenticationRoute = createAuthenticationRoute(userRepository);
+
+  const labsRoute = require('./routes/labs-route')(labsRepository);
 
   app.use(cors());
   app.use(bodyParser.json());
@@ -50,12 +54,13 @@ module.exports = function getApp(connection) {
   app.use('/api/v1/groups', createRoute(groupRepository, permissions('crud|r|r|')));
   app.use('/api/v1/specialties', createRoute(specialtyRepository, permissions('crud|r|r|')));
   app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+  app.use('/api/v1/labs', labsRoute);
 
   // eslint-disable-next-line no-unused-vars
   app.use((err, request, response, next) => {
     const error = err;
     error.code = err.code || 400;
-    return response.status(error.code).json(error);
+    return response.status(error.code).json(error.message);
   });
 
   return app;

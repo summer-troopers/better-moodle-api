@@ -2,6 +2,7 @@
 
 module.exports = {
   mysql: process.env.MYSQL_URI || 'mysql://localhost:3306/moodle',
+  mongo: process.env.MONGO_URI || 'mongodb://192.168.99.100:27017/uploads',
   sendgridApiKey: process.env.SENDGRID_API_KEY,
   port: process.env.PORT || 80,
   host: process.env.HOST || '0.0.0.0',
