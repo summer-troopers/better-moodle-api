@@ -9,7 +9,6 @@ const swaggerUi = require('swagger-ui-express');
 const swaggerDocument = require('../swagger.json');
 const logger = require('../src/services/winston/logger');
 
-const importModels = require('./models/import');
 const createRoute = require('./routes/route-factory');
 const createAuthenticationRoute = require('./routes/authentication-route');
 
@@ -21,7 +20,6 @@ const createAuthorizationVerifier = require('./middlewares/authorization-verifie
 module.exports = function getApp(connection) {
   const app = express();
 
-  importModels(connection);
   const adminRepository = createRepository(connection.models.Admin);
   const teacherRepository = createRepository(connection.models.Teacher);
   const studentRepository = createRepository(connection.models.Student);
@@ -33,6 +31,9 @@ module.exports = function getApp(connection) {
 
   const authenticationRoute = createAuthenticationRoute(userRepository);
 
+  const chat = require('./services/chat-io/chat-connection');
+
+
   app.use(cors());
   app.use(bodyParser.json());
   app.use(bodyParser.urlencoded({ extended: true }));
@@ -40,6 +41,7 @@ module.exports = function getApp(connection) {
   app.use(morgan('combined', { stream: logger.stream }));
 
   app.use('/api/v1/login', authenticationRoute);
+  app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
   app.use(createAuthorizationVerifier(userRepository).validateUser);
 
@@ -49,8 +51,7 @@ module.exports = function getApp(connection) {
   app.use('/api/v1/courses', createRoute(courseRepository, permissions('crud|r|r|')));
   app.use('/api/v1/groups', createRoute(groupRepository, permissions('crud|r|r|')));
   app.use('/api/v1/specialties', createRoute(specialtyRepository, permissions('crud|r|r|')));
-  app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
-
+  app.use('/api/v1/chat', chat);
   // eslint-disable-next-line no-unused-vars
   app.use((err, request, response, next) => {
     const error = err;

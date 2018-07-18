@@ -48,7 +48,6 @@
           "msg",
           "maxsize",
           "param"
-
         ]
       }
     ],
@@ -58,6 +57,7 @@
     ],
     "no-unused-vars": "warn",
     "global-require": "warn",
+    "prefer-template": "off",
     "no-use-before-define": "warn",
     "no-useless-escape": "off",
     "no-undef": "off",
