@@ -3,6 +3,7 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
 const config = require('config');
+const errors = require('@feathersjs/errors');
 const hashPassword = require('../helpers/hash/hash-factory')();
 
 module.exports = function createAuthenticationRoute(repository) {
@@ -22,7 +23,12 @@ module.exports = function createAuthenticationRoute(repository) {
         if (result) return next();
         return response.sendStatus(404);
       })
-      .catch(console.error);
+      .catch((error) => {
+        if (response.code === 404) {
+          response.sendStatus(403);
+          console.error(error);
+        }
+      });
   }
 
   router.route('/')
