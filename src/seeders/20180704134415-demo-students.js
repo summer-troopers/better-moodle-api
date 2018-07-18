@@ -3,7 +3,7 @@ const hashFactory = require('../helpers/hash/hash-factory')();
 
 module.exports = {
   // eslint-disable-next-line no-unused-vars, no-use-before-define
-  async up(queryInterface, Sequelize) { return queryInterface.bulkInsert('students', generate50Students(), {}); },
+  async up(queryInterface, Sequelize) { return queryInterface.bulkInsert('students', await generate50Students(), {}); },
   // eslint-disable-next-line no-unused-vars
   down(queryInterface, Sequelize) { return queryInterface.bulkDelete('students', null, {}); },
 };
@@ -11,11 +11,12 @@ module.exports = {
 
 async function generate50Students() {
   const students = [];
+  const hash = await hashFactory.encrypt('student');
   students.push({
     first_name: 'student',
     last_name: 'student',
     email: 'student@email.com',
-    password: await hashFactory.encrypt('student'),
+    password: await hash.toString('hex'),
     phone_number: '689-689-0688',
     id_group: '1',
   });

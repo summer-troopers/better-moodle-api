@@ -3,6 +3,7 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
 const config = require('config');
+const hashPassword = require('../helpers/hash/hash-factory')();
 
 module.exports = function createAuthenticationRoute(repository) {
   const router = express.Router();
@@ -14,8 +15,18 @@ module.exports = function createAuthenticationRoute(repository) {
     return response.status(200).json({ token });
   }
 
+  async function comparePassword(request, response, next) {
+    const passwordDb = await repository.returnUser(request.body);
+    await hashPassword.compare(request.body.password, passwordDb.user.dataValues.password)
+      .then((result) => {
+        if (result) return next();
+        return response.sendStatus(404);
+      })
+      .catch(console.error);
+  }
+
   router.route('/')
-    .post(loginUser);
+    .post(comparePassword, loginUser);
 
   return router;
 };
