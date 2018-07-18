@@ -28,6 +28,5 @@ module.exports = function createAuthenticationRoute(repository) {
 
   router.route('/')
     .post(comparePassword, loginUser);
-
   return router;
 };
