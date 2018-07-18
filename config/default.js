@@ -21,7 +21,7 @@ module.exports = {
   jwtconf: {
     secret: 'supersecret',
     time: {
-      expiresIn: 8640000000000,
+      expiresIn: 864000, // 10 days exist token
     },
   },
 };
