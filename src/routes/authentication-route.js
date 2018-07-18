@@ -3,7 +3,6 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
 const config = require('config');
-const errors = require('@feathersjs/errors');
 const hashPassword = require('../helpers/hash/hash-factory')();
 
 module.exports = function createAuthenticationRoute(repository) {
@@ -18,17 +17,13 @@ module.exports = function createAuthenticationRoute(repository) {
 
   async function comparePassword(request, response, next) {
     const passwordDb = await repository.returnUser(request.body);
-    hashPassword.compare(request.body.password, passwordDb.user.dataValues.password)
-      .then((result) => {
-        if (result) return next();
-        return response.sendStatus(404);
-      })
-      .catch((error) => {
-        if (response.code === 404) {
-          response.sendStatus(403);
-          console.error(error);
-        }
-      });
+    try {
+      const bool = await hashPassword.compare(request.body.password, passwordDb.user.dataValues.password);
+      if (bool) next();
+      else throw bool;
+    } catch (error) {
+      response.sendStatus(403);
+    }
   }
 
   router.route('/')
