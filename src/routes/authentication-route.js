@@ -16,7 +16,7 @@ module.exports = function createAuthenticationRoute(repository) {
   }
 
   async function comparePassword(request, response, next) {
-    const passwordDb = await repository.returnUser(request.body);
+    const passwordDb = await repository.getUser(request.body);
     try {
       const compareResult = await hashPassword.compare(request.body.password, passwordDb[1].password);
       if (compareResult) next();
