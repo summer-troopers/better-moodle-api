@@ -6,7 +6,7 @@ const hashFactory = require('../helpers/hash/hash-factory')();
 
 module.exports = {
   // eslint-disable-next-line no-unused-vars, no-use-before-define
-  async up(queryInterface, Sequelize) { return queryInterface.bulkInsert('teachers', generate50Teachers(), {}); },
+  async up(queryInterface, Sequelize) { return queryInterface.bulkInsert('teachers', await generate50Teachers(), {}); },
   // eslint-disable-next-line no-unused-vars
   down(queryInterface, Sequelize) { return queryInterface.bulkDelete('teachers', null, {}); },
 };
