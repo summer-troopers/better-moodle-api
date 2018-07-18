@@ -33,6 +33,8 @@ module.exports = function getApp(connection) {
 
   const authenticationRoute = createAuthenticationRoute(userRepository);
 
+  const chat = require('../src/services/chat-io/chat');
+
   app.use(cors());
   app.use(bodyParser.json());
   app.use(bodyParser.urlencoded({ extended: true }));
@@ -50,7 +52,7 @@ module.exports = function getApp(connection) {
   app.use('/api/v1/groups', createRoute(groupRepository, permissions('crud|r|r|')));
   app.use('/api/v1/specialties', createRoute(specialtyRepository, permissions('crud|r|r|')));
   app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
-
+  app.use('/api/v1/chat', chat);
   // eslint-disable-next-line no-unused-vars
   app.use((err, request, response, next) => {
     const error = err;
