@@ -5,19 +5,25 @@ const config = require('config');
 const createAuthorizationVerifier = require('../../../src/middlewares/authorization-verifier');
 const roles = require('../../../src/helpers/constants/roles');
 
-const ENCRYPTED_TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoidGVhY2hlciIsInVzZXIiOjEsImlhdCI6MTUzMTkxMDIxOSwiZXhwIjo4NjQxNTMxOTEwMjE5fQ.v0YZpn0beF5x7fqCy_0j0A1011PBhoz6ofKZVo2GPvo';
+
+const user = {
+  role: roles.TEACHER,
+  user: 1,
+};
+
+const ENCRYPTED_TOKEN = jwt.sign(user, config.jwtconf.secret, config.jwtconf.time);
+
+const request = {
+  headers: {
+    token: ENCRYPTED_TOKEN,
+  },
+};
 
 const userRepository = {
   exists(id, role) {
     return new Promise((resolve, reject) => {
       resolve(id === 1 && role === roles.TEACHER);
     });
-  },
-};
-
-const request = {
-  headers: {
-    token: ENCRYPTED_TOKEN,
   },
 };
 
