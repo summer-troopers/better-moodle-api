@@ -12,7 +12,7 @@ async function cryptoPassword(password) {
   } catch (error) {
     logger.error(error);
   }
-  return hash;
+  return hash.toString('hex');
 }
 
 async function comparePassword(password, hash) {
