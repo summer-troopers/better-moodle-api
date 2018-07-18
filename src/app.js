@@ -54,6 +54,19 @@ module.exports = function getApp(connection) {
 
   app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
+  // MOCK BEGIN
+
+  const mockTeachersRepository = require('./mock/repositories/teachers-repository')(models); // eslint-disable-line global-require
+  const mockCoursesRepository = require('./mock/repositories/courses-repository')(models); // eslint-disable-line global-require
+
+  const mockTeachersRoute = require('./mock/routes/teachers-route')(mockTeachersRepository); // eslint-disable-line global-require
+  const mockCoursesRoute = createRoute(mockCoursesRepository, permissions('crud|r|r|')); // eslint-disable-line global-require
+
+  app.use('/api/mock/teachers', mockTeachersRoute);
+  app.use('/api/mock/courses', mockCoursesRoute);
+
+  // MOCK END
+
   // eslint-disable-next-line no-unused-vars
   app.use((err, request, response, next) => {
     const error = err;

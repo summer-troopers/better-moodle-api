@@ -49,7 +49,8 @@
           "maxsize",
           "param",
           "middlewares",
-          "verifier"
+          "verifier",
+          "const"
 
         ]
       }
