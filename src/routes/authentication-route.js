@@ -11,14 +11,14 @@ module.exports = function createAuthenticationRoute(repository) {
   async function loginUser(request, response) {
     const result = await repository.returnUser(request.body);
     if (!result) return response.sendStatus(404);
-    const token = jwt.sign(result, config.jwtconf.secret, config.jwtconf.time);
+    const token = jwt.sign({ role: result[0], user: result[1].id }, config.jwtconf.secret, config.jwtconf.time);
     return response.status(200).json({ token });
   }
 
   async function comparePassword(request, response, next) {
     const passwordDb = await repository.returnUser(request.body);
     try {
-      const compareResult = await hashPassword.compare(request.body.password, passwordDb.user.dataValues.password);
+      const compareResult = await hashPassword.compare(request.body.password, passwordDb[1].password);
       if (compareResult) next();
       else throw compareResult;
     } catch (error) {

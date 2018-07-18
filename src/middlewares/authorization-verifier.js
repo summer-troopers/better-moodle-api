@@ -23,7 +23,7 @@ module.exports = function createAuthorizationVerifier(userRepository) {
   }
 
   function verifyUserId(request, response, next) {
-    return userRepository.exists(request.token.user.id, request.token.role)
+    return userRepository.exists(request.token.user, request.token.role)
       .then((result) => {
         if (!result) return next(new errors.Forbidden());
         return next();
