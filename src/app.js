@@ -32,11 +32,11 @@ module.exports = function getApp(sqlConnection, mongoConnection) {
 
   const userRepository = createUserRepository(models);
 
-  const labsRepository = require('./repositories/labs-repository')(mongoConnection);
+  const labsRepository = require('./repositories/labs-repository')(mongoConnection); // eslint-disable-line global-require
 
   const authenticationRoute = createAuthenticationRoute(userRepository);
 
-  const labsRoute = require('./routes/labs-route')(labsRepository, permissions('crud|r|cr|'));
+  const labsRoute = require('./routes/labs-route')(labsRepository, permissions('crud|r|cr|')); // eslint-disable-line global-require
 
   app.use(cors());
   app.use(bodyParser.json());
@@ -54,6 +54,7 @@ module.exports = function getApp(sqlConnection, mongoConnection) {
   app.use('/api/v1/courses', createRoute(coursesRepository, permissions('crud|r|r|')));
   app.use('/api/v1/groups', createRoute(groupsRepository, permissions('crud|r|r|')));
   app.use('/api/v1/specialties', createRoute(specialtiesRepository, permissions('crud|r|r|')));
+  app.use('/api/v1/labs', labsRoute);
   app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
   // eslint-disable-next-line no-unused-vars
