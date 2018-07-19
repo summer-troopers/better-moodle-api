@@ -11,7 +11,7 @@ module.exports = function createAuthorizationVerifier(userRepository) {
 
   // eslint-disable-next-line complexity
   function extractAuthorizationToken(request, response, next) {
-    const { token } = request.headers;
+    const token = request.headers.token || request.body.token;
     if (!token) return next(new errors.Forbidden());
     try {
       request.token = jwt.verify(token, config.jwtconf.secret);
