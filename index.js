@@ -15,4 +15,4 @@ createConnection()
       logger.info(`Server started on: ${port}, host: ${host}`);
     });
   })
-  .catch(console.error);
+  .catch(logger.error);
