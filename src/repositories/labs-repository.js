@@ -1,17 +1,14 @@
-const config = require('config');
 const mongoose = require('mongoose');
 const Grid = require('gridfs-stream');
 
-const connection = mongoose.createConnection(config.mongo, { useNewUrlParser: true });
+module.exports = function createLabsRepository(connection) {
+  let gfs;
 
-let gfs;
+  connection.once('open', () => {
+    gfs = Grid(connection.db, mongoose.mongo);
+    gfs.collection('fs');
+  });
 
-connection.once('open', () => {
-  gfs = Grid(connection.db, mongoose.mongo);
-  gfs.collection('fs');
-});
-
-module.exports = function createLabsRepository() {
   function list() {
     const result = gfs.files.find().toArray();
     return result;

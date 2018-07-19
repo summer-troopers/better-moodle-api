@@ -2,9 +2,13 @@
 
 const config = require('config');
 
+const sqlConnector = require('./sql-connector')(config.mysql);
+const mongoConnector = require('./mongo-connector')(config.mongo);
+
 // eslint-disable-next-line global-require
-module.exports = { getSQLConnector, getMongoConnector };
-
-function getSQLConnector() { return require('./sql-connector')(config.mysql); }
-
-function getMongoConnector() { return require('./mongo-connector')(config.mongo); }
+module.exports = function connectToDBs() {
+  return Promise.all([
+    sqlConnector.connect(),
+    mongoConnector.connect(),
+  ]);
+};
