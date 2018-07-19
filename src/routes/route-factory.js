@@ -3,19 +3,20 @@
 const express = require('express');
 const errors = require('@feathersjs/errors');
 const parseQueryParams = require('../middlewares/parse-query');
+const hashPassword = require('../middlewares/hash-password');
 
 module.exports = function createRoute(repository, permissions) {
   const router = express.Router();
 
   router.route('/')
     .get(parseQueryParams, list)
-    .post(add);
+    .post(hashPassword, add);
 
   router.param('id', validateId);
 
   router.route('/:id')
     .get(view)
-    .put(update)
+    .put(hashPassword, update)
     .delete(remove);
 
   function validateId(request, response, next, id) {
