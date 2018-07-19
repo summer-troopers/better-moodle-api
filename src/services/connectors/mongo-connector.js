@@ -7,7 +7,7 @@ module.exports = function getMongoConnector(uri) {
     connect, // eslint-disable-line no-use-before-define
   };
 
-  async function connect() {
+  function connect() {
     return mongoose.createConnection(uri, { useNewUrlParser: true });
   }
 };

@@ -14,6 +14,7 @@ module.exports = function createLabsRepository(connection) {
     const result = await gfs.files.findOne({ filename: fileName });
     return result;
   }
+  
   function add() {
   }
 
