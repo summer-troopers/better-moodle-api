@@ -2,27 +2,23 @@ const mongoose = require('mongoose');
 const Grid = require('gridfs-stream');
 
 module.exports = function createLabsRepository(connection) {
-  let gfs;
+  const gfs = Grid(connection.db, mongoose.mongo);
+  gfs.collection('fs');
 
-  connection.once('open', () => {
-    gfs = Grid(connection.db, mongoose.mongo);
-    gfs.collection('fs');
-  });
-
-  function list() {
-    const result = gfs.files.find().toArray();
+  async function list() {
+    const result = await gfs.files.find().toArray();
     return result;
   }
 
-  function view(fileName) {
-    const result = gfs.files.findOne({ filename: fileName });
+  async function view(fileName) {
+    const result = await gfs.files.findOne({ filename: fileName });
     return result;
   }
   function add() {
   }
 
-  function remove(fileId) {
-    gfs.remove({ _id: fileId, root: 'fs' });
+  async function remove(fileId) {
+    await gfs.remove({ _id: fileId, root: 'fs' });
   }
 
   return {

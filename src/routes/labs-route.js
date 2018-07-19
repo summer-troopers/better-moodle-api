@@ -10,7 +10,7 @@ const storage = new GridFsStorage({
   connectionOpts: { useNewUrlParser: true },
   file: (req, file) => {
     return new Promise((resolve, reject) => {
-      const fileName = Date.now() + path.extname(file.originalname);
+      const fileName = Date.now() + file.originalname;
 
       const fileInfo = {
         filename: fileName,
@@ -38,53 +38,38 @@ module.exports = function createLabsRoute(repository, createPermissions) {
 
   return router;
 
-  function add(request, result) {
-    // if (!createPermissions[request.token.role].read) res.json(new errors.Forbidden());
-    // else if (!request.file) {
-    //   result.status(400).json({ err: 'File not received.' });
-    // } else result.json({ succes: 'File added' });
-
-    if (!request.file) {
-      result.status(400).json({ err: 'File not received.' });
-    } else result.json({ succes: 'File added' });
+  function add(request, response) {
+    if (!createPermissions[request.token.role].create) response.json(new errors.Forbidden());
+    else if (!request.file) {
+      response.status(400).json({ err: 'File not received.' });
+    } else response.json({ succes: 'File added' });
   }
 
-  async function list(request, res) {
-    // if (!createPermissions[request.token.role].read) result.json(new errors.Forbidden());
-    // else {
-    //   const resultFiles = await repository.list();
-    //   if (!resultFiles || resultFiles.length === 0) {
-    //     result.status(404).json({ err: 'File not found.' });
-    //   } else result.json(resultFiles);
-    // }
-
-    const resultFiles = await repository.list();
-    if (!resultFiles || resultFiles.length === 0) {
-      result.status(404).json({ err: 'File not found.' });
-    } else result.json(resultFiles);
+  async function list(request, response) {
+    if (!createPermissions[request.token.role].read) response.json(new errors.Forbidden());
+    else {
+      const resultFiles = await repository.list();
+      if (!resultFiles || resultFiles.length === 0) {
+        response.status(404).json({ err: 'File not found.' });
+      } else response.json(resultFiles);
+    }
   }
 
-  async function view(request, result) {
-    // if (!createPermissions[request.token.role].read) result.json(new errors.Forbidden());
-    // else {
-    //   const resultFile = await repository.view(request.params.filename);
-    //   if (!resultFile || resultFile.length === 0) {
-    //     result.status(404).json({ err: 'No such file exists.' });
-    //   } else result.json(resultFile);
-    // }
-    const resultFile = await repository.view(request.params.filename);
-    if (!resultFile || resultFile.length === 0) {
-      result.status(404).json({ err: 'No such file exists.' });
-    } else result.json(resultFile);
+  async function view(request, response) {
+    if (!createPermissions[request.token.role].read) response.json(new errors.Forbidden());
+    else {
+      const resultFile = await repository.view(request.params.filename);
+      if (!resultFile || resultFile.length === 0) {
+        response.status(404).json({ err: 'No such file exists.' });
+      } else response.json(resultFile);
+    }
   }
 
-  async function remove(request, result) {
-    // if (!createPermissions[request.token.role].read) result.json(new errors.Forbidden());
-    // else {
-    //   const deleteResult = await repository.remove(request.params.id);
-    //   result.json(deleteResult);
-    // }
-    const deleteResult = await repository.remove(request.params.id);
-    result.json(deleteResult);
+  async function remove(request, response) {
+    if (!createPermissions[request.token.role].delete) response.json(new errors.Forbidden());
+    else {
+      const deleteResult = await repository.remove(request.params.id);
+      response.json(deleteResult);
+    }
   }
 };
