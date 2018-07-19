@@ -18,8 +18,8 @@ module.exports = function defineSpecialty(sequelize, DataTypes) {
     timestamps: false,
   });
   Specialty.associate = function associateSpecialty(models) {
-    Specialty.hasMany(models.Group, {
-      foreignKey: 'id',
+    Specialty.belongsToMany(models.Course, {
+      through: 'CourseSpecialty', foreignKey: 'idSpecialty',
     });
   };
   return Specialty;

@@ -3,23 +3,55 @@
 const { Op } = require('sequelize');
 
 module.exports = function createSpecialtiesRepository(models) {
-  const { Specialty } = models;
+  const { Specialty, Course, CourseSpecialty } = models;
 
-  function list(queryParams) {
-    const { limit, offset, contains } = queryParams;
-
-    return Specialty.findAndCountAll({
-      offset,
+  async function list(queryParams) {
+    const {
       limit,
-      where: { name: { [Op.like]: [`%${contains}%`] } },
-    });
+      offset,
+      contains,
+      courseId,
+    } = queryParams;
+
+    const filter = {
+      limit,
+      offset,
+      where: {
+        name: {
+          [Op.like]: [`%${contains}%`],
+        },
+      },
+    };
+
+    if (courseId) {
+      return Specialty.findAndCountAll({
+        ...filter,
+        include: [{
+          model: Course,
+          attributes: [],
+          where: {
+            id: {
+              [Op.eq]: courseId,
+            },
+          },
+        }],
+      });
+    }
+    return Specialty.findAndCountAll(filter);
   }
 
   async function view(id) {
     return Specialty.findById(id);
   }
 
-  function add(form) {
+  async function add(form, queryParams) {
+    if (queryParams.courseId) {
+      const course = await Course.findById(queryParams.courseId);
+      if (!course) throw new errors.NotFound();
+      const specialty = await Specialty.findById(form.specialtyId);
+      if (!specialty) throw new errors.NotFound();
+      return specialty.addCourse(course);
+    }
     return Specialty.create(form);
   }
 
@@ -35,7 +67,19 @@ module.exports = function createSpecialtiesRepository(models) {
     });
   }
 
-  function remove(id) {
+  function remove(id, queryParams) {
+    if (queryParams.courseId) {
+      return CourseSpecialty.destroy({
+        where: {
+          idSpecialty: {
+            [Op.eq]: id,
+          },
+          idCourse: {
+            [Op.eq]: queryParams.courseId,
+          },
+        },
+      });
+    }
     return Specialty.destroy({ where: { id: { [Op.eq]: id } } });
   }
 

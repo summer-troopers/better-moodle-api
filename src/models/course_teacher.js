@@ -5,16 +5,15 @@ module.exports = function defineCourseTeacher(sequelize, DataTypes) {
     idCourse: {
       type: DataTypes.INTEGER,
       field: 'id_course',
-      foreignKey: true,
+      primaryKey: true,
       allowNull: false,
     },
     idTeacher: {
       type: DataTypes.INTEGER,
       field: 'id_teacher',
-      foreignKey: true,
+      primaryKey: true,
       allowNull: false,
     },
-
   }, {
     tableName: 'courses_teachers',
     timestamps: false,

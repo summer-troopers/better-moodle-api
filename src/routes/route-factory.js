@@ -35,7 +35,8 @@ module.exports = function createRoute(repository, permissions) {
 
     return repository.list(request.query)
       .then((result) => {
-        response.json({
+        if (result.count === 0) return next(new errors.NotFound());
+        return response.json({
           total: result.count,
           limit: request.query.limit,
           offset: request.query.offset,
@@ -58,7 +59,7 @@ module.exports = function createRoute(repository, permissions) {
   function add(request, response, next) {
     if (!permissions[request.token.role].create) return next(new errors.Forbidden());
 
-    return repository.add(request.body)
+    return repository.add(request.body, request.query)
       .then((result) => {
         response.json(result);
       })
@@ -68,7 +69,7 @@ module.exports = function createRoute(repository, permissions) {
   function remove(request, response, next) {
     if (!permissions[request.token.role].delete) return next(new errors.Forbidden());
 
-    return repository.remove(request.params.id)
+    return repository.remove(request.params.id, request.query)
       .then((result) => {
         response.json(result);
       })
