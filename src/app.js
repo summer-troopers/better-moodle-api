@@ -18,20 +18,24 @@ const createUserRepository = require('./repositories/user-repository');
 const { permissions } = require('./helpers/util');
 const createAuthorizationVerifier = require('./middlewares/authorization-verifier');
 
-module.exports = function getApp(connection) {
+module.exports = function getApp(sqlConnection, mongoConnection) {
   const app = express();
 
-  importModels(connection);
-  const adminRepository = createRepository(connection.models.Admin);
-  const teacherRepository = createRepository(connection.models.Teacher);
-  const studentRepository = createRepository(connection.models.Student);
-  const courseRepository = createRepository(connection.models.Course);
-  const groupRepository = createRepository(connection.models.Group);
-  const specialtyRepository = createRepository(connection.models.Specialty);
+  importModels(sqlConnection);
+  const adminRepository = createRepository(sqlConnection.models.Admin);
+  const teacherRepository = createRepository(sqlConnection.models.Teacher);
+  const studentRepository = createRepository(sqlConnection.models.Student);
+  const courseRepository = createRepository(sqlConnection.models.Course);
+  const groupRepository = createRepository(sqlConnection.models.Group);
+  const specialtyRepository = createRepository(sqlConnection.models.Specialty);
 
-  const userRepository = createUserRepository(connection);
+  const userRepository = createUserRepository(sqlConnection);
+
+  const labsRepository = require('./repositories/labs-repository')(mongoConnection);
 
   const authenticationRoute = createAuthenticationRoute(userRepository);
+
+  const labsRoute = require('./routes/labs-route')(labsRepository, permissions('crud|r|cr|'));
 
   app.use(cors());
   app.use(bodyParser.json());
@@ -49,13 +53,14 @@ module.exports = function getApp(connection) {
   app.use('/api/v1/courses', createRoute(courseRepository, permissions('crud|r|r|')));
   app.use('/api/v1/groups', createRoute(groupRepository, permissions('crud|r|r|')));
   app.use('/api/v1/specialties', createRoute(specialtyRepository, permissions('crud|r|r|')));
+  app.use('/api/v1/labs', labsRoute);
   app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
   // eslint-disable-next-line no-unused-vars
   app.use((err, request, response, next) => {
     const error = err;
     error.code = err.code || 400;
-    return response.status(error.code).json(error);
+    return response.status(error.code).json(error.message);
   });
 
   return app;

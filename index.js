@@ -1,13 +1,12 @@
 'use strict';
 
 const config = require('config');
-const createConnection = require('./src/services/connectors/connector-factory');
+const connectToDBs = require('./src/services/connectors/connector-factory');
 const logger = require('./src/services/winston/logger');
 
-createConnection()
-  .connect()
-  .then((connection) => {
-    const app = require('./src/app')(connection); // eslint-disable-line global-require
+connectToDBs()
+  .then(([sqlConnection, mongoConnection]) => {
+    const app = require('./src/app')(sqlConnection, mongoConnection); // eslint-disable-line global-require
 
     const { port, host } = config;
 

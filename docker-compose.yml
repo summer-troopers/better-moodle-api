@@ -18,3 +18,8 @@ services:
     environment:
       - MYSQL_URI=mysql://root:parola@db:3306/moodle
       - PORT=8080
+  mongo:
+    container_name: labs_storage
+    image: mongo:3.0
+    ports:
+      - 27017:27017
