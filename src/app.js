@@ -35,7 +35,7 @@ module.exports = function getApp(connection) {
 
   const authenticationRoute = createAuthenticationRoute(userRepository);
 
-  const labsRoute = require('./routes/labs-route')(labsRepository);
+  const labsRoute = require('./routes/labs-route')(labsRepository, permissions('crud|r|cr|'));
 
   app.use(cors());
   app.use(bodyParser.json());
@@ -53,8 +53,8 @@ module.exports = function getApp(connection) {
   app.use('/api/v1/courses', createRoute(courseRepository, permissions('crud|r|r|')));
   app.use('/api/v1/groups', createRoute(groupRepository, permissions('crud|r|r|')));
   app.use('/api/v1/specialties', createRoute(specialtyRepository, permissions('crud|r|r|')));
-  app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
   app.use('/api/v1/labs', labsRoute);
+  app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
   // eslint-disable-next-line no-unused-vars
   app.use((err, request, response, next) => {

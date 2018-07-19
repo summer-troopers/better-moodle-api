@@ -2,12 +2,12 @@ const config = require('config');
 const mongoose = require('mongoose');
 const Grid = require('gridfs-stream');
 
-const conn = mongoose.createConnection(config.mongo, { useNewUrlParser: true });
+const connection = mongoose.createConnection(config.mongo, { useNewUrlParser: true });
 
 let gfs;
 
-conn.once('open', () => {
-  gfs = Grid(conn.db, mongoose.mongo);
+connection.once('open', () => {
+  gfs = Grid(connection.db, mongoose.mongo);
   gfs.collection('fs');
 });
 
