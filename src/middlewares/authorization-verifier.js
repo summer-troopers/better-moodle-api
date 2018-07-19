@@ -15,6 +15,7 @@ module.exports = function createAuthorizationVerifier(userRepository) {
     if (!token) return next(new errors.Forbidden());
     try {
       request.token = jwt.verify(token, config.jwtconf.secret);
+      if (typeof request.token.user === 'object' || !request.token.role) throw new errors.Forbidden();
     } catch (err) {
       return next(new errors.Forbidden());
     }

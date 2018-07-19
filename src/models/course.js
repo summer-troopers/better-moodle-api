@@ -21,7 +21,8 @@ module.exports = function defineCourse(sequelize, DataTypes) {
   });
   // eslint-disable-next-line no-unused-vars
   Course.associate = function associateCourse(models) {
-    // associations can be defined here
+    Course.belongsToMany(models.Teacher, { through: 'CourseTeacher', foreignKey: 'idCourse' });
+    Course.belongsToMany(models.Specialty, { through: 'CourseSpecialty', foreignKey: 'idCourse' });
   };
   return Course;
 };

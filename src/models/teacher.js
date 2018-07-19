@@ -52,7 +52,7 @@ module.exports = function defineTeacher(sequelize, DataTypes) {
   });
   // eslint-disable-next-line no-unused-vars
   Teacher.associate = function associateTeacher(models) {
-    // associations can be defined here
+    Teacher.belongsToMany(models.Course, { through: 'CourseTeacher', foreignKey: 'idTeacher' });
   };
   return Teacher;
 };
