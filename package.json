@@ -9,6 +9,11 @@
     "lint": "eslint . --fix",
     "start": "node index.js"
   },
+  "husky": {
+    "hooks": {
+      "pre-push": "npm run lint && npm test"
+    }
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
@@ -37,6 +42,7 @@
     "eslint-config-airbnb-base": "^13.0.0",
     "eslint-plugin-import": "^2.13.0",
     "eslint-plugin-spellcheck": "0.0.10",
+    "husky": "^1.0.0-rc.13",
     "mocha": "^5.2.0"
   }
 }

@@ -58,7 +58,7 @@
     ],
     "no-unused-vars": "warn",
     "global-require": "warn",
-    "no-use-before-define": "warn",
+    "no-use-before-define": "off",
     "no-useless-escape": "off",
     "no-undef": "off",
     "arrow-body-style": "off",
