@@ -1,7 +1,6 @@
 const config = require('config');
 const multer = require('multer');
 const GridFsStorage = require('multer-gridfs-storage');
-const path = require('path');
 const express = require('express');
 const errors = require('@feathersjs/errors');
 
