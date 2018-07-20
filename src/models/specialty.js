@@ -22,7 +22,11 @@ module.exports = function defineSpecialty(sequelize, DataTypes) {
       foreignKey: 'specialtyId',
       otherKey: 'courseId',
     });
+<<<<<<< HEAD
     Specialty.hasMany(models.Group, { foreignKey: 'specialtyId', sourceKey: 'id' });
+=======
+    Specialty.hasMany(models.Group, { foreignKey: 'idSpecialty' });
+>>>>>>> discovered associations for modelsgit add .
   };
   return Specialty;
 };
