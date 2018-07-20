@@ -6,5 +6,6 @@ cache:
     - "node_modules"
 script:
   - "npm audit"
+  - "npm run redosy"
   - "npm run lint"
   - "npm test"
