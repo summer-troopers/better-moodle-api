@@ -26,13 +26,8 @@ module.exports = function defineGroup(sequelize, DataTypes) {
     timestamps: false,
   });
   Group.associate = function associateGroup(models) {
-<<<<<<< HEAD
     Group.hasMany(models.Student, { foreignKey: 'groupId', sourceKey: 'id' });
     Group.belongsTo(models.Specialty, { foreignKey: 'specialtyId', targetKey: 'id' });
-=======
-    Group.hasMany(models.Student, { foreignKey: 'id' });
-    Group.belongsTo(models.Specialty, { foreignKey: 'idSpecialty' });
->>>>>>> discovered associations for modelsgit add .
   };
   return Group;
 };
