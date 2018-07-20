@@ -44,6 +44,8 @@ module.exports = function getApp(sqlConnection, mongoConnection) {
 
   app.use(morgan('combined', { stream: logger.stream }));
 
+  app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
   app.use('/api/v1/login', authenticationRoute);
 
   app.use(createAuthorizationVerifier(userRepository).validateUser);
@@ -55,7 +57,6 @@ module.exports = function getApp(sqlConnection, mongoConnection) {
   app.use('/api/v1/groups', createRoute(groupsRepository, permissions('crud|r|r|')));
   app.use('/api/v1/specialties', createRoute(specialtiesRepository, permissions('crud|r|r|')));
   app.use('/api/v1/labs', labsRoute);
-  app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
   // eslint-disable-next-line no-unused-vars
   app.use((err, request, response, next) => {
