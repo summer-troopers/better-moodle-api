@@ -4,13 +4,82 @@
     "version": "1.0.0",
     "title": "Moodle App"
   },
-  "host": "10.177.106.10",
+  "host": "localhost",
+  "tags": [
+    {
+      "name": "login"
+    },
+    {
+      "name": "admin",
+      "description": "Everything about Admins"
+    },
+    {
+      "name": "teacher",
+      "description": "Everything about Tachers"
+    },
+    {
+      "name": "student",
+      "description": "Everything about Studnets"
+    },
+    {
+      "name": "course",
+      "description": "Everything about Courses"
+    },
+    {
+      "name": "group",
+      "description": "Everything about Groups"
+    },
+    {
+      "name": "specialty",
+      "description": "Everything about Specialties"
+    }
+  ],
   "schemes": [
     "http"
   ],
+  "security": [
+    {
+      "api_key": []
+    }
+  ],
   "paths": {
+    "/api/v1/login": {
+      "post": {
+        "tags": [
+          "login"
+        ],
+        "summary": "Get authorization token.",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/User"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "success"
+          },
+          "400": {
+            "description": "error"
+          }
+        }
+      }
+    },
     "/api/v1/admins": {
       "get": {
+        "tags": [
+          "admin"
+        ],
         "summary": "Get all admins",
         "produces": [
           "application/json"
@@ -46,6 +115,9 @@
         }
       },
       "post": {
+        "tags": [
+          "admin"
+        ],
         "summary": "Add an admin in the DB.",
         "consumes": [
           "application/json"
@@ -75,6 +147,9 @@
     },
     "/api/v1/teachers": {
       "get": {
+        "tags": [
+          "teacher"
+        ],
         "summary": "Get all teachers",
         "produces": [
           "application/json"
@@ -110,6 +185,9 @@
         }
       },
       "post": {
+        "tags": [
+          "teacher"
+        ],
         "summary": "Add a teacher in the DB.",
         "consumes": [
           "application/json"
@@ -139,6 +217,9 @@
     },
     "/api/v1/students": {
       "get": {
+        "tags": [
+          "student"
+        ],
         "summary": "Get all students",
         "produces": [
           "application/json"
@@ -174,6 +255,9 @@
         }
       },
       "post": {
+        "tags": [
+          "student"
+        ],
         "summary": "Add a student in the DB.",
         "consumes": [
           "application/json"
@@ -203,6 +287,9 @@
     },
     "/api/v1/courses": {
       "get": {
+        "tags": [
+          "course"
+        ],
         "summary": "Get all courses",
         "produces": [
           "application/json"
@@ -246,6 +333,9 @@
         }
       },
       "post": {
+        "tags": [
+          "course"
+        ],
         "summary": "Add a course in the DB.",
         "consumes": [
           "application/json"
@@ -275,6 +365,9 @@
     },
     "/api/v1/groups": {
       "get": {
+        "tags": [
+          "group"
+        ],
         "summary": "Get all groups",
         "produces": [
           "application/json"
@@ -318,6 +411,9 @@
         }
       },
       "post": {
+        "tags": [
+          "group"
+        ],
         "summary": "Add a group in the DB.",
         "consumes": [
           "application/json"
@@ -347,6 +443,9 @@
     },
     "/api/v1/specialties": {
       "get": {
+        "tags": [
+          "specialty"
+        ],
         "summary": "Get all specialties",
         "produces": [
           "application/json"
@@ -390,6 +489,9 @@
         }
       },
       "post": {
+        "tags": [
+          "specialty"
+        ],
         "summary": "Add a speciality in the DB.",
         "consumes": [
           "application/json"
@@ -419,6 +521,9 @@
     },
     "/api/v1/admins/{id}": {
       "get": {
+        "tags": [
+          "admin"
+        ],
         "summary": "Get an admin by id.",
         "produces": [
           "application/json"
@@ -445,6 +550,9 @@
         }
       },
       "delete": {
+        "tags": [
+          "admin"
+        ],
         "summary": "Delete an admin by ID.",
         "produces": [
           "application/json"
@@ -468,6 +576,9 @@
         }
       },
       "put": {
+        "tags": [
+          "admin"
+        ],
         "summary": "Update the data of an admin.",
         "consumes": [
           "application/json"
@@ -506,6 +617,9 @@
     },
     "/api/v1/teachers/{id}": {
       "get": {
+        "tags": [
+          "teacher"
+        ],
         "summary": "Get a teacher",
         "produces": [
           "application/json"
@@ -532,6 +646,9 @@
         }
       },
       "delete": {
+        "tags": [
+          "teacher"
+        ],
         "summary": "Delete a teacher by ID.",
         "produces": [
           "application/json"
@@ -555,6 +672,9 @@
         }
       },
       "put": {
+        "tags": [
+          "teacher"
+        ],
         "summary": "Update the data of an teacher.",
         "consumes": [
           "application/json"
@@ -593,6 +713,9 @@
     },
     "/api/v1/students/{id}": {
       "get": {
+        "tags": [
+          "student"
+        ],
         "summary": "Get a student by ID.",
         "produces": [
           "application/json"
@@ -619,6 +742,9 @@
         }
       },
       "delete": {
+        "tags": [
+          "student"
+        ],
         "summary": "Delete a student by ID.",
         "produces": [
           "application/json"
@@ -642,6 +768,9 @@
         }
       },
       "put": {
+        "tags": [
+          "student"
+        ],
         "summary": "Update the data of an student.",
         "consumes": [
           "application/json"
@@ -680,6 +809,9 @@
     },
     "/api/v1/courses/{id}": {
       "get": {
+        "tags": [
+          "course"
+        ],
         "summary": "Get a course by ID.",
         "produces": [
           "application/json"
@@ -706,6 +838,9 @@
         }
       },
       "delete": {
+        "tags": [
+          "course"
+        ],
         "summary": "Delete a course by ID.",
         "produces": [
           "application/json"
@@ -729,6 +864,9 @@
         }
       },
       "put": {
+        "tags": [
+          "course"
+        ],
         "summary": "Update the data of an course.",
         "consumes": [
           "application/json"
@@ -767,6 +905,9 @@
     },
     "/api/v1/groups/{id}": {
       "get": {
+        "tags": [
+          "group"
+        ],
         "summary": "Get a group by ID.",
         "produces": [
           "application/json"
@@ -793,6 +934,9 @@
         }
       },
       "delete": {
+        "tags": [
+          "group"
+        ],
         "summary": "Delete a group by ID.",
         "produces": [
           "application/json"
@@ -816,6 +960,9 @@
         }
       },
       "put": {
+        "tags": [
+          "group"
+        ],
         "summary": "Update the data of a group by ID.",
         "consumes": [
           "application/json"
@@ -854,6 +1001,9 @@
     },
     "/api/v1/specialties/{id}": {
       "get": {
+        "tags": [
+          "specialty"
+        ],
         "summary": "Get a specialty by ID.",
         "produces": [
           "application/json"
@@ -880,6 +1030,9 @@
         }
       },
       "delete": {
+        "tags": [
+          "specialty"
+        ],
         "summary": "Delete a speciality by ID.",
         "produces": [
           "application/json"
@@ -903,6 +1056,9 @@
         }
       },
       "put": {
+        "tags": [
+          "specialty"
+        ],
         "summary": "Update the data of a speciality by ID.",
         "consumes": [
           "application/json"
@@ -940,7 +1096,30 @@
       }
     }
   },
+  "securityDefinitions": {
+    "api_key": {
+      "type": "apiKey",
+      "name": "token",
+      "in": "header"
+    }
+  },
   "definitions": {
+    "User": {
+      "type": "object",
+      "required": [
+        "email",
+        "password"
+      ],
+      "properties": {
+        "email": {
+          "type": "string",
+          "format": "email"
+        },
+        "password": {
+          "type": "string"
+        }
+      }
+    },
     "Admin": {
       "type": "object",
       "required": [
