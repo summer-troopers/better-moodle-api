@@ -15,8 +15,10 @@ services:
     tty: true
     links:
         - db
+        - mongo
     environment:
       - MYSQL_URI=mysql://root:parola@db:3306/moodle
+      - MONGO_URI=mongodb://mongo:27017/uploads
       - PORT=8080
   mongo:
     container_name: labs_storage
