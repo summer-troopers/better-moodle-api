@@ -58,6 +58,7 @@ module.exports = function defineStudent(sequelize, DataTypes) {
   });
   Student.associate = function associateStudent(models) {
     Student.belongsTo(models.Group, { foreignKey: 'id' });
+    Student.belongsTo(models.TaskLaboratory, { foreignKey: 'id' });
   };
   return Student;
 };
