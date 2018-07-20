@@ -7,6 +7,7 @@
   "scripts": {
     "test": "mocha --recursive",
     "lint": "eslint . --fix",
+    "redosy": "redosy .",
     "start": "node index.js"
   },
   "husky": {
@@ -36,6 +37,7 @@
     "multer-gridfs-storage": "^3.0.1",
     "mysql2": "^1.5.3",
     "node": "^10.6.0",
+    "redosy": "^1.0.2",
     "sequelize": "^4.38.0",
     "sequelize-rc": "^1.0.5",
     "swagger-ui-express": "^3.0.10",
