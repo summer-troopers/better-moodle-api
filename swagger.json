@@ -4,7 +4,7 @@
     "version": "1.0.0",
     "title": "Moodle App"
   },
-  "host": "localhost",
+  "host": "10.177.106.10",
   "tags": [
     {
       "name": "login"
