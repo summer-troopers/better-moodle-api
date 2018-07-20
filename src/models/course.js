@@ -23,6 +23,7 @@ module.exports = function defineCourse(sequelize, DataTypes) {
   Course.associate = function associateCourse(models) {
     Course.belongsToMany(models.Teacher, { through: 'CourseTeacher', foreignKey: 'idCourse' });
     Course.belongsToMany(models.Specialty, { through: 'CourseSpecialty', foreignKey: 'idCourse' });
+    Course.belongsTo(models.TaskLaboratory, { foreignKey: 'id' });
   };
   return Course;
 };
