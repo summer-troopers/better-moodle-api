@@ -1,4 +1,7 @@
 #!/usr/bin/env node
+# To start this script, use this command:
+# 1 :  chmod +x deploy.sh
+# 2 : ./bin/deploy.sh
 
 const { execSync } = require('child_process');
 
@@ -31,36 +34,8 @@ execSync(
 );
 
 execSync(
-  'rm -r ./node_modules',
-  (err, data, stderr) => {
-    console.log('\n\nRemoved node_modules\n');
-  },
-);
-
-execSync(
   'npm ci',
   (err, data, stderr) => {
     console.log('\n\nNpm ci \n');
-  },
-);
-
-execSync(
-  'sequelize db:create',
-  (err, data, stderr) => {
-    console.log('\n\nDB create\n');
-  },
-);
-
-execSync(
-  'sequelize db:migrate',
-  (err, data, stderr) => {
-    console.log('\n\nMigrate db \n');
-  },
-);
-
-execSync(
-  'sequelize db:seed:all',
-  (err, data, stderr) => {
-    console.log('\n\nSeed for db \n');
   },
 );
