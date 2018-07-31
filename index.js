@@ -14,4 +14,4 @@ connectToDBs()
       logger.info(`Server started on: ${port}, host: ${host}`);
     });
   })
-  .catch(logger.error);
+  .catch(console.error);
