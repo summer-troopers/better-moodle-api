@@ -11,13 +11,15 @@ module.exports = function createAuthenticationRoute(repository) {
   async function loginUser(request, response) {
     const result = await repository.getUser(request.body);
     if (!result) return response.sendStatus(404);
-    const [token, userData] = [jwt.sign({ role: result[0], user: result[1].id }, config.jwtconf.secret, config.jwtconf.time), {
-      id: result[1].id,
-      firstName: result[1].firstName,
-      lastName: result[1].lastName,
-      phoneNumber: result[1].phoneNumber,
-      email: result[1].email,
-    }];
+    const [role, user] = result;
+    const token = jwt.sign({ userRole: role, user: user.id }, config.jwtconf.secret, config.jwtconf.time);
+    const userData = {
+      id: user.id,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      phoneNumber: user.phoneNumber,
+      email: user.email,
+    };
     return response.status(200).json({ token, userData });
   }
 
