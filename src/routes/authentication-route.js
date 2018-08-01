@@ -19,6 +19,7 @@ module.exports = function createAuthenticationRoute(repository) {
       lastName: user.lastName,
       phoneNumber: user.phoneNumber,
       email: user.email,
+      userRole: role,
     };
     return response.status(200).json({ token, userData });
   }
