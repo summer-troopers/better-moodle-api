@@ -32,7 +32,7 @@ module.exports = function createRoute(repository, permissions) {
   }
 
   async function list(request, response, next) {
-    if (!permissions[request.token.role].read) return next(new errors.Forbidden());
+    if (!permissions[request.token.userRole].read) return next(new errors.Forbidden());
 
     return repository.list(request.query)
       .then((result) => {
@@ -48,7 +48,7 @@ module.exports = function createRoute(repository, permissions) {
   }
 
   function view(request, response, next) {
-    if (!permissions[request.token.role].read) return next(new errors.Forbidden());
+    if (!permissions[request.token.userRole].read) return next(new errors.Forbidden());
 
     return repository.view(request.params.id)
       .then((result) => {
@@ -58,7 +58,7 @@ module.exports = function createRoute(repository, permissions) {
   }
 
   function add(request, response, next) {
-    if (!permissions[request.token.role].create) return next(new errors.Forbidden());
+    if (!permissions[request.token.userRole].create) return next(new errors.Forbidden());
 
     return repository.add(request.body, request.query)
       .then((result) => {
@@ -68,7 +68,7 @@ module.exports = function createRoute(repository, permissions) {
   }
 
   function remove(request, response, next) {
-    if (!permissions[request.token.role].delete) return next(new errors.Forbidden());
+    if (!permissions[request.token.userRole].delete) return next(new errors.Forbidden());
 
     return repository.remove(request.params.id, request.query)
       .then((result) => {
@@ -78,7 +78,7 @@ module.exports = function createRoute(repository, permissions) {
   }
 
   function update(request, response, next) {
-    if (!permissions[request.token.role].update) return next(new errors.Forbidden());
+    if (!permissions[request.token.userRole].update) return next(new errors.Forbidden());
 
     return repository.update(request.params.id, request.body)
       .then((result) => {
