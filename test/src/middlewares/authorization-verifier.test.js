@@ -7,7 +7,7 @@ const roles = require('../../../src/helpers/constants/roles');
 
 
 const user = {
-  role: roles.TEACHER,
+  userRole: roles.TEACHER,
   user: 1,
 };
 
