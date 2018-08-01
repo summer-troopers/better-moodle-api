@@ -48,7 +48,7 @@ module.exports = function createTeacherRepository(models) {
     }
     return Teacher.findAndCountAll(filter);
   }
-/*
+  /*
         async function view(id) {
           return Teacher.findById(id);
         }
