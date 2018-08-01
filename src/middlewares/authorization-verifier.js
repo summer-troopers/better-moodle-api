@@ -15,7 +15,7 @@ module.exports = function createAuthorizationVerifier(userRepository) {
     if (!token) return next(new errors.Forbidden());
     try {
       request.token = jwt.verify(token, config.jwtconf.secret);
-      if (typeof request.token.user === 'object' || !request.token.role) throw new errors.Forbidden();
+      if (typeof request.token.user !== 'number' || !request.token.userRole) throw new errors.Forbidden();
     } catch (err) {
       return next(new errors.Forbidden());
     }
@@ -24,7 +24,7 @@ module.exports = function createAuthorizationVerifier(userRepository) {
   }
 
   function verifyUserId(request, response, next) {
-    return userRepository.exists(request.token.user, request.token.role)
+    return userRepository.exists(request.token.user, request.token.userRole)
       .then((result) => {
         if (!result) return next(new errors.Forbidden());
         return next();
