@@ -47,7 +47,7 @@ module.exports = function createTeachersRepository(models) {
     return Teacher.findById(id);
   }
 
-  async function add(form) {
+  async function add(form, queryParams) {
     if (queryParams.courseId) {
       const course = await Course.findById(form.teacherId);
       if (!course) throw new errors.NotFound();
