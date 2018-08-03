@@ -7,3 +7,4 @@ _ttd_log_/
 rebuild-db.sh
 prof-logs/
 labs/
+dist/
