@@ -44,11 +44,13 @@ module.exports = function getApp(sqlConnection, mongoConnection) {
 
   app.use(morgan('combined', { stream: logger.stream }));
 
+  app.use('/', express.static('dist/better-moodle-ui'));
+
   app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
   app.use('/api/v1/login', authenticationRoute);
 
-  app.use(createAuthorizationVerifier(userRepository).validateUser);
+  app.use('/api', createAuthorizationVerifier(userRepository).validateUser);
 
   app.use('/api/v1/admins', createRoute(adminsRepository, permissions('crud|||')));
   app.use('/api/v1/teachers', createRoute(teachersRepository, permissions('crud|r|r|')));
