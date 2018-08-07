@@ -5,18 +5,25 @@ const { Op } = require('sequelize');
 
 module.exports = function createTeacherRepository(models) {
   const {
-    Course,
     Teacher,
+    Course,
     CourseTeacher,
   } = models;
 
-  Teacher.Students = Teacher.associations.Courses.target.associations.Specialties.target.associations.Groups.target.associations.Students;
+  const TeachersCourses = Teacher.associations.Courses;
+  const CoursesSpecialties = TeachersCourses.target.associations.Specialties;
+  const SpecialtiesGroups = CoursesSpecialties.target.associations.Groups;
+  const GroupsStudents = SpecialtiesGroups.target.associations.Students;
+
 
   async function list(queryParams) {
     const {
       limit,
       offset,
       contains,
+      courseId,
+      specialtyId,
+      groupId,
       studentId,
     } = queryParams;
 
@@ -33,21 +40,95 @@ module.exports = function createTeacherRepository(models) {
       },
     };
 
-    if (studentId) {
+    if (courseId) {
       return Teacher.findAndCountAll({
         ...filter,
         raw: true,
         include: [{
-          association: Teacher.Students,
+          association: TeachersCourses,
+          required: true,
           attributes: [],
           where: {
-            id: studentId,
+            id: courseId,
           },
         }],
       });
     }
+
+    if (specialtyId) {
+      return Teacher.findAndCountAll({
+        ...filter,
+        raw: true,
+        include: [{
+          association: TeachersCourses,
+          required: true,
+          attributes: [],
+          include: [{
+            association: CoursesSpecialties,
+            required: true,
+            attributes: [],
+            where: {
+              id: specialtyId,
+            },
+          }],
+        }],
+      });
+    }
+
+    if (groupId) {
+      return Teacher.findAndCountAll({
+        ...filter,
+        raw: true,
+        include: [{
+          association: TeachersCourses,
+          required: true,
+          attributes: [],
+          include: [{
+            association: CoursesSpecialties,
+            attributes: [],
+            required: true,
+            include: [{
+              association: SpecialtiesGroups,
+              attributes: [],
+              required: true,
+              where: {
+                id: groupId,
+              },
+            }],
+          }],
+        }],
+      });
+    }
+
+    /*     if (studentId) {
+          return Teacher.findAndCountAll({
+            ...filter,
+            raw: true,
+            include: [{
+              association: TeachersCourses,
+              attributes: [],
+              include: [{
+                association: CoursesSpecialties,
+                attributes: [],
+                include: [{
+                  association: SpecialtiesGroups,
+                  attributes: [],
+                  include: [{
+                    association: GroupsStudents,
+                    attributes: [],
+                    where: {
+                      id: studentId,
+                    },
+                  }],
+                }],
+              }],
+            }],
+          });
+        } */
+
     return Teacher.findAndCountAll(filter);
   }
+
 
   async function view(id) {
     return Teacher.findById(id);
@@ -96,6 +177,7 @@ module.exports = function createTeacherRepository(models) {
     });
   }
 
+
   function remove(id, queryParams) {
     if (queryParams.teacherId) {
       return CourseTeacher.destroy({
@@ -121,7 +203,6 @@ module.exports = function createTeacherRepository(models) {
         },
       });
     }
-
     return Course.destroy({
       where: {
         id: {
@@ -130,6 +211,8 @@ module.exports = function createTeacherRepository(models) {
       },
     });
   }
+
+
   return {
     list,
     view,

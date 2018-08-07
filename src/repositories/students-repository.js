@@ -1,20 +1,106 @@
 'use strict';
 
-const { Op } = require('sequelize');
 const errors = require('@feathersjs/errors');
+const { Op } = require('sequelize');
 
 module.exports = function createStudentsRepository(models) {
-  const { Student, Group } = models;
+  const {
+    Student,
+    Group,
+  } = models;
 
-  function list(queryParams) {
-    const { limit, offset, contains } = queryParams;
+  const StudentsGroup = Student.associations.Group;
+  const GroupSpecialty = StudentsGroup.target.associations.Specialty;
+  const SpecialtyCourses = GroupSpecialty.target.associations.Courses;
+  const CoursesTeachers = SpecialtyCourses.target.associations.Teachers;
 
-    return Student.findAndCountAll({
-      offset,
+  async function list(queryParams) {
+    const {
       limit,
-      where: { firstName: { [Op.like]: [`%${contains}%`] } },
-    });
+      offset,
+      contains,
+      groupId,
+      specialtyId,
+      courseId,
+      studentId,
+    } = queryParams;
+
+    const filter = {
+      limit,
+      offset,
+      where: {
+        firstName: {
+          [Op.like]: [`%${contains}%`],
+        },
+      },
+      attributes: {
+        exclude: ['password'],
+      },
+    };
+
+    if (groupId) {
+      return Student.findAndCountAll({
+        ...filter,
+        raw: true,
+        include: [{
+          association: StudentsGroup,
+          required: true,
+          attributes: [],
+          where: {
+            id: groupId,
+          },
+        }],
+      });
+    }
+
+    if (specialtyId) {
+      return Student.findAndCountAll({
+        ...filter,
+        raw: true,
+        include: [{
+          association: StudentsGroup,
+          required: true,
+          attributes: [],
+          include: [{
+            association: GroupSpecialty,
+            required: true,
+            attributes: [],
+            where: {
+              id: specialtyId,
+            },
+          }],
+        }],
+      });
+    }
+
+    if (courseId) {
+      return Student.findAndCountAll({
+        ...filter,
+        raw: true,
+        include: [{
+          association: StudentsGroup,
+          required: true,
+          attributes: [],
+          include: [{
+            association: GroupSpecialty,
+            required: true,
+            attributes: [],
+            include: [{
+              association: SpecialtyCourses,
+              required: true,
+              attributes: [],
+              where: {
+                id: courseId,
+              },
+            }],
+          }],
+        }],
+      });
+    }
+
+    return Student.findAndCountAll(filter);
   }
+
 
   async function view(id) {
     return Student.findById(id);
