@@ -55,43 +55,81 @@ module.exports = function createTeacherRepository(models) {
 
   async function add(form, queryParams) {
     if (queryParams.courseId) {
-      const course = await Course.findById(form.teacherId);
-      if (!course) throw new errors.NotFound();
-      const teacher = await Teacher.findById(queryParams.courseId);
-      if (!teacher) throw new errors.NotFound();
-      return teacher.addCourse(course);
+      const i = addCourse(form.teacherId, queryParams.courseId);
+      return addCourse(form.i, queryParams.courseId);
     }
-    return Teacher.create(form);
+    if (queryParams.studentId) {
+      return addStudent(form.teacherId, queryParams.courseId);
+    }
+    return Course.create(form);
+  }
+
+  async function addStudent(id, teacherId) {
+    const teacher = await Teacher.findById(teacherId);
+    if (!teacher) throw new errors.NotFound();
+    const course = await Course.findById(id);
+    if (!course) throw new errors.NotFound();
+    return course.addTeacher(teacher);
+  }
+
+  async function addCourse(id, teacherId) {
+    const teacher = await Teacher.findById(teacherId);
+    if (!teacher) throw new errors.NotFound();
+    const course = await Course.findById(id);
+    if (!course) throw new errors.NotFound();
+    return course.addTeacher(teacher);
   }
 
   async function exists(id) {
-    const result = await Teacher.findById(id);
+    const result = await Course.findById(id);
     if (result) return true;
     return false;
   }
 
   async function update(id, form) {
-    return Teacher.update(form, {
-      where: { id: { [Op.eq]: id } },
+    return Course.update(form, {
+      where: {
+        id: {
+          [Op.eq]: id,
+        },
+      },
     });
   }
 
   function remove(id, queryParams) {
-    if (queryParams.courseId) {
+    if (queryParams.teacherId) {
       return CourseTeacher.destroy({
         where: {
           idTeacher: {
-            [Op.eq]: id,
+            [Op.eq]: queryParams.teacherId,
           },
           idCourse: {
-            [Op.eq]: queryParams.courseId,
+            [Op.eq]: id,
           },
         },
       });
     }
-    return Teacher.destroy({ where: { id: { [Op.eq]: id } } });
-  }
+    if (queryParams.specialtyId) {
+      return CourseSpecialty.destroy({
+        where: {
+          idSpecialty: {
+            [Op.eq]: queryParams.specialtyId,
+          },
+          idCourse: {
+            [Op.eq]: id,
+          },
+        },
+      });
+    }
 
+    return Course.destroy({
+      where: {
+        id: {
+          [Op.eq]: id,
+        },
+      },
+    });
+  }
   return {
     list,
     view,
