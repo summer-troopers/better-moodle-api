@@ -4,13 +4,14 @@ const express = require('express');
 const jwt = require('jsonwebtoken');
 const config = require('config');
 const hashPassword = require('../helpers/hash/hash-factory')();
+const errors = require('@feathersjs/errors');
 
 module.exports = function createAuthenticationRoute(repository) {
   const router = express.Router();
 
-  async function loginUser(request, response) {
+  async function loginUser(request, response, next) {
     const result = await repository.getUser(request.body);
-    if (!result) return response.sendStatus(404);
+    if (!result) return next(new errors.NotFound('USER_NOT_FOUND'));
     const [role, user] = result;
     const token = jwt.sign({ userRole: role, user: user.id }, config.jwtconf.secret, config.jwtconf.time);
     const userData = {
@@ -21,18 +22,19 @@ module.exports = function createAuthenticationRoute(repository) {
       email: user.email,
       userRole: role,
     };
-    return response.status(200).json({ token, userData });
+    response.status(200).json({ token, userData });
+    return next();
   }
 
   async function comparePassword(request, response, next) {
     const user = await repository.getUser(request.body);
     try {
       const compareResult = await hashPassword.compare(request.body.password, user[1].password);
-      if (compareResult) next();
-      else throw compareResult;
+      if (!compareResult) return next(new errors.NotAuthenticated('PASSWORD_COMPARE_FAILED'));
     } catch (error) {
-      response.sendStatus(403);
+      return next(new errors.GeneralError('UNKNOWN_AUTHENTICATION_ERROR',{ error }));
     }
+    return next();
   }
 
   router.route('/')
