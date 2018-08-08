@@ -18,7 +18,9 @@ module.exports = function defineSpecialty(sequelize, DataTypes) {
   });
   Specialty.associate = function associateSpecialty(models) {
     Specialty.belongsToMany(models.Course, {
-      through: 'CourseSpecialty', foreignKey: 'specialtyId', otherKey: 'courseId'
+      through: 'CourseSpecialty',
+      foreignKey: 'specialtyId',
+      otherKey: 'courseId',
     });
   };
   return Specialty;

@@ -57,7 +57,7 @@ module.exports = function defineStudent(sequelize, DataTypes) {
     timestamps: false,
   });
   Student.associate = function associateStudent(models) {
-    Student.belongsTo(models.Group, { foreignKey: 'groupId', targerKey: 'id' });
+    Student.belongsTo(models.Group, { foreignKey: 'groupId', targetKey: 'id' });
     Student.hasMany(models.LabReport, { foreignKey: 'studentId', sourceKey: 'id' });
   };
   return Student;

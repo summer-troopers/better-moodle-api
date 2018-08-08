@@ -13,7 +13,7 @@ module.exports = {
 async function generate50Admins() {
   const admins = [];
   admins.push({
-    first_name: 'administator',
+    first_name: 'administrator',
     last_name: 'admin',
     email: 'administrator@moodle.com',
     password: await hashFactory.encrypt('administrator'), // 'administrator' - original password

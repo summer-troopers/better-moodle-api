@@ -7,6 +7,7 @@ module.exports = {
         type: Sequelize.INTEGER,
         field: 'course_id',
         primaryKey: true,
+        foreignKey: true,
         allowNull: false,
         references: {
           model: 'courses',
@@ -17,6 +18,7 @@ module.exports = {
         type: Sequelize.INTEGER,
         field: 'teacher_id',
         primaryKey: true,
+        foreignKey: true,
         allowNull: false,
         references: {
           model: 'teachers',
