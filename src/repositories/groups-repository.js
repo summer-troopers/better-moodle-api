@@ -10,8 +10,8 @@ module.exports = function createGroupsRepository(models) {
   } = models;
 
   const GroupsSpecialty = Group.associations.Specialty;
-  const SpecialtiesCourses = GroupsSpecialty.target.associations.Courses;
-  const CoursesTeachers = SpecialtiesCourses.target.associations.Teachers;
+  const SpecialtyCourses = GroupsSpecialty.target.associations.Courses;
+  const CoursesTeachers = SpecialtyCourses.target.associations.Teachers;
   const GroupStudents = Group.associations.Students;
   const StudentsLaboratory = GroupStudents.target.associations.Laboratory;
 
@@ -37,15 +37,14 @@ module.exports = function createGroupsRepository(models) {
       },
     };
 
-    // not working until fixed models   !!!!verify!!!!!!!!!!!!!   -> remove
     if (specialtyId) {
       return Group.findAndCountAll({
         ...filter,
         raw: true,
         include: [{
           association: GroupsSpecialty,
-          // required: true,
-          // attributes: [],
+          required: true,
+          attributes: [],
           where: {
             id: specialtyId,
           },
@@ -53,27 +52,26 @@ module.exports = function createGroupsRepository(models) {
       });
     }
 
-    /*
-        // not working until fixed models
-        if (courseId) {
-          return Group.findAndCountAll({
-            ...filter,
-            raw: true,
-            include: [{
-              association: GroupsSpecialty,
-              required: true,
-              attributes: [],
-              include: [{
-                association: SpecialtiesCourses,
-                required: true,
-                attributes: [],
-                where: {
-                  id: courseId,
-                },
-              }],
-            }],
-          });
-        } */
+    // not working until fixed models   !!!!!!!!!!!11 courses-specialties
+    if (courseId) {
+      return Group.findAndCountAll({
+        ...filter,
+        raw: true,
+        include: [{
+          association: GroupsSpecialty,
+          required: true,
+          attributes: [],
+          include: [{
+            association: SpecialtyCourses,
+            required: true,
+            attributes: [],
+            where: {
+              id: courseId,
+            },
+          }],
+        }],
+      });
+    }
 
     // not working until fixed models
     if (teacherId) {
@@ -85,7 +83,7 @@ module.exports = function createGroupsRepository(models) {
           required: true,
           attributes: [],
           include: [{
-            association: SpecialtiesCourses,
+            association: SpecialtyCourses,
             required: true,
             attributes: [],
             include: [{

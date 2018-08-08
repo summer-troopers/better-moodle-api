@@ -8,6 +8,10 @@ module.exports = function defineCourseTeacher(sequelize, DataTypes) {
       primaryKey: true,
       foreignKey: true,
       allowNull: false,
+      references: {
+        model: 'courses',
+        key: 'id',
+      },
     },
     teacherId: {
       type: DataTypes.INTEGER,
@@ -15,6 +19,10 @@ module.exports = function defineCourseTeacher(sequelize, DataTypes) {
       primaryKey: true,
       foreignKey: true,
       allowNull: false,
+      references: {
+        model: 'teachers',
+        key: 'id',
+      },
     },
   }, {
     tableName: 'courses_teachers',

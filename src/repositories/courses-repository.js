@@ -166,10 +166,10 @@ module.exports = function createCoursesRepository(models) {
     if (queryParams.teacherId) {
       return CourseTeacher.destroy({
         where: {
-          idTeacher: {
+          teacherId: {
             [Op.eq]: queryParams.teacherId,
           },
-          idCourse: {
+          courseId: {
             [Op.eq]: id,
           },
         },
@@ -178,10 +178,10 @@ module.exports = function createCoursesRepository(models) {
     if (queryParams.specialtyId) {
       return CourseSpecialty.destroy({
         where: {
-          idSpecialty: {
+          specialtyId: {
             [Op.eq]: queryParams.specialtyId,
           },
-          idCourse: {
+          courseId: {
             [Op.eq]: id,
           },
         },

@@ -213,7 +213,7 @@ module.exports = function createStudentsRepository(models) {
     if (queryParams.specialtyId) {
       return GroupsSpecialty.destroy({
         where: {
-          specialityId: {
+          specialtyId: {
             [Op.eq]: queryParams.specialtyId,
           },
           groupId: {

@@ -12,6 +12,8 @@ module.exports = function createSpecialtiesRepository(models) {
 
   const SpecialtiesCourses = Specialty.associations.Courses;
   const CoursesTeachers = SpecialtiesCourses.target.associations.Teachers;
+  const SpecialtyGroups = Specialty.associations.Groups;
+  const GroupStudents = SpecialtyGroups.target.associations.Students;
 
   async function list(queryParams) {
     const {
@@ -20,6 +22,8 @@ module.exports = function createSpecialtiesRepository(models) {
       contains,
       courseId,
       teacherId,
+      groupId,
+      studentId,
     } = queryParams;
 
     const filter = {
@@ -67,6 +71,41 @@ module.exports = function createSpecialtiesRepository(models) {
       });
     }
 
+    if (groupId) {
+      return Specialty.findAndCountAll({
+        ...filter,
+        raw: true,
+        include: [{
+          association: SpecialtyGroups,
+          required: true,
+          attributes: [],
+          where: {
+            id: groupId,
+          },
+        }],
+      });
+    }
+
+    if (studentId) {
+      return Specialty.findAndCountAll({
+        ...filter,
+        raw: true,
+        include: [{
+          association: SpecialtyGroups,
+          required: true,
+          attributes: [],
+          include: [{
+            association: GroupStudents,
+            required: true,
+            attributes: [],
+            where: {
+              id: studentId,
+            },
+          }],
+        }],
+      });
+    }
+
     return Specialty.findAndCountAll(filter);
   }
 
@@ -104,10 +143,10 @@ module.exports = function createSpecialtiesRepository(models) {
     if (queryParams.courseId) {
       return CourseSpecialty.destroy({
         where: {
-          idSpecialty: {
+          specialtyId: {
             [Op.eq]: id,
           },
-          idCourse: {
+          courseId: {
             [Op.eq]: queryParams.courseId,
           },
         },
