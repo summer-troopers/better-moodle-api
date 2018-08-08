@@ -10,7 +10,7 @@ module.exports = {
         foreignKey: true,
         allowNull: false,
         references: {
-          model: 'courses',
+          model: 'specialties',
           key: 'id',
         },
       },
@@ -21,7 +21,7 @@ module.exports = {
         foreignKey: true,
         allowNull: false,
         references: {
-          model: 'specialties',
+          model: 'courses',
           key: 'id',
         },
       },
