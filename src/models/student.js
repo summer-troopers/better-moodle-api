@@ -3,10 +3,10 @@
 module.exports = function defineStudent(sequelize, DataTypes) {
   const Student = sequelize.define('Student', {
     id: {
-      allowNull: false,
-      autoIncrement: true,
-      primaryKey: true,
       type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
+      allowNull: false,
     },
     firstName: {
       type: DataTypes.STRING,
@@ -45,11 +45,11 @@ module.exports = function defineStudent(sequelize, DataTypes) {
         isEmail: true,
       },
     },
-    idGroup: {
+    groupId: {
       type: DataTypes.INTEGER,
-      allowNull: false,
-      field: 'id_group',
+      field: 'group_id',
       foreignKey: true,
+      allowNull: false,
     },
 
   }, {
@@ -57,8 +57,8 @@ module.exports = function defineStudent(sequelize, DataTypes) {
     timestamps: false,
   });
   Student.associate = function associateStudent(models) {
-    Student.belongsTo(models.Group, { foreignKey: 'id' });
-    Student.belongsTo(models.TaskLaboratory, { foreignKey: 'id' });
+    Student.belongsTo(models.Group, { foreignKey: 'groupId', targerKey: 'id' });
+    Student.hasMany(models.LabReport, { foreignKey: 'studentId', sourceKey: 'id' });
   };
   return Student;
 };

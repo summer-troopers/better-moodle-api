@@ -3,14 +3,13 @@
 module.exports = function defineSpecialty(sequelize, DataTypes) {
   const Specialty = sequelize.define('Specialty', {
     id: {
-      allowNull: false,
-      autoIncrement: true,
-      primaryKey: true,
       type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
+      allowNull: false,
     },
     name: {
       type: DataTypes.STRING,
-      field: 'name',
       allowNull: false,
     },
   }, {
@@ -19,7 +18,7 @@ module.exports = function defineSpecialty(sequelize, DataTypes) {
   });
   Specialty.associate = function associateSpecialty(models) {
     Specialty.belongsToMany(models.Course, {
-      through: 'CourseSpecialty', foreignKey: 'idSpecialty',
+      through: 'CourseSpecialty', foreignKey: 'specialtyId', otherKey: 'courseId'
     });
   };
   return Specialty;

@@ -3,26 +3,26 @@
 module.exports = function defineAdmin(sequelize, DataTypes) {
   const Admin = sequelize.define('Admin', {
     id: {
-      allowNull: false,
-      autoIncrement: true,
-      primaryKey: true,
       type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
+      allowNull: false,
     },
     firstName: {
       type: DataTypes.STRING,
       field: 'first_name',
+      allowNull: false,
       validate: {
         len: [1, 50],
       },
-      allowNull: false,
     },
     lastName: {
       type: DataTypes.STRING,
       field: 'last_name',
+      allowNull: false,
       validate: {
         len: [1, 50],
       },
-      allowNull: false,
     },
     password: {
       type: DataTypes.STRING,
@@ -38,12 +38,11 @@ module.exports = function defineAdmin(sequelize, DataTypes) {
     },
     email: {
       type: DataTypes.STRING,
-      field: 'email',
+      allowNull: false,
       unique: true,
       validate: {
         isEmail: true,
       },
-      allowNull: false,
     },
   }, {
     tableName: 'admins',

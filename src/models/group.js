@@ -3,10 +3,10 @@
 module.exports = function defineGroup(sequelize, DataTypes) {
   const Group = sequelize.define('Group', {
     id: {
-      allowNull: false,
-      autoIncrement: true,
-      primaryKey: true,
       type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
+      allowNull: false,
     },
     name: {
       type: DataTypes.STRING,
@@ -15,11 +15,11 @@ module.exports = function defineGroup(sequelize, DataTypes) {
         len: [1, 50],
       },
     },
-    idSpecialty: {
+    specialtyId: {
       type: DataTypes.INTEGER,
-      field: 'id_specialty',
-      allowNull: false,
+      field: 'specialty_id',
       foreignKey: true,
+      allowNull: false,
     },
 
   }, {
@@ -27,8 +27,8 @@ module.exports = function defineGroup(sequelize, DataTypes) {
     timestamps: false,
   });
   Group.associate = function associateGroup(models) {
-    Group.hasMany(models.Student, { foreignKey: 'id' });
-    Group.belongsTo(models.Specialty, { foreignKey: 'id' });
+    Group.hasMany(models.Student, { foreignKey: 'groupId', sourceKey: 'id' });
+    Group.belongsTo(models.Specialty, { foreignKey: 'specialtyId', targetKey: 'id' });
   };
   return Group;
 };

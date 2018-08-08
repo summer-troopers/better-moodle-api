@@ -3,10 +3,10 @@
 module.exports = function defineTeacher(sequelize, DataTypes) {
   const Teacher = sequelize.define('Teacher', {
     id: {
-      allowNull: false,
-      autoIncrement: true,
-      primaryKey: true,
       type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
+      allowNull: false,
     },
     firstName: {
       type: DataTypes.STRING,
@@ -52,8 +52,8 @@ module.exports = function defineTeacher(sequelize, DataTypes) {
   });
   // eslint-disable-next-line no-unused-vars
   Teacher.associate = function associateTeacher(models) {
-    Teacher.belongsToMany(models.Course, { through: 'CourseTeacher', foreignKey: 'idTeacher' });
-    Teacher.belongsTo(models.TaskLaboratory, { foreignKey: 'id' });
+    Teacher.belongsToMany(models.Course, { through: 'CourseTeacher', foreignKey: 'teacherId', otherKey: 'courseId' });
+    Teacher.hasMany(models.LabTask, { foreignKey: 'teacherId', sourceKey: 'id' });
   };
   return Teacher;
 };
