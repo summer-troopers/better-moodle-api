@@ -11,12 +11,12 @@ function generate50Groups() {
   const group = [];
   group.push({
     name: 'AI-151',
-    id_specialty: '4',
+    specialty_id: '4',
   });
   for (let i = 1; i <= 50; i += 1) {
     group.push({
       name: `${getRandomLetters()}${faker.random.number(60)}`, // eslint-disable-line no-unused-vars, no-use-before-define
-      id_specialty: faker.random.number(10) + 1,
+      specialty_id: faker.random.number(10) + 1,
     });
   }
   return group;

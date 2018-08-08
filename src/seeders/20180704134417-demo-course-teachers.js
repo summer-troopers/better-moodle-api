@@ -11,8 +11,8 @@ function generate50Connections() {
   const connections = [];
   for (let i = 0; i <= 10; i += 1) {
     connections.push({
-      id_teacher: faker.random.number(49) + 1,
-      id_course: faker.random.number(49) + 1,
+      teacher_id: faker.random.number(49) + 1,
+      course_id: faker.random.number(49) + 1,
     });
   }
   return connections;

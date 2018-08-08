@@ -17,7 +17,7 @@ async function generate50Students() {
     email: 'student@email.com',
     password: await hashFactory.encrypt('student'),
     phone_number: '689-689-0688',
-    id_group: '1',
+    group_id: '1',
   });
   for (let i = 1; i <= 50; i += 1) {
     students.push({
@@ -26,7 +26,7 @@ async function generate50Students() {
       email: faker.internet.email(),
       password: faker.random.alphaNumeric(60),
       phone_number: faker.phone.phoneNumberFormat(0),
-      id_group: faker.random.number(10) + 1,
+      group_id: faker.random.number(10) + 1,
     });
   }
   return students;
