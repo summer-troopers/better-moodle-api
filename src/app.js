@@ -3,6 +3,7 @@
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const express = require('express');
+const { FeathersError } = require('@feathersjs/errors');
 
 const morgan = require('morgan');
 const swaggerUi = require('swagger-ui-express');
@@ -17,7 +18,6 @@ const createUserRepository = require('./repositories/users-repository');
 const { permissions } = require('./helpers/util');
 const createAuthorizationVerifier = require('./middlewares/authorization-verifier');
 
-const { FeathersError } = require('@feathersjs/errors');
 
 module.exports = function getApp(sqlConnection, mongoConnection) {
   const app = express();

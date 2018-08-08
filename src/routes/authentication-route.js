@@ -3,8 +3,8 @@
 const express = require('express');
 const jwt = require('jsonwebtoken');
 const config = require('config');
-const hashPassword = require('../helpers/hash/hash-factory')();
 const errors = require('@feathersjs/errors');
+const hashPassword = require('../helpers/hash/hash-factory')();
 
 module.exports = function createAuthenticationRoute(repository) {
   const router = express.Router();
@@ -32,7 +32,7 @@ module.exports = function createAuthenticationRoute(repository) {
       const compareResult = await hashPassword.compare(request.body.password, user[1].password);
       if (!compareResult) return next(new errors.NotAuthenticated('PASSWORD_COMPARE_FAILED'));
     } catch (error) {
-      return next(new errors.GeneralError('UNKNOWN_AUTHENTICATION_ERROR',{ error }));
+      return next(new errors.GeneralError('UNKNOWN_AUTHENTICATION_ERROR', { error }));
     }
     return next();
   }
