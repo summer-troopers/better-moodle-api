@@ -12,6 +12,11 @@ module.exports = function createCoursesRepository(models) {
     Specialty,
   } = models;
 
+  const CoursesTeachers = Course.associations.Teachers;
+  const CoursesSpecialties = Course.associations.Specialties;
+  const SpecialtiesGroups = CoursesSpecialties.target.associations.Groups;
+  const GroupsStudents = SpecialtiesGroups.target.associations.Students;
+
   async function list(queryParams) {
     const {
       limit,
@@ -19,6 +24,8 @@ module.exports = function createCoursesRepository(models) {
       contains,
       teacherId,
       specialtyId,
+      groupId,
+      studentId,
     } = queryParams;
 
     const filter = {
@@ -31,34 +38,53 @@ module.exports = function createCoursesRepository(models) {
       },
     };
 
-    if (teacherId) {
-      return Course.findAndCountAll({
-        ...filter,
-        include: [{
-          model: Teacher,
-          attributes: [],
-          where: {
-            id: {
-              [Op.eq]: teacherId,
-            },
-          },
-        }],
-      });
-    }
     if (specialtyId) {
       return Course.findAndCountAll({
         ...filter,
+        raw: true,
         include: [{
-          model: Specialty,
+          association: CoursesSpecialties,
           attributes: [],
           where: {
-            id: {
-              [Op.eq]: specialtyId,
-            },
+            id: specialtyId,
           },
         }],
       });
     }
+
+    if (groupId) {
+      return Course.findAndCountAll({
+        ...filter,
+        raw: true,
+        include: [{
+          association: CoursesSpecialties,
+          attributes: [],
+          include: [{
+            association: SpecialtiesGroups,
+            attributes: [],
+            where: {
+              id: groupId,
+            },
+          }],
+        }],
+      });
+    }
+
+    if (teacherId) {
+      return Course.findAndCountAll({
+        ...filter,
+        raw: true,
+        include: [{
+          association: CoursesTeachers,
+          required: true,
+          attributes: [],
+          where: {
+            id: teacherId,
+          },
+        }],
+      });
+    }
+
     return Course.findAndCountAll(filter);
   }
 

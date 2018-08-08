@@ -13,6 +13,7 @@ module.exports = function createStudentsRepository(models) {
   const GroupSpecialty = StudentsGroup.target.associations.Specialty;
   const SpecialtyCourses = GroupSpecialty.target.associations.Courses;
   const CoursesTeachers = SpecialtyCourses.target.associations.Teachers;
+  const StudentsLaboratories = Student.associations.Laboratory;
 
   async function list(queryParams) {
     const {
@@ -22,7 +23,9 @@ module.exports = function createStudentsRepository(models) {
       groupId,
       specialtyId,
       courseId,
+      teacherId,
       studentId,
+      laboratoryId,
     } = queryParams;
 
     const filter = {
@@ -53,42 +56,43 @@ module.exports = function createStudentsRepository(models) {
       });
     }
 
-    if (specialtyId) {
-      return Student.findAndCountAll({
-        ...filter,
-        raw: true,
-        include: [{
-          association: StudentsGroup,
-          required: true,
-          attributes: [],
-          include: [{
-            association: GroupSpecialty,
-            required: true,
-            attributes: [],
-            where: {
-              id: specialtyId,
-            },
-          }],
-        }],
-      });
-    }
+    /*     if (specialtyId) {
+          return Student.findAndCountAll({
+            ...filter,
+            raw: true,
+            include: [{
+              association: StudentsGroup,
+              required: true,
+              attributes: [],
+              include: [{
+                association: GroupSpecialty,
+                required: true,
+                attributes: [],
+                where: {
+                  id: specialtyId,
+                },
+              }],
+            }],
+          });
+        } */
 
+    // not working
     if (courseId) {
       return Student.findAndCountAll({
         ...filter,
         raw: true,
         include: [{
           association: StudentsGroup,
-          required: true,
-          attributes: [],
+          // required: true,
+          // attributes: [],
           include: [{
             association: GroupSpecialty,
-            required: true,
-            attributes: [],
+            // required: true,
+            // attributes: [],
             include: [{
               association: SpecialtyCourses,
-              required: true,
-              attributes: [],
+              // required: true,
+              // attributes: [],
               where: {
                 id: courseId,
               },
@@ -98,9 +102,55 @@ module.exports = function createStudentsRepository(models) {
       });
     }
 
+    // not working
+    if (teacherId) {
+      return Student.findAndCountAll({
+        ...filter,
+        raw: true,
+        include: [{
+          association: StudentsGroup,
+          // required: true,
+          // attributes: [],
+          include: [{
+            association: GroupSpecialty,
+            // required: true,
+            // attributes: [],
+            include: [{
+              association: SpecialtyCourses,
+              // required: true,
+              // attributes: [],
+              include: [{
+                association: CoursesTeachers,
+                // required: true,
+                // attributes: [],
+                where: {
+                  id: teacherId,
+                },
+              }],
+            }],
+          }],
+        }],
+      });
+    }
+
+    // not working
+    if (laboratoryId) {
+      return Student.findAndCountAll({
+        ...filter,
+        raw: true,
+        include: [{
+          association: StudentsLaboratories,
+          required: true,
+          attributes: [],
+          where: {
+            id: laboratoryId,
+          },
+        }],
+      });
+    }
+
     return Student.findAndCountAll(filter);
   }
-
 
   async function view(id) {
     return Student.findById(id);

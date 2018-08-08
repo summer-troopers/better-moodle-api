@@ -75,6 +75,7 @@ module.exports = function createTeacherRepository(models) {
       });
     }
 
+    // not working
     if (groupId) {
       return Teacher.findAndCountAll({
         ...filter,
@@ -100,7 +101,9 @@ module.exports = function createTeacherRepository(models) {
       });
     }
 
-    /*     if (studentId) {
+    /*
+    // not working
+      if (studentId) {
           return Teacher.findAndCountAll({
             ...filter,
             raw: true,

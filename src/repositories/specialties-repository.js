@@ -1,9 +1,17 @@
 'use strict';
 
 const { Op } = require('sequelize');
+const errors = require('@feathersjs/errors');
 
 module.exports = function createSpecialtiesRepository(models) {
-  const { Specialty, Course, CourseSpecialty } = models;
+  const {
+    Specialty,
+    Course,
+    CourseSpecialty,
+  } = models;
+
+  const SpecialtyCourses = Specialty.associations.Courses;
+  const CoursesTeachers = SpecialtyCourses.target.associations.Teachers;
 
   async function list(queryParams) {
     const {
@@ -11,6 +19,7 @@ module.exports = function createSpecialtiesRepository(models) {
       offset,
       contains,
       courseId,
+      teacherId,
     } = queryParams;
 
     const filter = {
@@ -26,17 +35,38 @@ module.exports = function createSpecialtiesRepository(models) {
     if (courseId) {
       return Specialty.findAndCountAll({
         ...filter,
+        raw: true,
         include: [{
-          model: Course,
+          association: SpecialtyCourses,
+          required: true,
           attributes: [],
           where: {
-            id: {
-              [Op.eq]: courseId,
-            },
+            id: courseId,
           },
         }],
       });
     }
+
+    if (teacherId) {
+      return Specialty.findAndCountAll({
+        ...filter,
+        raw: true,
+        include: [{
+          association: SpecialtyCourses,
+          required: true,
+          attributes: [],
+          include: [{
+            association: CoursesTeachers,
+            required: true,
+            attributes: [],
+            where: {
+              id: teacherId,
+            },
+          }],
+        }],
+      });
+    }
+
     return Specialty.findAndCountAll(filter);
   }
 
