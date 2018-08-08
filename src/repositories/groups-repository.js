@@ -9,11 +9,11 @@ module.exports = function createGroupsRepository(models) {
     Specialty,
   } = models;
 
-  const GroupsStudents = Group.associations.Students;
-  const StudentsLaboratories = GroupsStudents.target.associations.Laboratory;
-  const GroupSpecialty = Group.associations.Specialty;
-  const SpecialtyCourses = GroupSpecialty.target.associations.Courses;
-  const CoursesTeachers = SpecialtyCourses.target.associations.Teachers;
+  const GroupsSpecialty = Group.associations.Specialty;
+  const SpecialtiesCourses = GroupsSpecialty.target.associations.Courses;
+  const CoursesTeachers = SpecialtiesCourses.target.associations.Teachers;
+  const GroupStudents = Group.associations.Students;
+  const StudentsLaboratory = GroupStudents.target.associations.Laboratory;
 
   function list(queryParams) {
     const {
@@ -21,8 +21,10 @@ module.exports = function createGroupsRepository(models) {
       offset,
       contains,
       courseId,
+      specialtyId,
       teacherId,
       studentId,
+      laboratoryId,
     } = queryParams;
 
     const filter = {
@@ -35,38 +37,55 @@ module.exports = function createGroupsRepository(models) {
       },
     };
 
-    // not working
-    if (courseId) {
+    // not working until fixed models   !!!!verify!!!!!!!!!!!!!   -> remove
+    if (specialtyId) {
       return Group.findAndCountAll({
         ...filter,
         raw: true,
         include: [{
-          association: GroupSpecialty,
-          required: true,
-          attributes: [],
-          include: [{
-            association: SpecialtyCourses,
-            required: true,
-            attributes: [],
-            where: {
-              id: courseId,
-            },
-          }],
+          association: GroupsSpecialty,
+          // required: true,
+          // attributes: [],
+          where: {
+            id: specialtyId,
+          },
         }],
       });
     }
 
-    // not working
+    /*
+        // not working until fixed models
+        if (courseId) {
+          return Group.findAndCountAll({
+            ...filter,
+            raw: true,
+            include: [{
+              association: GroupsSpecialty,
+              required: true,
+              attributes: [],
+              include: [{
+                association: SpecialtiesCourses,
+                required: true,
+                attributes: [],
+                where: {
+                  id: courseId,
+                },
+              }],
+            }],
+          });
+        } */
+
+    // not working until fixed models
     if (teacherId) {
       return Group.findAndCountAll({
         ...filter,
         raw: true,
         include: [{
-          association: GroupSpecialty,
+          association: GroupsSpecialty,
           required: true,
           attributes: [],
           include: [{
-            association: SpecialtyCourses,
+            association: SpecialtiesCourses,
             required: true,
             attributes: [],
             include: [{
@@ -82,17 +101,38 @@ module.exports = function createGroupsRepository(models) {
       });
     }
 
-
     if (studentId) {
       return Group.findAndCountAll({
         ...filter,
         raw: true,
         include: [{
-          association: GroupsStudents,
+          association: GroupStudents,
+          required: true,
           attributes: [],
           where: {
             id: studentId,
           },
+        }],
+      });
+    }
+
+    // not working because of labs-model
+    if (laboratoryId) {
+      return Group.findAndCountAll({
+        ...filter,
+        raw: true,
+        include: [{
+          association: GroupStudents,
+          required: true,
+          attributes: [],
+          include: [{
+            association: StudentsLaboratory,
+            required: true,
+            attributes: [],
+            where: {
+              id: laboratoryId,
+            },
+          }],
         }],
       });
     }
@@ -105,7 +145,7 @@ module.exports = function createGroupsRepository(models) {
   }
 
   async function add(form) {
-    const result = await Specialty.findById(form.idSpecialty);
+    const result = await Specialty.findById(form.specialtyId);
     if (!result) throw new errors.NotFound();
 
     return Group.create(form);
@@ -118,7 +158,7 @@ module.exports = function createGroupsRepository(models) {
   }
 
   async function update(id, form) {
-    const result = await Specialty.findById(form.idSpecialty);
+    const result = await Specialty.findById(form.specialtyId);
     if (!result) throw new errors.NotFound('');
 
     return Group.update(form, {
@@ -126,8 +166,38 @@ module.exports = function createGroupsRepository(models) {
     });
   }
 
-  function remove(id) {
-    return Group.destroy({ where: { id: { [Op.eq]: id } } });
+  function remove(id, queryParams) {
+    if (queryParams.studentId) {
+      return GroupStudents.destroy({
+        where: {
+          studentId: {
+            [Op.eq]: queryParams.studentId,
+          },
+          id: {
+            [Op.eq]: id,
+          },
+        },
+      });
+    }
+    if (queryParams.specialityId) {
+      return GroupsSpecialities.destroy({
+        where: {
+          id: {
+            [Op.eq]: id,
+          },
+          specialityId: {
+            [Op.eq]: queryParams.specialityId,
+          },
+        },
+      });
+    }
+    return Group.destroy({
+      where: {
+        id: {
+          [Op.eq]: id,
+        },
+      },
+    });
   }
 
   return {

@@ -69,7 +69,7 @@
     "max-len": "off",
     "complexity": [
       "error",
-      5
+      6
     ]
   }
 }

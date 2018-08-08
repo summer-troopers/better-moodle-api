@@ -12,8 +12,8 @@ module.exports = function createTeacherRepository(models) {
 
   const TeachersCourses = Teacher.associations.Courses;
   const CoursesSpecialties = TeachersCourses.target.associations.Specialties;
-  const SpecialtiesGroups = CoursesSpecialties.target.associations.Groups;
-  const GroupsStudents = SpecialtiesGroups.target.associations.Students;
+  const SpecialtyGroups = CoursesSpecialties.target.associations.Groups;
+  const GroupStudents = SpecialtyGroups.target.associations.Students;
 
 
   async function list(queryParams) {
@@ -86,12 +86,12 @@ module.exports = function createTeacherRepository(models) {
           attributes: [],
           include: [{
             association: CoursesSpecialties,
-            attributes: [],
             required: true,
+            attributes: [],
             include: [{
-              association: SpecialtiesGroups,
-              attributes: [],
+              association: SpecialtyGroups,
               required: true,
+              attributes: [],
               where: {
                 id: groupId,
               },
@@ -101,37 +101,39 @@ module.exports = function createTeacherRepository(models) {
       });
     }
 
-    /*
-    // not working
-      if (studentId) {
-          return Teacher.findAndCountAll({
-            ...filter,
-            raw: true,
+    // not working until fixed models
+    if (studentId) {
+      return Teacher.findAndCountAll({
+        ...filter,
+        raw: true,
+        include: [{
+          association: TeachersCourses,
+          required: true,
+          attributes: [],
+          include: [{
+            association: CoursesSpecialties,
+            required: true,
+            attributes: [],
             include: [{
-              association: TeachersCourses,
+              association: SpecialtyGroups,
+              required: true,
               attributes: [],
               include: [{
-                association: CoursesSpecialties,
+                association: GroupStudents,
+                required: true,
                 attributes: [],
-                include: [{
-                  association: SpecialtiesGroups,
-                  attributes: [],
-                  include: [{
-                    association: GroupsStudents,
-                    attributes: [],
-                    where: {
-                      id: studentId,
-                    },
-                  }],
-                }],
+                where: {
+                  id: studentId,
+                },
               }],
             }],
-          });
-        } */
+          }],
+        }],
+      });
+    }
 
     return Teacher.findAndCountAll(filter);
   }
-
 
   async function view(id) {
     return Teacher.findById(id);
@@ -139,21 +141,12 @@ module.exports = function createTeacherRepository(models) {
 
   async function add(form, queryParams) {
     if (queryParams.courseId) {
-      const i = addCourse(form.teacherId, queryParams.courseId);
-      return addCourse(form.i, queryParams.courseId);
+      return addCourse(form.teacherId, queryParams.courseId);
     }
     if (queryParams.studentId) {
       return addStudent(form.teacherId, queryParams.courseId);
     }
     return Course.create(form);
-  }
-
-  async function addStudent(id, teacherId) {
-    const teacher = await Teacher.findById(teacherId);
-    if (!teacher) throw new errors.NotFound();
-    const course = await Course.findById(id);
-    if (!course) throw new errors.NotFound();
-    return course.addTeacher(teacher);
   }
 
   async function addCourse(id, teacherId) {
@@ -164,13 +157,24 @@ module.exports = function createTeacherRepository(models) {
     return course.addTeacher(teacher);
   }
 
+  async function addStudent(id, teacherId) {
+    const teacher = await Teacher.findById(teacherId);
+    if (!teacher) throw new errors.NotFound();
+    const student = await Student.findById(id);
+    if (!student) throw new errors.NotFound();
+    return student.addTeacher(teacher);
+  }
+
   async function exists(id) {
-    const result = await Course.findById(id);
+    const result = await Teacher.findById(id);
     if (result) return true;
     return false;
   }
 
   async function update(id, form) {
+    const result = await Course.findById(form.courseId);
+    if (!result) throw new errors.NotFound();
+
     return Course.update(form, {
       where: {
         id: {
@@ -180,33 +184,32 @@ module.exports = function createTeacherRepository(models) {
     });
   }
 
-
   function remove(id, queryParams) {
     if (queryParams.teacherId) {
-      return CourseTeacher.destroy({
+      return CoursesTeacher.destroy({
         where: {
-          idTeacher: {
-            [Op.eq]: queryParams.teacherId,
-          },
-          idCourse: {
+          id: {
             [Op.eq]: id,
+          },
+          courseId: {
+            [Op.eq]: queryParams.courseId,
           },
         },
       });
     }
     if (queryParams.specialtyId) {
-      return CourseSpecialty.destroy({
+      return CoursesSpecialties.destroy({
         where: {
-          idSpecialty: {
+          specialtyId: {
             [Op.eq]: queryParams.specialtyId,
           },
-          idCourse: {
-            [Op.eq]: id,
+          courseId: {
+            [Op.eq]: queryParams.courseId,
           },
         },
       });
     }
-    return Course.destroy({
+    return Teacher.destroy({
       where: {
         id: {
           [Op.eq]: id,

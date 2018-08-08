@@ -14,8 +14,8 @@ module.exports = function createCoursesRepository(models) {
 
   const CoursesTeachers = Course.associations.Teachers;
   const CoursesSpecialties = Course.associations.Specialties;
-  const SpecialtiesGroups = CoursesSpecialties.target.associations.Groups;
-  const GroupsStudents = SpecialtiesGroups.target.associations.Students;
+  const SpecialtyGroups = CoursesSpecialties.target.associations.Groups;
+  const GroupStudents = SpecialtyGroups.target.associations.Students;
 
   async function list(queryParams) {
     const {
@@ -44,6 +44,7 @@ module.exports = function createCoursesRepository(models) {
         raw: true,
         include: [{
           association: CoursesSpecialties,
+          required: true,
           attributes: [],
           where: {
             id: specialtyId,
@@ -58,13 +59,40 @@ module.exports = function createCoursesRepository(models) {
         raw: true,
         include: [{
           association: CoursesSpecialties,
+          required: true,
           attributes: [],
           include: [{
-            association: SpecialtiesGroups,
+            association: SpecialtyGroups,
+            required: true,
             attributes: [],
             where: {
               id: groupId,
             },
+          }],
+        }],
+      });
+    }
+
+    if (studentId) {
+      return Course.findAndCountAll({
+        ...filter,
+        raw: true,
+        include: [{
+          association: CoursesSpecialties,
+          required: true,
+          attributes: [],
+          include: [{
+            association: SpecialtyGroups,
+            required: true,
+            attributes: [],
+            include: [{
+              association: GroupStudents,
+              required: true,
+              attributes: [],
+              where: {
+                id: studentId,
+              },
+            }],
           }],
         }],
       });

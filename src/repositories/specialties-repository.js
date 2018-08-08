@@ -10,8 +10,8 @@ module.exports = function createSpecialtiesRepository(models) {
     CourseSpecialty,
   } = models;
 
-  const SpecialtyCourses = Specialty.associations.Courses;
-  const CoursesTeachers = SpecialtyCourses.target.associations.Teachers;
+  const SpecialtiesCourses = Specialty.associations.Courses;
+  const CoursesTeachers = SpecialtiesCourses.target.associations.Teachers;
 
   async function list(queryParams) {
     const {
@@ -37,7 +37,7 @@ module.exports = function createSpecialtiesRepository(models) {
         ...filter,
         raw: true,
         include: [{
-          association: SpecialtyCourses,
+          association: SpecialtiesCourses,
           required: true,
           attributes: [],
           where: {
@@ -52,7 +52,7 @@ module.exports = function createSpecialtiesRepository(models) {
         ...filter,
         raw: true,
         include: [{
-          association: SpecialtyCourses,
+          association: SpecialtiesCourses,
           required: true,
           attributes: [],
           include: [{
@@ -92,6 +92,9 @@ module.exports = function createSpecialtiesRepository(models) {
   }
 
   async function update(id, form) {
+    const result = await Course.findById(form.courseId);
+    if (!result) throw new errors.NotFound();
+
     return Specialty.update(form, {
       where: { id: { [Op.eq]: id } },
     });
