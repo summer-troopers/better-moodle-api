@@ -4,13 +4,12 @@ module.exports = {
   up(queryInterface, Sequelize) {
     return queryInterface.createTable('specialties', {
       id: {
-        autoIncrement: true,
-        primaryKey: true,
         type: Sequelize.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
       },
       name: {
         type: Sequelize.STRING,
-        field: 'name',
         allowNull: false,
       },
     });

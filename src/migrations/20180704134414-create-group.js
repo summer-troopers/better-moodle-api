@@ -12,9 +12,10 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
       },
-      idSpecialty: {
+      specialtyId: {
         type: Sequelize.INTEGER,
-        field: 'id_specialty',
+        field: 'specialty_id',
+        foreignKey: true,
         allowNull: false,
         references: {
           model: 'specialties',

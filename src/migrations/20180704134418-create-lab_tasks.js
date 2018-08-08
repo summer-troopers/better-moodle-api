@@ -2,37 +2,39 @@
 
 module.exports = {
   up(queryInterface, Sequelize) {
-    return queryInterface.createTable('task_laboratory', {
+    return queryInterface.createTable('lab_tasks', {
       id: {
-        autoIncrement: true,
+        type: Sequelize.INTEGER,
         primaryKey: true,
-        type: Sequelize.INTEGER,
+        autoIncrement: true,
       },
-      idTeacher: {
+      teacherId: {
         type: Sequelize.INTEGER,
+        field: 'teacher_id',
+        foreignKey: true,
         allowNull: false,
-        field: 'id_teacher',
         references: {
           model: 'teachers',
           key: 'id',
         },
       },
-      idCourse: {
+      courseId: {
         type: Sequelize.INTEGER,
+        field: 'course_id',
+        foreignKey: true,
         allowNull: false,
-        field: 'id_course',
         references: {
           model: 'courses',
           key: 'id',
         },
       },
-      idLaboratoryTaskMoongo: {
-        type: Sequelize.INTEGER,
-        field: 'id_laboratory_task_mongo',
+      mongoFileId: {
+        type: Sequelize.STRING,
+        field: 'mongo_file_id',
         allowNull: false,
       },
     });
   },
   // eslint-disable-next-line no-unused-vars
-  down(queryInterface, Sequelize) { return queryInterface.dropTable('task_laboratory'); },
+  down(queryInterface, Sequelize) { return queryInterface.dropTable('lab_tasks'); },
 };
