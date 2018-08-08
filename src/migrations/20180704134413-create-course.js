@@ -4,9 +4,9 @@ module.exports = {
   up(queryInterface, Sequelize) {
     return queryInterface.createTable('courses', {
       id: {
-        autoIncrement: true,
-        primaryKey: true,
         type: Sequelize.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
       },
       name: {
         type: Sequelize.STRING,

@@ -4,24 +4,24 @@ module.exports = {
   up(queryInterface, Sequelize) {
     return queryInterface.createTable('students', {
       id: {
-        autoIncrement: true,
-        primaryKey: true,
         type: Sequelize.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
       },
       firstName: {
         type: Sequelize.STRING,
-        allowNull: false,
         field: 'first_name',
+        allowNull: false,
       },
       lastName: {
         type: Sequelize.STRING,
-        allowNull: false,
         field: 'last_name',
+        allowNull: false,
       },
       email: {
         type: Sequelize.STRING,
-        allowNull: false,
         unique: true,
+        allowNull: false,
       },
       password: {
         type: Sequelize.STRING,
@@ -31,9 +31,11 @@ module.exports = {
         type: Sequelize.STRING,
         field: 'phone_number',
       },
-      idGroup: {
+      groupId: {
         type: Sequelize.INTEGER,
-        field: 'id_group',
+        field: 'group_id',
+        foreignKey: true,
+        allowNull: false,
         references: {
           model: 'groups',
           key: 'id',

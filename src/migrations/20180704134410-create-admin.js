@@ -4,9 +4,9 @@ module.exports = {
   up(queryInterface, Sequelize) {
     return queryInterface.createTable('admins', {
       id: {
+        type: Sequelize.INTEGER,
         autoIncrement: true,
         primaryKey: true,
-        type: Sequelize.INTEGER,
       },
       firstName: {
         type: Sequelize.STRING,
@@ -20,8 +20,8 @@ module.exports = {
       },
       email: {
         type: Sequelize.STRING,
-        allowNull: false,
         unique: true,
+        allowNull: false,
       },
       password: {
         type: Sequelize.STRING,

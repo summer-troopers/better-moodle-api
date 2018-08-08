@@ -3,21 +3,23 @@
 module.exports = {
   up(queryInterface, Sequelize) {
     return queryInterface.createTable('courses_teachers', {
-      idCourse: {
+      courseId: {
         type: Sequelize.INTEGER,
-        allowNull: false,
+        field: 'course_id',
         primaryKey: true,
-        field: 'id_course',
+        foreignKey: true,
+        allowNull: false,
         references: {
           model: 'courses',
           key: 'id',
         },
       },
-      idTeacher: {
+      teacherId: {
         type: Sequelize.INTEGER,
-        allowNull: false,
+        field: 'teacher_id',
         primaryKey: true,
-        field: 'id_teacher',
+        foreignKey: true,
+        allowNull: false,
         references: {
           model: 'teachers',
           key: 'id',

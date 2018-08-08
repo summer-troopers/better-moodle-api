@@ -4,24 +4,24 @@ module.exports = {
   up(queryInterface, Sequelize) {
     return queryInterface.createTable('teachers', {
       id: {
-        autoIncrement: true,
-        primaryKey: true,
         type: Sequelize.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
       },
       firstName: {
         type: Sequelize.STRING,
-        allowNull: false,
         field: 'first_name',
+        allowNull: false,
       },
       lastName: {
         type: Sequelize.STRING,
-        allowNull: false,
         field: 'last_name',
+        allowNull: false,
       },
       email: {
         type: Sequelize.STRING,
-        allowNull: false,
         unique: true,
+        allowNull: false,
       },
       password: {
         type: Sequelize.STRING,
