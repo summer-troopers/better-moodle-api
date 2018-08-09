@@ -35,5 +35,5 @@ module.exports = function defineLabTask(sequelize, DataTypes) {
     LabTask.belongsTo(models.Course, { foreignKey: 'courseId', targetKey: 'id' });
     LabTask.hasMany(models.LabReport, { foreignKey: 'labTaskId', sourceKey: 'id' });
   };
-  return TaskLaboratory;
+  return LabTask;
 };

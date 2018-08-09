@@ -21,7 +21,7 @@ module.exports = function defineCourseTeacher(sequelize, DataTypes) {
     timestamps: false,
   });
   CourseTeacher.associate = function associateCourseTeacher(models) {
-    CourseTeacher.hasMany(models.Course, { foreignKey: 'courseId', targerKey: 'id' });
+    CourseTeacher.hasMany(models.Course, { foreignKey: 'courseId', targetKey: 'id' });
     CourseTeacher.hasMany(models.Teacher, { foreignKey: 'teacherId', targetKey: 'id' });
   };
   return CourseTeacher;
