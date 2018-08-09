@@ -4,7 +4,6 @@ const errors = require('@feathersjs/errors');
 const { Op } = require('sequelize');
 
 module.exports = function createStudentsRepository(connection) {
-
   async function list(queryParams) {
     const {
       Student,

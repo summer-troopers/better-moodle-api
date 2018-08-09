@@ -158,24 +158,24 @@ module.exports = function createLabsRepository(connection) {
     const result = await gfs.files.findAndCountAll(filter).toArray();
     return result;
   }
-}
 
-async function view(fileName) {
-  const result = await gfs.files.findOne({ filename: fileName });
-  return result;
-}
 
-function add() {
-}
+  async function view(fileName) {
+    const result = await gfs.files.findOne({ filename: fileName });
+    return result;
+  }
 
-async function remove(fileId) {
-  await gfs.remove({ _id: fileId, root: 'fs' });
-}
+  function add() {
+  }
 
-return {
-  list,
-  view,
-  add,
-  remove,
-};
+  async function remove(fileId) {
+    await gfs.remove({ _id: fileId, root: 'fs' });
+  }
+
+  return {
+    list,
+    view,
+    add,
+    remove,
+  };
 };

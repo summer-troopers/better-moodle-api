@@ -215,7 +215,6 @@ module.exports = function createTeacherRepository(sequelize) {
     });
   }
 
-
   return {
     list,
     view,
