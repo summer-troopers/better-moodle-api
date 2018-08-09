@@ -11,13 +11,11 @@ module.exports = function defineLabReport(sequelize, DataTypes) {
     studentId: {
       type: DataTypes.INTEGER,
       field: 'student_id',
-      foreignKey: true,
       allowNull: false,
     },
     labTaskId: {
       type: DataTypes.INTEGER,
       field: 'lab_task_id',
-      foreignKey: true,
       allowNull: false,
     },
     mongoFileId: {

@@ -18,7 +18,6 @@ module.exports = function defineGroup(sequelize, DataTypes) {
     specialtyId: {
       type: DataTypes.INTEGER,
       field: 'specialty_id',
-      foreignKey: true,
       allowNull: false,
     },
 

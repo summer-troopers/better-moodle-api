@@ -6,14 +6,12 @@ module.exports = function defineCourseSpecialty(sequelize, DataTypes) {
       type: DataTypes.INTEGER,
       field: 'course_id',
       primaryKey: true,
-      foreignKey: true,
       allowNull: false,
     },
     specialtyId: {
       type: DataTypes.INTEGER,
       field: 'specialty_id',
       primaryKey: true,
-      foreignKey: true,
       allowNull: false,
     },
   }, {
