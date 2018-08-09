@@ -4,7 +4,6 @@ const errors = require('@feathersjs/errors');
 const { Op } = require('sequelize');
 
 module.exports = function createStudentsRepository(connection) {
-
   // const StudentsGroup = Student.associations.Group;
   // const GroupsSpecialty = StudentsGroup.target.associations.Specialty;
   // const SpecialtyCourses = GroupsSpecialty.target.associations.Courses;
@@ -53,6 +52,7 @@ module.exports = function createStudentsRepository(connection) {
         subQuery: false,
         include: [{
           model: Group,
+          required: true,
           where: {
             id: groupId,
           },
@@ -66,10 +66,11 @@ module.exports = function createStudentsRepository(connection) {
         raw: true,
         subQuery: false,
         include: [{
-          required: true,
           model: Group,
+          required: true,
           include: [{
             model: Specialty,
+            required: true,
             where: {
               id: specialtyId,
             },
@@ -84,13 +85,14 @@ module.exports = function createStudentsRepository(connection) {
         raw: true,
         subQuery: false,
         include: [{
-          required: true,
           model: Group,
+          required: true,
           include: [{
             model: Specialty,
             required: true,
             include: [{
               model: Course,
+              required: true,
               where: {
                 id: courseId,
               },
@@ -116,6 +118,7 @@ module.exports = function createStudentsRepository(connection) {
               required: true,
               include: [{
                 model: Teacher,
+                required: true,
                 where: {
                   id: teacherId,
                 },
@@ -133,6 +136,7 @@ module.exports = function createStudentsRepository(connection) {
         subQuery: false,
         include: [{
           model: LabReport,
+          required: true,
           where: {
             id: laboratoryId,
           },
@@ -146,10 +150,11 @@ module.exports = function createStudentsRepository(connection) {
         raw: true,
         subQuery: false,
         include: [{
-          required: true,
           model: LabReport,
+          required: true,
           include: [{
             model: LabTask,
+            required: true,
             where: {
               id: taskId,
             },

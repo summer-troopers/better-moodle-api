@@ -47,6 +47,7 @@ module.exports = function createTeacherRepository(sequelize) {
         subQuery: false,
         include: [{
           model: Course,
+          required: true,
           where: {
             id: courseId,
           },
@@ -64,6 +65,7 @@ module.exports = function createTeacherRepository(sequelize) {
           required: true,
           include: [{
             model: Specialty,
+            required: true,
             where: {
               id: specialtyId,
             },
@@ -85,6 +87,7 @@ module.exports = function createTeacherRepository(sequelize) {
             required: true,
             include: [{
               model: Group,
+              required: true,
               where: {
                 id: groupId,
               },
@@ -110,6 +113,7 @@ module.exports = function createTeacherRepository(sequelize) {
               required: true,
               include: [{
                 model: Student,
+                required: true,
                 where: {
                   id: studentId,
                 },
@@ -127,6 +131,7 @@ module.exports = function createTeacherRepository(sequelize) {
         subQuery: false,
         include: [{
           model: LabTask,
+          required: true,
           where: {
             id: taskId,
           },
@@ -144,6 +149,7 @@ module.exports = function createTeacherRepository(sequelize) {
           required: true,
           include: [{
             model: LabReport,
+            required: true,
             where: {
               id: laboratoryId,
             },

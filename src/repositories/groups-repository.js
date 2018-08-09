@@ -7,7 +7,6 @@ module.exports = function createGroupsRepository(sequelize) {
   const {
     Group,
     Specialty,
-    CourseSpecialty,
     Course,
     Teacher,
     Student,
@@ -25,6 +24,7 @@ module.exports = function createGroupsRepository(sequelize) {
       teacherId,
       studentId,
       laboratoryId,
+      taskId,
     } = queryParams;
 
     const filter = {
@@ -46,7 +46,7 @@ module.exports = function createGroupsRepository(sequelize) {
           model: Specialty,
           required: true,
           where: {
-            id: courseId,
+            id: specialtyId,
           },
         }],
       });
@@ -98,8 +98,10 @@ module.exports = function createGroupsRepository(sequelize) {
       return Group.findAndCountAll({
         ...filter,
         raw: true,
+        subQuery: false,
         include: [{
           model: Student,
+          required: true,
           where: {
             id: studentId,
           },
@@ -111,13 +113,39 @@ module.exports = function createGroupsRepository(sequelize) {
       return Group.findAndCountAll({
         ...filter,
         raw: true,
+        subQuery: false,
         include: [{
           model: Student,
+          required: true,
           include: [{
             model: LabReport,
+            required: true,
             where: {
               id: laboratoryId,
             },
+          }],
+        }],
+      });
+    }
+
+    if (taskId) {
+      return Group.findAndCountAll({
+        ...filter,
+        raw: true,
+        subQuery: false,
+        include: [{
+          model: Student,
+          required: true,
+          include: [{
+            model: LabReport,
+            required: true,
+            include: [{
+              model: LabTask,
+              required: true,
+              where: {
+                id: taskId,
+              },
+            }],
           }],
         }],
       });
