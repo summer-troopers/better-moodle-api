@@ -51,7 +51,10 @@
           "middlewares",
           "verifier",
           "mongo",
-          "hasher"
+          "hasher",
+          "gridfs",
+          "multer"
+
         ]
       }
     ],

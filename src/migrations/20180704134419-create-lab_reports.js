@@ -29,7 +29,7 @@ module.exports = {
         },
       },
       mongoFileId: {
-        type: Sequelize.INTEGER,
+        type: Sequelize.STRING,
         field: 'mongo_file_id',
         allowNull: false,
       },
