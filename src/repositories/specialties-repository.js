@@ -5,12 +5,13 @@ const errors = require('@feathersjs/errors');
 
 module.exports = function createSpecialtiesRepository(sequelize) {
   const {
+    Group,
     Specialty,
     Course,
-    CourseSpecialty,
     Teacher,
-    Group,
     Student,
+    LabReport,
+    LabTask,
   } = sequelize.models;
 
   async function list(queryParams) {
@@ -19,9 +20,11 @@ module.exports = function createSpecialtiesRepository(sequelize) {
       offset,
       contains,
       courseId,
-      teacherId,
       groupId,
+      teacherId,
       studentId,
+      laboratoryId,
+      taskId,
     } = queryParams;
 
     const filter = {
@@ -37,8 +40,11 @@ module.exports = function createSpecialtiesRepository(sequelize) {
     if (courseId) {
       return Specialty.findAndCountAll({
         ...filter,
+        raw: true,
+        subQuery: false,
         include: [{
           model: Course,
+          required: true,
           where: {
             id: courseId,
           },
@@ -49,10 +55,14 @@ module.exports = function createSpecialtiesRepository(sequelize) {
     if (teacherId) {
       return Specialty.findAndCountAll({
         ...filter,
+        raw: true,
+        subQuery: false,
         include: [{
           model: Course,
+          required: true,
           include: [{
             model: Teacher,
+            required: true,
             where: {
               id: teacherId,
             },
@@ -65,8 +75,10 @@ module.exports = function createSpecialtiesRepository(sequelize) {
       return Specialty.findAndCountAll({
         ...filter,
         raw: true,
+        subQuery: false,
         include: [{
           model: Group,
+          required: true,
           where: {
             id: groupId,
           },
@@ -78,13 +90,43 @@ module.exports = function createSpecialtiesRepository(sequelize) {
       return Specialty.findAndCountAll({
         ...filter,
         raw: true,
+        subQuery: false,
         include: [{
           model: Group,
+          required: true,
           include: [{
             model: Student,
+            required: true,
             where: {
               id: studentId,
             },
+          }],
+        }],
+      });
+    }
+
+    if (taskId) {
+      return Specialty.findAndCountAll({
+        ...filter,
+        raw: true,
+        subQuery: false,
+        include: [{
+          model: Group,
+          required: true,
+          include: [{
+            model: Student,
+            required: true,
+            include: [{
+              model: LabReport,
+              required: true,
+              include: [{
+                model: LabTask,
+                required: true,
+                where: {
+                  id: taskId,
+                },
+              }],
+            }],
           }],
         }],
       });
