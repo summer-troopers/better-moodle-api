@@ -3,19 +3,14 @@
 const errors = require('@feathersjs/errors');
 const { Op } = require('sequelize');
 
-module.exports = function createCoursesRepository(models) {
+module.exports = function createCoursesRepository(sequelize) {
   const {
     Course,
     CourseTeacher,
     Teacher,
     CourseSpecialty,
     Specialty,
-  } = models;
-
-  const CoursesTeachers = Course.associations.Teachers;
-  const CoursesSpecialties = Course.associations.Specialties;
-  const SpecialtyGroups = CoursesSpecialties.target.associations.Groups;
-  const GroupStudents = SpecialtyGroups.target.associations.Students;
+  } = sequelize.models;
 
   async function list(queryParams) {
     const {
@@ -98,17 +93,33 @@ module.exports = function createCoursesRepository(models) {
       });
     }
 
+    // if (teacherId) {
+    //   return Course.findAndCountAll({
+    //     ...filter,
+    //     raw: true,
+    //     include: [{
+    //       association: CoursesTeachers,
+    //       required: true,
+    //       attributes: [],
+    //       where: {
+    //         id: teacherId,
+    //       },
+    //     }],
+    //   });
+    // }
+
+    // not working until fixed models
     if (teacherId) {
       return Course.findAndCountAll({
         ...filter,
-        raw: true,
         include: [{
-          association: CoursesTeachers,
-          required: true,
-          attributes: [],
-          where: {
-            id: teacherId,
-          },
+          model: Course,
+          include: [{
+            model: Teacher,
+            where: {
+              id: teacherId,
+            },
+          }],
         }],
       });
     }

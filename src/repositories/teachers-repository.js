@@ -3,18 +3,12 @@
 const errors = require('@feathersjs/errors');
 const { Op } = require('sequelize');
 
-module.exports = function createTeacherRepository(models) {
+module.exports = function createTeacherRepository(sequelize) {
   const {
     Teacher,
     Course,
     CourseTeacher,
-  } = models;
-
-  const TeachersCourses = Teacher.associations.Courses;
-  const CoursesSpecialties = TeachersCourses.target.associations.Specialties;
-  const SpecialtyGroups = CoursesSpecialties.target.associations.Groups;
-  const GroupStudents = SpecialtyGroups.target.associations.Students;
-
+  } = sequelize.models;
 
   async function list(queryParams) {
     const {

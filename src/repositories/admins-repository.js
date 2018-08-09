@@ -2,8 +2,8 @@
 
 const { Op } = require('sequelize');
 
-module.exports = function createAdminsRepository(models) {
-  const { Admin } = models;
+module.exports = function createAdminsRepository(sequelize) {
+  const { Admin } = sequelize.models;
 
   function list(queryParams) {
     const { limit, offset, contains } = queryParams;

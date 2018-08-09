@@ -3,19 +3,27 @@
 const errors = require('@feathersjs/errors');
 const { Op } = require('sequelize');
 
-module.exports = function createStudentsRepository(models) {
-  const {
-    Student,
-    Group,
-  } = models;
+module.exports = function createStudentsRepository(connection) {
 
-  const StudentsGroup = Student.associations.Group;
-  const GroupsSpecialty = StudentsGroup.target.associations.Specialty;
-  const SpecialtyCourses = GroupsSpecialty.target.associations.Courses;
-  const CoursesTeachers = SpecialtyCourses.target.associations.Teachers;
-  const StudentsLaboratories = Student.associations.Laboratory;
+
+  // const StudentsGroup = Student.associations.Group;
+  // const GroupsSpecialty = StudentsGroup.target.associations.Specialty;
+  // const SpecialtyCourses = GroupsSpecialty.target.associations.Courses;
+  // const CoursesTeachers = SpecialtyCourses.target.associations.Teachers;
+  // const StudentsLaboratories = Student.associations.Laboratory;
 
   async function list(queryParams) {
+    const {
+      Student,
+      Group,
+      Specialty,
+      Course,
+      Teacher,
+      LabReport,
+      CourseSpecialty,
+      LabTask,
+    } = connection.models;
+
     const {
       limit,
       offset,
@@ -43,11 +51,9 @@ module.exports = function createStudentsRepository(models) {
     if (groupId) {
       return Student.findAndCountAll({
         ...filter,
-        raw: true,
         include: [{
-          association: StudentsGroup,
+          model: Group,
           required: true,
-          attributes: [],
           where: {
             id: groupId,
           },
@@ -55,19 +61,15 @@ module.exports = function createStudentsRepository(models) {
       });
     }
 
-    // not working until fixed models
     if (specialtyId) {
       return Student.findAndCountAll({
         ...filter,
-        raw: true,
         include: [{
-          association: StudentsGroup,
-          // required: true,
-          // attributes: [],
+          model: Group,
+          required: true,
           include: [{
-            association: GroupsSpecialty,
-            // required: true,
-            // attributes: [],
+            model: Specialty,
+            required: true,
             where: {
               id: specialtyId,
             },
@@ -76,53 +78,54 @@ module.exports = function createStudentsRepository(models) {
       });
     }
 
-    // not working until fixed models
     if (courseId) {
       return Student.findAndCountAll({
         ...filter,
         raw: true,
+        subQuery: false,
         include: [{
-          association: StudentsGroup,
           required: true,
-          attributes: [],
+          model: Group,
           include: [{
-            association: GroupsSpecialty,
+            model: Specialty,
             required: true,
-            attributes: [],
             include: [{
-              association: SpecialtyCourses,
+              model: CourseSpecialty,
               required: true,
-              attributes: [],
-              where: {
-                id: courseId,
-              },
+              include: [{
+                model: Course,
+                where: {
+                  id: courseId,
+                },
+              }],
             }],
           }],
         }],
       });
     }
 
-    // not working until fixed models
     if (teacherId) {
       return Student.findAndCountAll({
         ...filter,
         raw: true,
+        subQuery: false,
         include: [{
-          association: StudentsGroup,
+          model: Group,
           required: true,
-          attributes: [],
+          subQuery: false,
           include: [{
-            association: GroupsSpecialty,
+            model: Specialty,
             required: true,
-            attributes: [],
+            subQuery: false,
             include: [{
-              association: SpecialtyCourses,
+              model: Course,
               required: true,
-              attributes: [],
+              subQuery: false,
+              through: {},
               include: [{
-                association: CoursesTeachers,
+                model: Teacher,
                 required: true,
-                attributes: [],
+                subQuery: false,
                 where: {
                   id: teacherId,
                 },
@@ -133,15 +136,11 @@ module.exports = function createStudentsRepository(models) {
       });
     }
 
-    // not working until fixed models
     if (laboratoryId) {
       return Student.findAndCountAll({
         ...filter,
-        raw: true,
         include: [{
-          association: StudentsLaboratories,
-          required: true,
-          attributes: [],
+          model: LabReport,
           where: {
             id: laboratoryId,
           },

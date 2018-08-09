@@ -3,17 +3,17 @@
 const { Op } = require('sequelize');
 const errors = require('@feathersjs/errors');
 
-module.exports = function createGroupsRepository(models) {
+module.exports = function createGroupsRepository(sequelize) {
   const {
     Group,
     Specialty,
-  } = models;
-
-  const GroupsSpecialty = Group.associations.Specialty;
-  const SpecialtyCourses = GroupsSpecialty.target.associations.Courses;
-  const CoursesTeachers = SpecialtyCourses.target.associations.Teachers;
-  const GroupStudents = Group.associations.Students;
-  const StudentsLaboratory = GroupStudents.target.associations.Laboratory;
+    CourseSpecialty,
+    Course,
+    Teacher,
+    Student,
+    LabReport,
+    LabTask,
+  } = sequelize.models;
 
   function list(queryParams) {
     const {
@@ -42,9 +42,7 @@ module.exports = function createGroupsRepository(models) {
         ...filter,
         raw: true,
         include: [{
-          association: GroupsSpecialty,
-          required: true,
-          attributes: [],
+          model: Specialty,
           where: {
             id: specialtyId,
           },
@@ -52,44 +50,56 @@ module.exports = function createGroupsRepository(models) {
       });
     }
 
-    // not working until fixed models   !!!!!!!!!!!11 courses-specialties
     if (courseId) {
       return Group.findAndCountAll({
         ...filter,
         raw: true,
+        subQuery: false,
         include: [{
-          association: GroupsSpecialty,
+          model: Specialty,
           required: true,
-          attributes: [],
+          // include: [{
+          //   model: CourseSpecialty,
+          //   required: true,
           include: [{
-            association: SpecialtyCourses,
+            model: Course,
             required: true,
-            attributes: [],
             where: {
               id: courseId,
             },
           }],
+          // }],
         }],
       });
     }
 
-    // not working until fixed models
+    // if (courseId) {
+    //   const sql = `select * from (((groups inner join specialties on groups.specialty_id = specialties.id) inner join courses_specialties on specialties.id = courses_specialties.specialty_id) inner join courses on courses_specialties.course_id = courses.id) WHERE courses.id = ${courseId} order by groups.id`;
+    //   return sequelize.query(sql, { type: sequelize.QueryTypes.SELECT })
+    //     .then((result) => {
+    //       return new Promise((resolve) => {
+    //         resolve({
+    //           rows: result,
+    //           count: result.length,
+    //         });
+    //       });
+    //     });
+    // }
+
     if (teacherId) {
       return Group.findAndCountAll({
         ...filter,
         raw: true,
+        subQuery: false,
         include: [{
-          association: GroupsSpecialty,
+          model: Specialty,
           required: true,
-          attributes: [],
           include: [{
-            association: SpecialtyCourses,
+            model: Course,
             required: true,
-            attributes: [],
             include: [{
-              association: CoursesTeachers,
+              model: Teacher,
               required: true,
-              attributes: [],
               where: {
                 id: teacherId,
               },
@@ -104,9 +114,7 @@ module.exports = function createGroupsRepository(models) {
         ...filter,
         raw: true,
         include: [{
-          association: GroupStudents,
-          required: true,
-          attributes: [],
+          model: Student,
           where: {
             id: studentId,
           },
@@ -114,19 +122,14 @@ module.exports = function createGroupsRepository(models) {
       });
     }
 
-    // not working because of labs-model
     if (laboratoryId) {
       return Group.findAndCountAll({
         ...filter,
         raw: true,
         include: [{
-          association: GroupStudents,
-          required: true,
-          attributes: [],
+          model: Student,
           include: [{
-            association: StudentsLaboratory,
-            required: true,
-            attributes: [],
+            model: LabReport,
             where: {
               id: laboratoryId,
             },

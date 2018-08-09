@@ -6,31 +6,21 @@ module.exports = function defineCourseTeacher(sequelize, DataTypes) {
       type: DataTypes.INTEGER,
       field: 'course_id',
       primaryKey: true,
-      foreignKey: true,
       allowNull: false,
-      references: {
-        model: 'courses',
-        key: 'id',
-      },
     },
     teacherId: {
       type: DataTypes.INTEGER,
       field: 'teacher_id',
       primaryKey: true,
-      foreignKey: true,
       allowNull: false,
-      references: {
-        model: 'teachers',
-        key: 'id',
-      },
     },
   }, {
     tableName: 'courses_teachers',
     timestamps: false,
   });
   CourseTeacher.associate = function associateCourseTeacher(models) {
-    CourseTeacher.hasMany(models.Course, { foreignKey: 'id', sourceKey: 'courseId' });
-    CourseTeacher.hasMany(models.Teacher, { foreignKey: 'id', sourceKey: 'teacherId' });
+    CourseTeacher.belongsTo(models.Course, { foreignKey: 'courseId' });
+    CourseTeacher.belongsTo(models.Teacher, { foreignKey: 'teacherId' });
   };
   return CourseTeacher;
 };

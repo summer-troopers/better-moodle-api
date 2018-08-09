@@ -3,17 +3,15 @@
 const { Op } = require('sequelize');
 const errors = require('@feathersjs/errors');
 
-module.exports = function createSpecialtiesRepository(models) {
+module.exports = function createSpecialtiesRepository(sequelize) {
   const {
     Specialty,
     Course,
     CourseSpecialty,
-  } = models;
-
-  const SpecialtiesCourses = Specialty.associations.Courses;
-  const CoursesTeachers = SpecialtiesCourses.target.associations.Teachers;
-  const SpecialtyGroups = Specialty.associations.Groups;
-  const GroupStudents = SpecialtyGroups.target.associations.Students;
+    Teacher,
+    Group,
+    Student,
+  } = sequelize.models;
 
   async function list(queryParams) {
     const {
@@ -39,11 +37,8 @@ module.exports = function createSpecialtiesRepository(models) {
     if (courseId) {
       return Specialty.findAndCountAll({
         ...filter,
-        raw: true,
         include: [{
-          association: SpecialtiesCourses,
-          required: true,
-          attributes: [],
+          model: Course,
           where: {
             id: courseId,
           },
@@ -54,15 +49,10 @@ module.exports = function createSpecialtiesRepository(models) {
     if (teacherId) {
       return Specialty.findAndCountAll({
         ...filter,
-        raw: true,
         include: [{
-          association: SpecialtiesCourses,
-          required: true,
-          attributes: [],
+          model: Course,
           include: [{
-            association: CoursesTeachers,
-            required: true,
-            attributes: [],
+            model: Teacher,
             where: {
               id: teacherId,
             },
@@ -76,9 +66,7 @@ module.exports = function createSpecialtiesRepository(models) {
         ...filter,
         raw: true,
         include: [{
-          association: SpecialtyGroups,
-          required: true,
-          attributes: [],
+          model: Group,
           where: {
             id: groupId,
           },
@@ -91,13 +79,9 @@ module.exports = function createSpecialtiesRepository(models) {
         ...filter,
         raw: true,
         include: [{
-          association: SpecialtyGroups,
-          required: true,
-          attributes: [],
+          model: Group,
           include: [{
-            association: GroupStudents,
-            required: true,
-            attributes: [],
+            model: Student,
             where: {
               id: studentId,
             },

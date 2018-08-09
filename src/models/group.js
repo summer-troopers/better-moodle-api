@@ -19,10 +19,6 @@ module.exports = function defineGroup(sequelize, DataTypes) {
       type: DataTypes.INTEGER,
       field: 'specialty_id',
       allowNull: false,
-      references: {
-        model: 'specialties',
-        key: 'id',
-      },
     },
 
   }, {
