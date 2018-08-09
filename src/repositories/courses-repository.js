@@ -6,10 +6,12 @@ const { Op } = require('sequelize');
 module.exports = function createCoursesRepository(sequelize) {
   const {
     Course,
-    CourseTeacher,
     Teacher,
-    CourseSpecialty,
     Specialty,
+    Group,
+    Student,
+    LabReport,
+    LabTask,
   } = sequelize.models;
 
   async function list(queryParams) {
@@ -21,6 +23,8 @@ module.exports = function createCoursesRepository(sequelize) {
       specialtyId,
       groupId,
       studentId,
+      laboratoryId,
+      taskId,
     } = queryParams;
 
     const filter = {
@@ -37,10 +41,10 @@ module.exports = function createCoursesRepository(sequelize) {
       return Course.findAndCountAll({
         ...filter,
         raw: true,
+        subQuery: false,
         include: [{
-          association: CoursesSpecialties,
+          model: Specialty,
           required: true,
-          attributes: [],
           where: {
             id: specialtyId,
           },
@@ -52,14 +56,13 @@ module.exports = function createCoursesRepository(sequelize) {
       return Course.findAndCountAll({
         ...filter,
         raw: true,
+        subQuery: false,
         include: [{
-          association: CoursesSpecialties,
+          model: Specialty,
           required: true,
-          attributes: [],
           include: [{
-            association: SpecialtyGroups,
+            model: Group,
             required: true,
-            attributes: [],
             where: {
               id: groupId,
             },
@@ -72,18 +75,16 @@ module.exports = function createCoursesRepository(sequelize) {
       return Course.findAndCountAll({
         ...filter,
         raw: true,
+        subQuery: false,
         include: [{
-          association: CoursesSpecialties,
+          model: Specialty,
           required: true,
-          attributes: [],
           include: [{
-            association: SpecialtyGroups,
+            model: Group,
             required: true,
-            attributes: [],
             include: [{
-              association: GroupStudents,
+              model: Student,
               required: true,
-              attributes: [],
               where: {
                 id: studentId,
               },
@@ -93,31 +94,61 @@ module.exports = function createCoursesRepository(sequelize) {
       });
     }
 
-    // if (teacherId) {
-    //   return Course.findAndCountAll({
-    //     ...filter,
-    //     raw: true,
-    //     include: [{
-    //       association: CoursesTeachers,
-    //       required: true,
-    //       attributes: [],
-    //       where: {
-    //         id: teacherId,
-    //       },
-    //     }],
-    //   });
-    // }
+    if (laboratoryId) {
+      return Course.findAndCountAll({
+        ...filter,
+        raw: true,
+        subQuery: false,
+        include: [{
+          model: Specialty,
+          required: true,
+          include: [{
+            model: Group,
+            required: true,
+            include: [{
+              model: Student,
+              required: true,
+              include: [{
+                model: LabReport,
+                required: true,
+                where: {
+                  id: laboratoryId,
+                },
+              }],
+            }],
+          }],
+        }],
+      });
+    }
 
-    // not working until fixed models
     if (teacherId) {
       return Course.findAndCountAll({
         ...filter,
+        raw: true,
+        subQuery: false,
         include: [{
-          model: Course,
+          model: Teacher,
+          required: true,
+          where: {
+            id: teacherId,
+          },
+        }],
+      });
+    }
+
+    if (taskId) {
+      return Course.findAndCountAll({
+        ...filter,
+        raw: true,
+        subQuery: false,
+        include: [{
+          model: Teacher,
+          required: true,
           include: [{
-            model: Teacher,
+            model: LabTask,
+            required: true,
             where: {
-              id: teacherId,
+              id: taskId,
             },
           }],
         }],
