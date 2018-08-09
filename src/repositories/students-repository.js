@@ -4,8 +4,6 @@ const errors = require('@feathersjs/errors');
 const { Op } = require('sequelize');
 
 module.exports = function createStudentsRepository(connection) {
-
-
   // const StudentsGroup = Student.associations.Group;
   // const GroupsSpecialty = StudentsGroup.target.associations.Specialty;
   // const SpecialtyCourses = GroupsSpecialty.target.associations.Courses;

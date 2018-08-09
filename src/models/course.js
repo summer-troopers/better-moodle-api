@@ -31,8 +31,8 @@ module.exports = function defineCourse(sequelize, DataTypes) {
       foreignKey: 'courseId',
       otherKey: 'specialtyId',
     });
-    //Course.hasMany(models.CourseSpecialty, { foreignKey: 'courseId' });
-    Course.hasMany(models.LabTask, { foreignKey: 'courseId'});
+    // Course.hasMany(models.CourseSpecialty, { foreignKey: 'courseId' });
+    Course.hasMany(models.LabTask, { foreignKey: 'courseId' });
   };
   return Course;
 };
