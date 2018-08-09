@@ -19,8 +19,8 @@ module.exports = function defineCourseTeacher(sequelize, DataTypes) {
     timestamps: false,
   });
   CourseTeacher.associate = function associateCourseTeacher(models) {
-    CourseTeacher.belongsTo(models.Course, { foreignKey: 'courseId' });
-    CourseTeacher.belongsTo(models.Teacher, { foreignKey: 'teacherId' });
+    // CourseTeacher.belongsTo(models.Course, { foreignKey: 'courseId' });
+    // CourseTeacher.belongsTo(models.Teacher, { foreignKey: 'teacherId' });
   };
   return CourseTeacher;
 };

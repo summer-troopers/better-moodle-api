@@ -4,6 +4,7 @@ const errors = require('@feathersjs/errors');
 const { Op } = require('sequelize');
 
 module.exports = function createStudentsRepository(connection) {
+
   // const StudentsGroup = Student.associations.Group;
   // const GroupsSpecialty = StudentsGroup.target.associations.Specialty;
   // const SpecialtyCourses = GroupsSpecialty.target.associations.Courses;
@@ -17,9 +18,7 @@ module.exports = function createStudentsRepository(connection) {
       Specialty,
       Course,
       Teacher,
-      LabReport,
-      CourseSpecialty,
-      LabTask,
+      LabReport, LabTask,
     } = connection.models;
 
     const {
@@ -31,6 +30,7 @@ module.exports = function createStudentsRepository(connection) {
       courseId,
       teacherId,
       laboratoryId,
+      taskId,
     } = queryParams;
 
     const filter = {
@@ -49,9 +49,10 @@ module.exports = function createStudentsRepository(connection) {
     if (groupId) {
       return Student.findAndCountAll({
         ...filter,
+        raw: true,
+        subQuery: false,
         include: [{
           model: Group,
-          required: true,
           where: {
             id: groupId,
           },
@@ -62,12 +63,13 @@ module.exports = function createStudentsRepository(connection) {
     if (specialtyId) {
       return Student.findAndCountAll({
         ...filter,
+        raw: true,
+        subQuery: false,
         include: [{
-          model: Group,
           required: true,
+          model: Group,
           include: [{
             model: Specialty,
-            required: true,
             where: {
               id: specialtyId,
             },
@@ -88,14 +90,10 @@ module.exports = function createStudentsRepository(connection) {
             model: Specialty,
             required: true,
             include: [{
-              model: CourseSpecialty,
-              required: true,
-              include: [{
-                model: Course,
-                where: {
-                  id: courseId,
-                },
-              }],
+              model: Course,
+              where: {
+                id: courseId,
+              },
             }],
           }],
         }],
@@ -110,20 +108,14 @@ module.exports = function createStudentsRepository(connection) {
         include: [{
           model: Group,
           required: true,
-          subQuery: false,
           include: [{
             model: Specialty,
             required: true,
-            subQuery: false,
             include: [{
               model: Course,
               required: true,
-              subQuery: false,
-              through: {},
               include: [{
                 model: Teacher,
-                required: true,
-                subQuery: false,
                 where: {
                   id: teacherId,
                 },
@@ -137,11 +129,31 @@ module.exports = function createStudentsRepository(connection) {
     if (laboratoryId) {
       return Student.findAndCountAll({
         ...filter,
+        raw: true,
+        subQuery: false,
         include: [{
           model: LabReport,
           where: {
             id: laboratoryId,
           },
+        }],
+      });
+    }
+
+    if (taskId) {
+      return Student.findAndCountAll({
+        ...filter,
+        raw: true,
+        subQuery: false,
+        include: [{
+          required: true,
+          model: LabReport,
+          include: [{
+            model: LabTask,
+            where: {
+              id: taskId,
+            },
+          }],
         }],
       });
     }

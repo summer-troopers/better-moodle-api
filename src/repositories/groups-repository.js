@@ -41,10 +41,12 @@ module.exports = function createGroupsRepository(sequelize) {
       return Group.findAndCountAll({
         ...filter,
         raw: true,
+        subQuery: false,
         include: [{
           model: Specialty,
+          required: true,
           where: {
-            id: specialtyId,
+            id: courseId,
           },
         }],
       });
@@ -58,9 +60,6 @@ module.exports = function createGroupsRepository(sequelize) {
         include: [{
           model: Specialty,
           required: true,
-          // include: [{
-          //   model: CourseSpecialty,
-          //   required: true,
           include: [{
             model: Course,
             required: true,
@@ -68,23 +67,9 @@ module.exports = function createGroupsRepository(sequelize) {
               id: courseId,
             },
           }],
-          // }],
         }],
       });
     }
-
-    // if (courseId) {
-    //   const sql = `select * from (((groups inner join specialties on groups.specialty_id = specialties.id) inner join courses_specialties on specialties.id = courses_specialties.specialty_id) inner join courses on courses_specialties.course_id = courses.id) WHERE courses.id = ${courseId} order by groups.id`;
-    //   return sequelize.query(sql, { type: sequelize.QueryTypes.SELECT })
-    //     .then((result) => {
-    //       return new Promise((resolve) => {
-    //         resolve({
-    //           rows: result,
-    //           count: result.length,
-    //         });
-    //       });
-    //     });
-    // }
 
     if (teacherId) {
       return Group.findAndCountAll({

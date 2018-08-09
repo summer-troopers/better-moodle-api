@@ -20,8 +20,8 @@ module.exports = function defineCourseSpecialty(sequelize, DataTypes) {
     timestamps: false,
   });
   CourseSpecialty.associate = function associateCourseSpecialty(models) {
-    CourseSpecialty.belongsTo(models.Course, { foreignKey: 'courseId' });
-    CourseSpecialty.belongsTo(models.Specialty, { foreignKey: 'specialtyId' });
+    // CourseSpecialty.belongsTo(models.Course, { foreignKey: 'courseId' });
+    // CourseSpecialty.belongsTo(models.Specialty, { foreignKey: 'specialtyId' });
   };
   return CourseSpecialty;
 };

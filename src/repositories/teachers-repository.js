@@ -7,7 +7,11 @@ module.exports = function createTeacherRepository(sequelize) {
   const {
     Teacher,
     Course,
-    CourseTeacher,
+    Specialty,
+    Group,
+    Student,
+    LabTask,
+    LabReport,
   } = sequelize.models;
 
   async function list(queryParams) {
@@ -19,6 +23,8 @@ module.exports = function createTeacherRepository(sequelize) {
       specialtyId,
       groupId,
       studentId,
+      taskId,
+      laboratoryId,
     } = queryParams;
 
     const filter = {
@@ -38,10 +44,9 @@ module.exports = function createTeacherRepository(sequelize) {
       return Teacher.findAndCountAll({
         ...filter,
         raw: true,
+        subQuery: false,
         include: [{
-          association: TeachersCourses,
-          required: true,
-          attributes: [],
+          model: Course,
           where: {
             id: courseId,
           },
@@ -53,14 +58,12 @@ module.exports = function createTeacherRepository(sequelize) {
       return Teacher.findAndCountAll({
         ...filter,
         raw: true,
+        subQuery: false,
         include: [{
-          association: TeachersCourses,
+          model: Course,
           required: true,
-          attributes: [],
           include: [{
-            association: CoursesSpecialties,
-            required: true,
-            attributes: [],
+            model: Specialty,
             where: {
               id: specialtyId,
             },
@@ -69,23 +72,19 @@ module.exports = function createTeacherRepository(sequelize) {
       });
     }
 
-    // not working
     if (groupId) {
       return Teacher.findAndCountAll({
         ...filter,
         raw: true,
+        subQuery: false,
         include: [{
-          association: TeachersCourses,
+          model: Course,
           required: true,
-          attributes: [],
           include: [{
-            association: CoursesSpecialties,
+            model: Specialty,
             required: true,
-            attributes: [],
             include: [{
-              association: SpecialtyGroups,
-              required: true,
-              attributes: [],
+              model: Group,
               where: {
                 id: groupId,
               },
@@ -95,32 +94,59 @@ module.exports = function createTeacherRepository(sequelize) {
       });
     }
 
-    // not working until fixed models
     if (studentId) {
       return Teacher.findAndCountAll({
         ...filter,
         raw: true,
+        subQuery: false,
         include: [{
-          association: TeachersCourses,
+          model: Course,
           required: true,
-          attributes: [],
           include: [{
-            association: CoursesSpecialties,
+            model: Specialty,
             required: true,
-            attributes: [],
             include: [{
-              association: SpecialtyGroups,
+              model: Group,
               required: true,
-              attributes: [],
               include: [{
-                association: GroupStudents,
-                required: true,
-                attributes: [],
+                model: Student,
                 where: {
                   id: studentId,
                 },
               }],
             }],
+          }],
+        }],
+      });
+    }
+
+    if (taskId) {
+      return Teacher.findAndCountAll({
+        ...filter,
+        raw: true,
+        subQuery: false,
+        include: [{
+          model: LabTask,
+          where: {
+            id: taskId,
+          },
+        }],
+      });
+    }
+
+    if (laboratoryId) {
+      return Teacher.findAndCountAll({
+        ...filter,
+        raw: true,
+        subQuery: false,
+        include: [{
+          model: LabTask,
+          required: true,
+          include: [{
+            model: LabReport,
+            where: {
+              id: laboratoryId,
+            },
           }],
         }],
       });
