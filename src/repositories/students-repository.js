@@ -4,11 +4,6 @@ const errors = require('@feathersjs/errors');
 const { Op } = require('sequelize');
 
 module.exports = function createStudentsRepository(connection) {
-  // const StudentsGroup = Student.associations.Group;
-  // const GroupsSpecialty = StudentsGroup.target.associations.Specialty;
-  // const SpecialtyCourses = GroupsSpecialty.target.associations.Courses;
-  // const CoursesTeachers = SpecialtyCourses.target.associations.Teachers;
-  // const StudentsLaboratories = Student.associations.Laboratory;
 
   async function list(queryParams) {
     const {
@@ -170,30 +165,8 @@ module.exports = function createStudentsRepository(connection) {
     return Student.findById(id);
   }
 
-  async function add(form, queryParams) {
-    if (queryParams.courseId) {
-      return addGroup(form.studentId, queryParams.groupId);
-    }
-    if (queryParams.studentId) {
-      return addTeacher(form.studentId, queryParams.groupId);
-    }
+  async function add(form) {
     return Student.create(form);
-  }
-
-  async function addGroup(id, studentId) {
-    const student = await Student.findById(studentId);
-    if (!student) throw new errors.NotFound();
-    const group = await Group.findById(id);
-    if (!group) throw new errors.NotFound();
-    return group.addStudent(student);
-  }
-
-  async function addTeacher(id, studentId) {
-    const student = await Student.findById(studentId);
-    if (!student) throw new errors.NotFound();
-    const teacher = await Teacher.findById(id);
-    if (!teacher) throw new errors.NotFound();
-    return course.addStudent(student);
   }
 
   async function exists(id) {
@@ -202,40 +175,18 @@ module.exports = function createStudentsRepository(connection) {
     return false;
   }
 
-  async function update(id, form) {
-    const result = await Group.findById(form.groupId);
-    if (!result) throw new errors.NotFound();
-
+  async function update(id) {
     return Student.update(form, {
-      where: { id: { [Op.eq]: id } },
+      where: {
+        id:
+        {
+          [Op.eq]: id,
+        },
+      },
     });
   }
 
-  function remove(id, queryParams) {
-    if (queryParams.studentId) {
-      return GroupStudents.destroy({
-        where: {
-          id: {
-            [Op.eq]: id,
-          },
-          groupId: {
-            [Op.eq]: queryParams.groupId,
-          },
-        },
-      });
-    }
-    if (queryParams.specialtyId) {
-      return GroupsSpecialty.destroy({
-        where: {
-          specialtyId: {
-            [Op.eq]: queryParams.specialtyId,
-          },
-          groupId: {
-            [Op.eq]: queryParams.groupId,
-          },
-        },
-      });
-    }
+  function remove(id) {
     return Student.destroy({
       where: {
         id: {
