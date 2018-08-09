@@ -48,7 +48,6 @@ module.exports = function defineStudent(sequelize, DataTypes) {
     groupId: {
       type: DataTypes.INTEGER,
       field: 'group_id',
-      foreignKey: true,
       allowNull: false,
     },
 

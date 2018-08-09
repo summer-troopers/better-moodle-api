@@ -11,13 +11,11 @@ module.exports = function defineLabTask(sequelize, DataTypes) {
     teacherId: {
       type: DataTypes.INTEGER,
       field: 'teacher_id',
-      foreignKey: true,
       allowNull: false,
     },
     courseId: {
       type: DataTypes.INTEGER,
       field: 'course_id',
-      foreignKey: true,
       allowNull: false,
     },
     mongoFileId: {
@@ -35,5 +33,5 @@ module.exports = function defineLabTask(sequelize, DataTypes) {
     LabTask.belongsTo(models.Course, { foreignKey: 'courseId', targetKey: 'id' });
     LabTask.hasMany(models.LabReport, { foreignKey: 'labTaskId', sourceKey: 'id' });
   };
-  return TaskLaboratory;
+  return LabTask;
 };

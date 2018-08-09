@@ -6,14 +6,12 @@ module.exports = function defineCourseSpecialty(sequelize, DataTypes) {
       type: DataTypes.INTEGER,
       field: 'course_id',
       primaryKey: true,
-      foreignKey: true,
       allowNull: false,
     },
     specialtyId: {
       type: DataTypes.INTEGER,
       field: 'specialty_id',
       primaryKey: true,
-      foreignKey: true,
       allowNull: false,
     },
   }, {
@@ -21,8 +19,8 @@ module.exports = function defineCourseSpecialty(sequelize, DataTypes) {
     timestamps: false,
   });
   CourseSpecialty.associate = function associateCourseSpecialty(models) {
-    CourseSpecialty.hasMany(models.Course, { foreignKey: 'courseId', targetKey: 'id' });
-    CourseSpecialty.hasMany(models.Specialty, { foreignKey: 'specialtyId', targetKey: 'id' });
+    CourseSpecialty.hasMany(models.Course, { foreignKey: 'id', sourceKey: 'courseId' });
+    CourseSpecialty.hasMany(models.Specialty, { foreignKey: 'id', sourceKey: 'specialtyId' });
   };
   return CourseSpecialty;
 };
