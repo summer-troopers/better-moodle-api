@@ -31,7 +31,6 @@ module.exports = function defineStudent(sequelize, DataTypes) {
     phoneNumber: {
       type: DataTypes.STRING,
       field: 'phone_number',
-      unique: true,
       validate: {
         is: ['^[\+]?[0]{0,2}?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$', 'i'],
         len: [9, 20],
@@ -41,7 +40,6 @@ module.exports = function defineStudent(sequelize, DataTypes) {
       type: DataTypes.STRING,
       field: 'email',
       allowNull: false,
-      unique: true,
       validate: {
         isEmail: true,
       },

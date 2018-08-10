@@ -4,20 +4,30 @@ const faker = require('faker');
 
 module.exports = {
   // eslint-disable-next-line no-unused-vars, no-use-before-define
-  up(queryInterface, Sequelize) { return queryInterface.bulkInsert('specialties', generate50Specialties(), {}); },
+  up(queryInterface, Sequelize) { return queryInterface.bulkInsert('specialties', generate20Specialties(), {}); },
   // eslint-disable-next-line no-unused-vars
   down(queryInterface, Sequelize) { return queryInterface.bulkDelete('specialties', null, {}); },
 };
 
-function generate50Specialties() {
+function generate20Specialties() {
   const specialties = [];
   specialties.push({
     name: 'Developer',
   });
-  for (let i = 1; i <= 50; i += 1) {
+  for (let i = 1; i <= 20; i += 1) {
     specialties.push({
-      name: faker.name.jobDescriptor(),
+      name: generateUniqueName(i, specialties),
     });
   }
   return specialties;
+}
+
+function generateUniqueName(i, specialties) {
+  let genName;
+  const predicate = object => object.name === genName;
+  while (true) {
+    genName = faker.name.jobDescriptor();
+    if (!specialties.find(predicate)) break;
+  }
+  return genName;
 }

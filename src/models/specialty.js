@@ -11,7 +11,6 @@ module.exports = function defineSpecialty(sequelize, DataTypes) {
     name: {
       type: DataTypes.STRING,
       allowNull: false,
-      unique: true,
     },
   },
   {

@@ -30,7 +30,6 @@ module.exports = function defineTeacher(sequelize, DataTypes) {
     },
     phoneNumber: {
       type: DataTypes.STRING,
-      unique: true,
       field: 'phone_number',
       validate: {
         is: ['^[\+]?[0]{0,2}?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$', 'i'],
@@ -40,7 +39,6 @@ module.exports = function defineTeacher(sequelize, DataTypes) {
     email: {
       type: DataTypes.STRING,
       field: 'email',
-      unique: true,
       allowNull: false,
       validate: {
         isEmail: true,
