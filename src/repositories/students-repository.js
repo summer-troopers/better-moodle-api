@@ -10,7 +10,8 @@ module.exports = function createStudentsRepository(connection) {
     Specialty,
     Course,
     Teacher,
-    LabReport, LabTask,
+    LabReport,
+    LabTask,
   } = connection.models;
 
   async function list(queryParams) {

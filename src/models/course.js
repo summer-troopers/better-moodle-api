@@ -10,6 +10,7 @@ module.exports = function defineCourse(sequelize, DataTypes) {
     },
     name: {
       type: DataTypes.STRING,
+      unique: true,
       allowNull: false,
       validate: {
         len: [1, 50],
