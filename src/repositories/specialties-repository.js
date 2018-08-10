@@ -161,7 +161,7 @@ module.exports = function createSpecialtiesRepository(sequelize) {
     if (!result) throw new errors.NotFound();
 
     return Specialty.update(form, {
-      where: { id: { [Op.eq]: id } },
+      where: { id },
     });
   }
 
@@ -169,16 +169,13 @@ module.exports = function createSpecialtiesRepository(sequelize) {
     if (queryParams.courseId) {
       return CourseSpecialty.destroy({
         where: {
-          specialtyId: {
-            [Op.eq]: id,
-          },
-          courseId: {
-            [Op.eq]: queryParams.courseId,
-          },
+          specialtyId: id,
+          courseId: queryParams.courseId,
         },
       });
     }
-    return Specialty.destroy({ where: { id: { [Op.eq]: id } } });
+
+    return Specialty.destroy({ where: { id } });
   }
 
   return {

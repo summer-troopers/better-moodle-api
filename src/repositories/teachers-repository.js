@@ -184,11 +184,7 @@ module.exports = function createTeacherRepository(sequelize) {
 
   async function update(id, form) {
     return Teacher.update(form, {
-      where: {
-        id: {
-          [Op.eq]: id,
-        },
-      },
+      where: { id },
     });
   }
 
@@ -196,22 +192,14 @@ module.exports = function createTeacherRepository(sequelize) {
     if (queryParams.courseId) {
       return CourseTeacher.destroy({
         where: {
-          courseId: {
-            [Op.eq]: queryParams.courseId,
-          },
-          teacherId: {
-            [Op.eq]: id,
-          },
+          courseId: queryParams.courseId,
+          teacherId: id,
         },
       });
     }
 
     return Teacher.destroy({
-      where: {
-        id: {
-          [Op.eq]: id,
-        },
-      },
+      where: { id },
     });
   }
 

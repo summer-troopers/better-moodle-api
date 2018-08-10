@@ -176,22 +176,13 @@ module.exports = function createStudentsRepository(connection) {
 
   async function update(id) {
     return Student.update(form, {
-      where: {
-        id:
-        {
-          [Op.eq]: id,
-        },
-      },
+      where: { id },
     });
   }
 
   function remove(id) {
     return Student.destroy({
-      where: {
-        id: {
-          [Op.eq]: id,
-        },
-      },
+      where: { id },
     });
   }
 

@@ -22,9 +22,7 @@ module.exports = function defineSpecialty(sequelize, DataTypes) {
     Specialty.belongsToMany(models.Course, {
       through: 'CourseSpecialty',
       foreignKey: 'specialtyId',
-      otherKey: 'courseId',
     });
-    // Specialty.hasMany(models.CourseSpecialty, { foreignKey: 'specialtyId' });
     Specialty.hasMany(models.Group, { foreignKey: 'specialtyId', sourceKey: 'id' });
   };
   return Specialty;

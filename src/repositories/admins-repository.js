@@ -31,12 +31,12 @@ module.exports = function createAdminsRepository(sequelize) {
 
   async function update(id, form) {
     return Admin.update(form, {
-      where: { id: { [Op.eq]: id } },
+      where: { id },
     });
   }
 
   function remove(id) {
-    return Admin.destroy({ where: { id: { [Op.eq]: id } } });
+    return Admin.destroy({ where: { id } });
   }
 
   return {

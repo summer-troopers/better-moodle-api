@@ -24,14 +24,11 @@ module.exports = function defineCourse(sequelize, DataTypes) {
     Course.belongsToMany(models.Teacher, {
       through: 'CourseTeacher',
       foreignKey: 'courseId',
-      otherKey: 'teacherId',
     });
     Course.belongsToMany(models.Specialty, {
       through: 'CourseSpecialty',
       foreignKey: 'courseId',
-      otherKey: 'specialtyId',
     });
-    // Course.hasMany(models.CourseSpecialty, { foreignKey: 'courseId' });
     Course.hasMany(models.LabTask, { foreignKey: 'courseId' });
   };
   return Course;

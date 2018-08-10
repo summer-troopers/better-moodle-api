@@ -55,7 +55,6 @@ module.exports = function defineTeacher(sequelize, DataTypes) {
     Teacher.belongsToMany(models.Course, {
       through: 'CourseTeacher',
       foreignKey: 'teacherId',
-      otherKey: 'courseId',
     });
     Teacher.hasMany(models.LabTask, { foreignKey: 'teacherId', sourceKey: 'id' });
   };

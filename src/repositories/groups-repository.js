@@ -159,9 +159,6 @@ module.exports = function createGroupsRepository(sequelize) {
   }
 
   async function add(form) {
-    const result = await Specialty.findById(form.specialtyId);
-    if (!result) throw new errors.NotFound();
-
     return Group.create(form);
   }
 
@@ -171,46 +168,15 @@ module.exports = function createGroupsRepository(sequelize) {
     return false;
   }
 
-  async function update(id, form) {
-    const result = await Specialty.findById(form.specialtyId);
-    if (!result) throw new errors.NotFound('');
-
+  async function update(id) {
     return Group.update(form, {
-      where: { id: { [Op.eq]: id } },
+      where: { id },
     });
   }
 
-  function remove(id, queryParams) {
-    if (queryParams.studentId) {
-      return GroupStudents.destroy({
-        where: {
-          studentId: {
-            [Op.eq]: queryParams.studentId,
-          },
-          id: {
-            [Op.eq]: id,
-          },
-        },
-      });
-    }
-    if (queryParams.specialityId) {
-      return GroupsSpecialities.destroy({
-        where: {
-          id: {
-            [Op.eq]: id,
-          },
-          specialityId: {
-            [Op.eq]: queryParams.specialityId,
-          },
-        },
-      });
-    }
+  function remove(id) {
     return Group.destroy({
-      where: {
-        id: {
-          [Op.eq]: id,
-        },
-      },
+      where: { id },
     });
   }
 
