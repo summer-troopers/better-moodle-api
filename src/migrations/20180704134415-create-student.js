@@ -30,6 +30,7 @@ module.exports = {
       phoneNumber: {
         type: Sequelize.STRING,
         field: 'phone_number',
+        unique: true,
       },
       groupId: {
         type: Sequelize.INTEGER,
