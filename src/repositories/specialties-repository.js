@@ -23,7 +23,6 @@ module.exports = function createSpecialtiesRepository(sequelize) {
       groupId,
       teacherId,
       studentId,
-      laboratoryId,
       taskId,
     } = queryParams;
 

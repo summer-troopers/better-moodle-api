@@ -3,7 +3,7 @@
 const errors = require('@feathersjs/errors');
 const { Op } = require('sequelize');
 
-module.exports = function createTeacherRepository(sequelize) {
+module.exports = function createTeacherRepository(connection) {
   const {
     Teacher,
     Course,
@@ -12,7 +12,7 @@ module.exports = function createTeacherRepository(sequelize) {
     Student,
     LabTask,
     LabReport,
-  } = sequelize.models;
+  } = connection.models;
 
   async function list(queryParams) {
     const {

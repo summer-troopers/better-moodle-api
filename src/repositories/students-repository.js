@@ -4,16 +4,16 @@ const errors = require('@feathersjs/errors');
 const { Op } = require('sequelize');
 
 module.exports = function createStudentsRepository(connection) {
-  async function list(queryParams) {
-    const {
-      Student,
-      Group,
-      Specialty,
-      Course,
-      Teacher,
-      LabReport, LabTask,
-    } = connection.models;
+  const {
+    Student,
+    Group,
+    Specialty,
+    Course,
+    Teacher,
+    LabReport, LabTask,
+  } = connection.models;
 
+  async function list(queryParams) {
     const {
       limit,
       offset,
@@ -38,6 +38,7 @@ module.exports = function createStudentsRepository(connection) {
         exclude: ['password'],
       },
     };
+
 
     if (groupId) {
       return Student.findAndCountAll({

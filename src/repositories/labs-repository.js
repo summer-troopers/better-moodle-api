@@ -5,17 +5,17 @@ module.exports = function createLabsRepository(connection) {
   const gfs = Grid(connection.db, mongoose.mongo);
   gfs.collection('fs');
 
-  async function list(queryParams) {
-    const {
-      LabReport,
-      LabTask,
-      Student,
-      Group,
-      Specialty,
-      Course,
-      Teacher,
-    } = connection.models;
+  const {
+    LabReport,
+    LabTask,
+    Student,
+    Group,
+    Specialty,
+    Course,
+    Teacher,
+  } = connection.models;
 
+  async function list(queryParams) {
     const {
       limit,
       offset,
