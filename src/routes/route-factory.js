@@ -32,11 +32,11 @@ module.exports = function createRoute(repository, permissions) {
   }
 
   async function list(request, response, next) {
-    if (!permissions[request.token.userRole].read) return next(new errors.Forbidden());
+    if (!permissions[request.token.userRole].read) return next(new errors.Forbidden('READ_PERMISSION_MISSING'));
 
     return repository.list(request.query)
       .then((result) => {
-        if (result.count === 0) return next(new errors.NotFound());
+        if (result.count === 0) return next(new errors.NotFound('NO_RESULT'));
         return response.json({
           total: result.count,
           limit: request.query.limit,
@@ -48,7 +48,7 @@ module.exports = function createRoute(repository, permissions) {
   }
 
   function view(request, response, next) {
-    if (!permissions[request.token.userRole].read) return next(new errors.Forbidden());
+    if (!permissions[request.token.userRole].read) return next(new errors.Forbidden('READ_PERMISSION_MISSING'));
 
     return repository.view(request.params.id)
       .then((result) => {
@@ -58,7 +58,7 @@ module.exports = function createRoute(repository, permissions) {
   }
 
   function add(request, response, next) {
-    if (!permissions[request.token.userRole].create) return next(new errors.Forbidden());
+    if (!permissions[request.token.userRole].create) return next(new errors.Forbidden('CREATE_PERMISSION_MISSING'));
 
     return repository.add(request.body, request.query)
       .then((result) => {
@@ -68,7 +68,7 @@ module.exports = function createRoute(repository, permissions) {
   }
 
   function remove(request, response, next) {
-    if (!permissions[request.token.userRole].delete) return next(new errors.Forbidden());
+    if (!permissions[request.token.userRole].delete) return next(new errors.Forbidden('DELETE_PERMISSION_MISSING'));
 
     return repository.remove(request.params.id, request.query)
       .then((result) => {
@@ -78,7 +78,7 @@ module.exports = function createRoute(repository, permissions) {
   }
 
   function update(request, response, next) {
-    if (!permissions[request.token.userRole].update) return next(new errors.Forbidden());
+    if (!permissions[request.token.userRole].update) return next(new errors.Forbidden('UPDATE_PERMISSION_MISSING'));
 
     return repository.update(request.params.id, request.body)
       .then((result) => {
