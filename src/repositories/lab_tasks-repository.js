@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const Grid = require('gridfs-stream');
+// const Grid = require('gridfs-stream');
 const GridFsStorage = require('multer-gridfs-storage');
 const errors = require('@feathersjs/errors');
 const roles = require('../helpers/constants/roles');
