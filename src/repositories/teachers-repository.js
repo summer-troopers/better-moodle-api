@@ -165,7 +165,7 @@ module.exports = function createTeacherRepository(connection) {
     return Teacher.findById(id);
   }
 
-  async function add(form) {
+  async function add(form, queryParams) {
     if (queryParams.courseId) {
       const course = await Course.findById(queryParams.courseId);
       if (!course) throw new errors.NotFound();
