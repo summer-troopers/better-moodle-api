@@ -3,14 +3,14 @@
 const express = require('express');
 const errors = require('@feathersjs/errors');
 const parseQueryParams = require('../middlewares/parse-query');
-const { hashPassword, hashPasswordOptional } = require('../middlewares/password-hasher');
+const { hashPasswordOptional } = require('../middlewares/password-hasher');
 
 module.exports = function createRoute(repository, permissions) {
   const router = express.Router();
 
   router.route('/')
     .get(parseQueryParams, list)
-    .post(hashPassword, add);
+    .post(hashPasswordOptional, add);
 
   router.param('id', validateId);
 
