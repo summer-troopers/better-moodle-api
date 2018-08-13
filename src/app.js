@@ -3,6 +3,7 @@
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const express = require('express');
+const { FeathersError } = require('@feathersjs/errors');
 
 const morgan = require('morgan');
 const swaggerUi = require('swagger-ui-express');
@@ -16,6 +17,7 @@ const createAuthenticationRoute = require('./routes/authentication-route');
 const createUserRepository = require('./repositories/users-repository');
 const { permissions } = require('./helpers/util');
 const createAuthorizationVerifier = require('./middlewares/authorization-verifier');
+
 
 module.exports = function getApp(sqlConnection, mongoConnection) {
   const app = express();
@@ -61,8 +63,14 @@ module.exports = function getApp(sqlConnection, mongoConnection) {
 
   // eslint-disable-next-line no-unused-vars
   app.use((err, request, response, next) => {
-    const error = err;
-    error.code = err.code || 400;
+    let error;
+    if (err instanceof FeathersError) {
+      error = err.toJSON();
+    } else {
+      error = err;
+      error.code = err.code || 500;
+      error.message = err.message || 'UNKNOWN_SERVER_ERROR';
+    }
     return response.status(error.code).json(error.message);
   });
 
