@@ -3,8 +3,8 @@
 const { Op } = require('sequelize');
 const roles = require('../helpers/constants/roles');
 
-module.exports = function getUserRepository(models) {
-  const { Teacher, Admin, Student } = models;
+module.exports = function getUserRepository(sequelize) {
+  const { Teacher, Admin, Student } = sequelize.models;
 
   function selectUserDB(user, model) {
     return model.findOne({ where: { email: { [Op.eq]: user.email } } });

@@ -1,45 +1,163 @@
 'use strict';
 
+const errors = require('@feathersjs/errors');
 const { Op } = require('sequelize');
 
-module.exports = function createTeachersRepository(models) {
-  const { Teacher, Course, CourseTeacher } = models;
+module.exports = function createTeacherRepository(connection) {
+  const {
+    Teacher,
+    Course,
+    Specialty,
+    Group,
+    Student,
+    LabTask,
+    LabReport,
+  } = connection.models;
 
-  function list(queryParams) {
+  async function list(queryParams) {
     const {
       limit,
       offset,
       contains,
       courseId,
+      specialtyId,
+      groupId,
+      studentId,
+      taskId,
+      laboratoryId,
     } = queryParams;
 
     const filter = {
       limit,
       offset,
-      attributes: {
-        exclude: ['password'],
-      },
       where: {
         firstName: {
           [Op.like]: [`%${contains}%`],
         },
+      },
+      attributes: {
+        exclude: ['password'],
       },
     };
 
     if (courseId) {
       return Teacher.findAndCountAll({
         ...filter,
+        raw: true,
+        subQuery: false,
         include: [{
           model: Course,
-          attributes: [],
+          required: true,
           where: {
-            id: {
-              [Op.eq]: courseId,
-            },
+            id: courseId,
           },
         }],
       });
     }
+
+    if (specialtyId) {
+      return Teacher.findAndCountAll({
+        ...filter,
+        raw: true,
+        subQuery: false,
+        include: [{
+          model: Course,
+          required: true,
+          include: [{
+            model: Specialty,
+            required: true,
+            where: {
+              id: specialtyId,
+            },
+          }],
+        }],
+      });
+    }
+
+    if (groupId) {
+      return Teacher.findAndCountAll({
+        ...filter,
+        raw: true,
+        subQuery: false,
+        include: [{
+          model: Course,
+          required: true,
+          include: [{
+            model: Specialty,
+            required: true,
+            include: [{
+              model: Group,
+              required: true,
+              where: {
+                id: groupId,
+              },
+            }],
+          }],
+        }],
+      });
+    }
+
+    if (studentId) {
+      return Teacher.findAndCountAll({
+        ...filter,
+        raw: true,
+        subQuery: false,
+        include: [{
+          model: Course,
+          required: true,
+          include: [{
+            model: Specialty,
+            required: true,
+            include: [{
+              model: Group,
+              required: true,
+              include: [{
+                model: Student,
+                required: true,
+                where: {
+                  id: studentId,
+                },
+              }],
+            }],
+          }],
+        }],
+      });
+    }
+
+    if (taskId) {
+      return Teacher.findAndCountAll({
+        ...filter,
+        raw: true,
+        subQuery: false,
+        include: [{
+          model: LabTask,
+          required: true,
+          where: {
+            id: taskId,
+          },
+        }],
+      });
+    }
+
+    if (laboratoryId) {
+      return Teacher.findAndCountAll({
+        ...filter,
+        raw: true,
+        subQuery: false,
+        include: [{
+          model: LabTask,
+          required: true,
+          include: [{
+            model: LabReport,
+            required: true,
+            where: {
+              id: laboratoryId,
+            },
+          }],
+        }],
+      });
+    }
+
     return Teacher.findAndCountAll(filter);
   }
 
@@ -47,11 +165,11 @@ module.exports = function createTeachersRepository(models) {
     return Teacher.findById(id);
   }
 
-  async function add(form, queryParams) {
+  async function add(form) {
     if (queryParams.courseId) {
-      const course = await Course.findById(form.teacherId);
+      const course = await Course.findById(queryParams.courseId);
       if (!course) throw new errors.NotFound();
-      const teacher = await Teacher.findById(queryParams.courseId);
+      const teacher = await Teacher.findById(form.teacherId);
       if (!teacher) throw new errors.NotFound();
       return teacher.addCourse(course);
     }
@@ -66,7 +184,7 @@ module.exports = function createTeachersRepository(models) {
 
   async function update(id, form) {
     return Teacher.update(form, {
-      where: { id: { [Op.eq]: id } },
+      where: { id },
     });
   }
 
@@ -74,16 +192,15 @@ module.exports = function createTeachersRepository(models) {
     if (queryParams.courseId) {
       return CourseTeacher.destroy({
         where: {
-          idTeacher: {
-            [Op.eq]: id,
-          },
-          idCourse: {
-            [Op.eq]: queryParams.courseId,
-          },
+          courseId: queryParams.courseId,
+          teacherId: id,
         },
       });
     }
-    return Teacher.destroy({ where: { id: { [Op.eq]: id } } });
+
+    return Teacher.destroy({
+      where: { id },
+    });
   }
 
   return {

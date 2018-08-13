@@ -1,9 +1,18 @@
 'use strict';
 
 const { Op } = require('sequelize');
+const errors = require('@feathersjs/errors');
 
-module.exports = function createSpecialtiesRepository(models) {
-  const { Specialty, Course, CourseSpecialty } = models;
+module.exports = function createSpecialtiesRepository(sequelize) {
+  const {
+    Group,
+    Specialty,
+    Course,
+    Teacher,
+    Student,
+    LabReport,
+    LabTask,
+  } = sequelize.models;
 
   async function list(queryParams) {
     const {
@@ -11,6 +20,10 @@ module.exports = function createSpecialtiesRepository(models) {
       offset,
       contains,
       courseId,
+      groupId,
+      teacherId,
+      studentId,
+      taskId,
     } = queryParams;
 
     const filter = {
@@ -26,17 +39,98 @@ module.exports = function createSpecialtiesRepository(models) {
     if (courseId) {
       return Specialty.findAndCountAll({
         ...filter,
+        raw: true,
+        subQuery: false,
         include: [{
           model: Course,
-          attributes: [],
+          required: true,
           where: {
-            id: {
-              [Op.eq]: courseId,
-            },
+            id: courseId,
           },
         }],
       });
     }
+
+    if (teacherId) {
+      return Specialty.findAndCountAll({
+        ...filter,
+        raw: true,
+        subQuery: false,
+        include: [{
+          model: Course,
+          required: true,
+          include: [{
+            model: Teacher,
+            required: true,
+            where: {
+              id: teacherId,
+            },
+          }],
+        }],
+      });
+    }
+
+    if (groupId) {
+      return Specialty.findAndCountAll({
+        ...filter,
+        raw: true,
+        subQuery: false,
+        include: [{
+          model: Group,
+          required: true,
+          where: {
+            id: groupId,
+          },
+        }],
+      });
+    }
+
+    if (studentId) {
+      return Specialty.findAndCountAll({
+        ...filter,
+        raw: true,
+        subQuery: false,
+        include: [{
+          model: Group,
+          required: true,
+          include: [{
+            model: Student,
+            required: true,
+            where: {
+              id: studentId,
+            },
+          }],
+        }],
+      });
+    }
+
+    if (taskId) {
+      return Specialty.findAndCountAll({
+        ...filter,
+        raw: true,
+        subQuery: false,
+        include: [{
+          model: Group,
+          required: true,
+          include: [{
+            model: Student,
+            required: true,
+            include: [{
+              model: LabReport,
+              required: true,
+              include: [{
+                model: LabTask,
+                required: true,
+                where: {
+                  id: taskId,
+                },
+              }],
+            }],
+          }],
+        }],
+      });
+    }
+
     return Specialty.findAndCountAll(filter);
   }
 
@@ -62,8 +156,11 @@ module.exports = function createSpecialtiesRepository(models) {
   }
 
   async function update(id, form) {
+    const result = await Course.findById(form.courseId);
+    if (!result) throw new errors.NotFound();
+
     return Specialty.update(form, {
-      where: { id: { [Op.eq]: id } },
+      where: { id },
     });
   }
 
@@ -71,16 +168,13 @@ module.exports = function createSpecialtiesRepository(models) {
     if (queryParams.courseId) {
       return CourseSpecialty.destroy({
         where: {
-          idSpecialty: {
-            [Op.eq]: id,
-          },
-          idCourse: {
-            [Op.eq]: queryParams.courseId,
-          },
+          specialtyId: id,
+          courseId: queryParams.courseId,
         },
       });
     }
-    return Specialty.destroy({ where: { id: { [Op.eq]: id } } });
+
+    return Specialty.destroy({ where: { id } });
   }
 
   return {

@@ -23,16 +23,15 @@ module.exports = function getApp(sqlConnection, mongoConnection) {
   const app = express();
 
   importModels(sqlConnection);
-  const { models } = sqlConnection;
 
-  const adminsRepository = require('./repositories/admins-repository')(models); // eslint-disable-line global-require
-  const teachersRepository = require('./repositories/teachers-repository')(models); // eslint-disable-line global-require
-  const studentsRepository = require('./repositories/students-repository')(models); // eslint-disable-line global-require
-  const coursesRepository = require('./repositories/courses-repository')(models); // eslint-disable-line global-require
-  const groupsRepository = require('./repositories/groups-repository')(models); // eslint-disable-line global-require
-  const specialtiesRepository = require('./repositories/specialties-repository')(models); // eslint-disable-line global-require
+  const adminsRepository = require('./repositories/admins-repository')(sqlConnection); // eslint-disable-line global-require
+  const teachersRepository = require('./repositories/teachers-repository')(sqlConnection); // eslint-disable-line global-require
+  const studentsRepository = require('./repositories/students-repository')(sqlConnection); // eslint-disable-line global-require
+  const coursesRepository = require('./repositories/courses-repository')(sqlConnection); // eslint-disable-line global-require
+  const groupsRepository = require('./repositories/groups-repository')(sqlConnection); // eslint-disable-line global-require
+  const specialtiesRepository = require('./repositories/specialties-repository')(sqlConnection); // eslint-disable-line global-require
 
-  const userRepository = createUserRepository(models);
+  const userRepository = createUserRepository(sqlConnection);
 
   const labsRepository = require('./repositories/labs-repository')(mongoConnection); // eslint-disable-line global-require
 

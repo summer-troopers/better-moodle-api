@@ -44,7 +44,8 @@ module.exports = function defineAdmin(sequelize, DataTypes) {
         isEmail: true,
       },
     },
-  }, {
+  },
+  {
     tableName: 'admins',
     timestamps: false,
   });

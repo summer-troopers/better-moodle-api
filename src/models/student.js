@@ -40,7 +40,6 @@ module.exports = function defineStudent(sequelize, DataTypes) {
       type: DataTypes.STRING,
       field: 'email',
       allowNull: false,
-      unique: true,
       validate: {
         isEmail: true,
       },
@@ -50,8 +49,8 @@ module.exports = function defineStudent(sequelize, DataTypes) {
       field: 'group_id',
       allowNull: false,
     },
-
-  }, {
+  },
+  {
     tableName: 'students',
     timestamps: false,
   });

@@ -14,13 +14,11 @@ module.exports = function defineCourseSpecialty(sequelize, DataTypes) {
       primaryKey: true,
       allowNull: false,
     },
-  }, {
+  },
+  {
     tableName: 'courses_specialties',
     timestamps: false,
   });
-  CourseSpecialty.associate = function associateCourseSpecialty(models) {
-    CourseSpecialty.hasMany(models.Course, { foreignKey: 'id', sourceKey: 'courseId' });
-    CourseSpecialty.hasMany(models.Specialty, { foreignKey: 'id', sourceKey: 'specialtyId' });
-  };
+  CourseSpecialty.associate = function associateCourseSpecialty(models) { };
   return CourseSpecialty;
 };

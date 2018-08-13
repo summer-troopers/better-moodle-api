@@ -51,7 +51,6 @@
           "middlewares",
           "verifier",
           "mongo"
-
         ]
       }
     ],
@@ -69,7 +68,7 @@
     "max-len": "off",
     "complexity": [
       "error",
-      4
+      7
     ]
   }
 }

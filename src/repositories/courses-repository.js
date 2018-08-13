@@ -3,14 +3,16 @@
 const errors = require('@feathersjs/errors');
 const { Op } = require('sequelize');
 
-module.exports = function createCoursesRepository(models) {
+module.exports = function createCoursesRepository(sequelize) {
   const {
     Course,
-    CourseTeacher,
     Teacher,
-    CourseSpecialty,
     Specialty,
-  } = models;
+    Group,
+    Student,
+    LabReport,
+    LabTask,
+  } = sequelize.models;
 
   async function list(queryParams) {
     const {
@@ -19,6 +21,10 @@ module.exports = function createCoursesRepository(models) {
       contains,
       teacherId,
       specialtyId,
+      groupId,
+      studentId,
+      laboratoryId,
+      taskId,
     } = queryParams;
 
     const filter = {
@@ -31,34 +37,124 @@ module.exports = function createCoursesRepository(models) {
       },
     };
 
-    if (teacherId) {
-      return Course.findAndCountAll({
-        ...filter,
-        include: [{
-          model: Teacher,
-          attributes: [],
-          where: {
-            id: {
-              [Op.eq]: teacherId,
-            },
-          },
-        }],
-      });
-    }
     if (specialtyId) {
       return Course.findAndCountAll({
         ...filter,
+        raw: true,
+        subQuery: false,
         include: [{
           model: Specialty,
-          attributes: [],
+          required: true,
           where: {
-            id: {
-              [Op.eq]: specialtyId,
-            },
+            id: specialtyId,
           },
         }],
       });
     }
+
+    if (groupId) {
+      return Course.findAndCountAll({
+        ...filter,
+        raw: true,
+        subQuery: false,
+        include: [{
+          model: Specialty,
+          required: true,
+          include: [{
+            model: Group,
+            required: true,
+            where: {
+              id: groupId,
+            },
+          }],
+        }],
+      });
+    }
+
+    if (studentId) {
+      return Course.findAndCountAll({
+        ...filter,
+        raw: true,
+        subQuery: false,
+        include: [{
+          model: Specialty,
+          required: true,
+          include: [{
+            model: Group,
+            required: true,
+            include: [{
+              model: Student,
+              required: true,
+              where: {
+                id: studentId,
+              },
+            }],
+          }],
+        }],
+      });
+    }
+
+    if (laboratoryId) {
+      return Course.findAndCountAll({
+        ...filter,
+        raw: true,
+        subQuery: false,
+        include: [{
+          model: Specialty,
+          required: true,
+          include: [{
+            model: Group,
+            required: true,
+            include: [{
+              model: Student,
+              required: true,
+              include: [{
+                model: LabReport,
+                required: true,
+                where: {
+                  id: laboratoryId,
+                },
+              }],
+            }],
+          }],
+        }],
+      });
+    }
+
+    if (teacherId) {
+      return Course.findAndCountAll({
+        ...filter,
+        raw: true,
+        subQuery: false,
+        include: [{
+          model: Teacher,
+          required: true,
+          where: {
+            id: teacherId,
+          },
+        }],
+      });
+    }
+
+    if (taskId) {
+      return Course.findAndCountAll({
+        ...filter,
+        raw: true,
+        subQuery: false,
+        include: [{
+          model: Teacher,
+          required: true,
+          include: [{
+            model: LabTask,
+            required: true,
+            where: {
+              id: taskId,
+            },
+          }],
+        }],
+      });
+    }
+
     return Course.findAndCountAll(filter);
   }
 
@@ -100,11 +196,7 @@ module.exports = function createCoursesRepository(models) {
 
   async function update(id, form) {
     return Course.update(form, {
-      where: {
-        id: {
-          [Op.eq]: id,
-        },
-      },
+      where: { id },
     });
   }
 
@@ -112,33 +204,21 @@ module.exports = function createCoursesRepository(models) {
     if (queryParams.teacherId) {
       return CourseTeacher.destroy({
         where: {
-          idTeacher: {
-            [Op.eq]: queryParams.teacherId,
-          },
-          idCourse: {
-            [Op.eq]: id,
-          },
+          id,
+          teacherId: queryParams.teacherId,
         },
       });
     }
     if (queryParams.specialtyId) {
       return CourseSpecialty.destroy({
         where: {
-          idSpecialty: {
-            [Op.eq]: queryParams.specialtyId,
-          },
-          idCourse: {
-            [Op.eq]: id,
-          },
+          specialtyId: queryParams.specialtyId,
+          courseId: id,
         },
       });
     }
     return Course.destroy({
-      where: {
-        id: {
-          [Op.eq]: id,
-        },
-      },
+      where: { id },
     });
   }
 

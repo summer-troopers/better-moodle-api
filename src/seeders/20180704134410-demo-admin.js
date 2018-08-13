@@ -23,10 +23,30 @@ async function generate50Admins() {
     admins.push({
       first_name: faker.name.firstName(),
       last_name: faker.name.lastName(),
-      email: faker.internet.email(),
+      email: generateUniqueEmail(i, admins),
       password: faker.random.alphaNumeric(60),
-      phone_number: faker.phone.phoneNumberFormat(0),
+      phone_number: generateUniqueNumber(i, admins),
     });
   }
   return admins;
+}
+
+function generateUniqueEmail(i, admins) {
+  let genEmail;
+  const predicate = object => object.email === genEmail;
+  while (true) {
+    genEmail = faker.internet.email();
+    if (!admins.find(predicate)) break;
+  }
+  return genEmail;
+}
+
+function generateUniqueNumber(i, admins) {
+  let genNumber;
+  const predicate = object => object.phone_number === genNumber;
+  while (true) {
+    genNumber = faker.phone.phoneNumberFormat(0);
+    if (!admins.find(predicate)) break;
+  }
+  return genNumber;
 }

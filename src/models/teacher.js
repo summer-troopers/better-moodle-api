@@ -39,7 +39,6 @@ module.exports = function defineTeacher(sequelize, DataTypes) {
     email: {
       type: DataTypes.STRING,
       field: 'email',
-      unique: true,
       allowNull: false,
       validate: {
         isEmail: true,
@@ -52,7 +51,10 @@ module.exports = function defineTeacher(sequelize, DataTypes) {
   });
   // eslint-disable-next-line no-unused-vars
   Teacher.associate = function associateTeacher(models) {
-    Teacher.belongsToMany(models.Course, { through: 'CourseTeacher', foreignKey: 'teacherId', otherKey: 'courseId' });
+    Teacher.belongsToMany(models.Course, {
+      through: 'CourseTeacher',
+      foreignKey: 'teacherId',
+    });
     Teacher.hasMany(models.LabTask, { foreignKey: 'teacherId', sourceKey: 'id' });
   };
   return Teacher;

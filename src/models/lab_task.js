@@ -23,7 +23,8 @@ module.exports = function defineLabTask(sequelize, DataTypes) {
       field: 'mongo_file_id',
       allowNull: false,
     },
-  }, {
+  },
+  {
     tableName: 'lab_tasks',
     timestamps: false,
   });

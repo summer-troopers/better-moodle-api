@@ -2,8 +2,8 @@
 
 const { Op } = require('sequelize');
 
-module.exports = function createAdminsRepository(models) {
-  const { Admin } = models;
+module.exports = function createAdminsRepository(sequelize) {
+  const { Admin } = sequelize.models;
 
   function list(queryParams) {
     const { limit, offset, contains } = queryParams;
@@ -31,12 +31,12 @@ module.exports = function createAdminsRepository(models) {
 
   async function update(id, form) {
     return Admin.update(form, {
-      where: { id: { [Op.eq]: id } },
+      where: { id },
     });
   }
 
   function remove(id) {
-    return Admin.destroy({ where: { id: { [Op.eq]: id } } });
+    return Admin.destroy({ where: { id } });
   }
 
   return {

@@ -12,15 +12,16 @@ module.exports = function defineSpecialty(sequelize, DataTypes) {
       type: DataTypes.STRING,
       allowNull: false,
     },
-  }, {
+  },
+  {
     tableName: 'specialties',
     timestamps: false,
   });
+
   Specialty.associate = function associateSpecialty(models) {
     Specialty.belongsToMany(models.Course, {
       through: 'CourseSpecialty',
       foreignKey: 'specialtyId',
-      otherKey: 'courseId',
     });
     Specialty.hasMany(models.Group, { foreignKey: 'specialtyId', sourceKey: 'id' });
   };

@@ -20,8 +20,8 @@ module.exports = function defineGroup(sequelize, DataTypes) {
       field: 'specialty_id',
       allowNull: false,
     },
-
-  }, {
+  },
+  {
     tableName: 'groups',
     timestamps: false,
   });
