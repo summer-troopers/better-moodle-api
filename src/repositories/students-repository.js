@@ -176,7 +176,7 @@ module.exports = function createStudentsRepository(connection) {
     return false;
   }
 
-  async function update(id) {
+  async function update(id, form) {
     return Student.update(form, {
       where: { id },
     });
