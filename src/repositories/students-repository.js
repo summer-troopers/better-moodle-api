@@ -28,8 +28,6 @@ module.exports = function createStudentsRepository(connection) {
       taskId,
     } = queryParams;
 
-    let response = null;
-
     const filter = {
       limit,
       offset,
@@ -43,24 +41,21 @@ module.exports = function createStudentsRepository(connection) {
       },
     };
 
-    const model1 = [Group];
-    const model2 = [Group, Specialty];
-    const model3 = [Group, Specialty, Course];
-    const model4 = [Group, Specialty, Course, Teacher];
-    const model5 = [LabReport];
-    const model6 = [LabReport, LabTask];
+    let response = null;
 
-    response = handleId(groupId, response, Student, filter, model1);
+    const modelsCollection1 = [Group];
+    const modelsCollection2 = modelsCollection1.concat([Specialty]);
+    const modelsCollection3 = modelsCollection2.concat([Course]);
+    const modelsCollection4 = modelsCollection3.concat([Teacher]);
+    const modelsCollection5 = [LabReport];
+    const modelsCollection6 = modelsCollection5.concat([LabTask]);
 
-    response = handleId(specialtyId, response, Student, filter, model2);
-
-    response = handleId(courseId, response, Student, filter, model3);
-
-    response = handleId(teacherId, response, Student, filter, model4);
-
-    response = handleId(laboratoryId, response, Student, filter, model5);
-
-    response = handleId(taskId, response, Student, filter, model6);
+    response = handleId(groupId, response, Student, filter, modelsCollection1);
+    response = handleId(specialtyId, response, Student, filter, modelsCollection2);
+    response = handleId(courseId, response, Student, filter, modelsCollection3);
+    response = handleId(teacherId, response, Student, filter, modelsCollection4);
+    response = handleId(laboratoryId, response, Student, filter, modelsCollection5);
+    response = handleId(taskId, response, Student, filter, modelsCollection6);
 
     if (response) {
       return response;
@@ -104,15 +99,14 @@ module.exports = function createStudentsRepository(connection) {
   };
 };
 
-function handleId(id, response, Student, filter, models) {
-  if (id) {
+function handleId(querryParamId, response, Student, filter, models) {
+  if (querryParamId) {
     const query = {
       ...filter,
       raw: true,
       subQuery: false,
-      ...buildIncludes(id, models),
+      ...buildIncludes(querryParamId, models),
     };
-    console.log(JSON.stringify(query));
     response = Student.findAndCountAll(query);
   }
   return response;

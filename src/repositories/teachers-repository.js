@@ -2,6 +2,7 @@
 
 const errors = require('@feathersjs/errors');
 const { Op } = require('sequelize');
+const { buildIncludes } = require('../helpers/util');
 
 module.exports = function createTeacherRepository(connection) {
   const {
@@ -40,124 +41,25 @@ module.exports = function createTeacherRepository(connection) {
       },
     };
 
-    if (courseId) {
-      return Teacher.findAndCountAll({
-        ...filter,
-        raw: true,
-        subQuery: false,
-        include: [{
-          model: Course,
-          required: true,
-          where: {
-            id: courseId,
-          },
-        }],
-      });
-    }
+    let response = null;
 
-    if (specialtyId) {
-      return Teacher.findAndCountAll({
-        ...filter,
-        raw: true,
-        subQuery: false,
-        include: [{
-          model: Course,
-          required: true,
-          include: [{
-            model: Specialty,
-            required: true,
-            where: {
-              id: specialtyId,
-            },
-          }],
-        }],
-      });
-    }
+    const modelsCollection1 = [Course];
+    const modelsCollection2 = modelsCollection1.concat([Specialty]);
+    const modelsCollection3 = modelsCollection2.concat([Group]);
+    const modelsCollection4 = modelsCollection3.concat([Student]);
+    const modelsCollection5 = [LabTask];
+    const modelsCollection6 = modelsCollection5.concat([LabReport]);
 
-    if (groupId) {
-      return Teacher.findAndCountAll({
-        ...filter,
-        raw: true,
-        subQuery: false,
-        include: [{
-          model: Course,
-          required: true,
-          include: [{
-            model: Specialty,
-            required: true,
-            include: [{
-              model: Group,
-              required: true,
-              where: {
-                id: groupId,
-              },
-            }],
-          }],
-        }],
-      });
-    }
+    response = handleId(courseId, response, Teacher, filter, modelsCollection1);
+    response = handleId(specialtyId, response, Teacher, filter, modelsCollection2);
+    response = handleId(groupId, response, Teacher, filter, modelsCollection3);
+    response = handleId(studentId, response, Teacher, filter, modelsCollection4);
+    response = handleId(taskId, response, Teacher, filter, modelsCollection5);
+    response = handleId(laboratoryId, response, Teacher, filter, modelsCollection6);
 
-    if (studentId) {
-      return Teacher.findAndCountAll({
-        ...filter,
-        raw: true,
-        subQuery: false,
-        include: [{
-          model: Course,
-          required: true,
-          include: [{
-            model: Specialty,
-            required: true,
-            include: [{
-              model: Group,
-              required: true,
-              include: [{
-                model: Student,
-                required: true,
-                where: {
-                  id: studentId,
-                },
-              }],
-            }],
-          }],
-        }],
-      });
+    if (response) {
+      return response;
     }
-
-    if (taskId) {
-      return Teacher.findAndCountAll({
-        ...filter,
-        raw: true,
-        subQuery: false,
-        include: [{
-          model: LabTask,
-          required: true,
-          where: {
-            id: taskId,
-          },
-        }],
-      });
-    }
-
-    if (laboratoryId) {
-      return Teacher.findAndCountAll({
-        ...filter,
-        raw: true,
-        subQuery: false,
-        include: [{
-          model: LabTask,
-          required: true,
-          include: [{
-            model: LabReport,
-            required: true,
-            where: {
-              id: laboratoryId,
-            },
-          }],
-        }],
-      });
-    }
-
     return Teacher.findAndCountAll(filter);
   }
 
@@ -212,3 +114,17 @@ module.exports = function createTeacherRepository(connection) {
     exists,
   };
 };
+
+
+function handleId(querryParamId, response, Teacher, filter, models) {
+  if (querryParamId) {
+    const query = {
+      ...filter,
+      raw: true,
+      subQuery: false,
+      ...buildIncludes(querryParamId, models),
+    };
+    response = Teacher.findAndCountAll(query);
+  }
+  return response;
+}

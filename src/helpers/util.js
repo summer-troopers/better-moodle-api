@@ -40,24 +40,24 @@ function createPermissions(permissions) {
 
 function buildIncludes(param, models) {
   models.reverse();
-  return models.reduce((acc, model, index) => {
+  return models.reduce((accumulator, model, index) => {
     if (index === 0) {
-      acc.include = [{
+      accumulator.include = [{
         model,
         required: true,
         where: {
           id: param,
         },
       }];
-      return acc;
+      return accumulator;
     }
 
-    acc.include = [{
+    accumulator.include = [{
       model,
       required: true,
-      include: acc.include,
+      include: accumulator.include,
     }];
-    return acc;
+    return accumulator;
   }, {});
 }
 
