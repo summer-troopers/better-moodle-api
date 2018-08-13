@@ -69,7 +69,7 @@
     "max-len": "off",
     "complexity": [
       "error",
-      4
+      7
     ],
     "no-param-reassign": "off"
   }
