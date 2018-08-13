@@ -1,15 +1,20 @@
-const mongoose = require('mongoose');
+const errors = require('@feathersjs/errors');
 const createGridFS = require('mongoose-gridfs');
 const GridFsStorage = require('multer-gridfs-storage');
+const logger = require('../services/winston/logger');
+// const GridFSBucket = require('mongodb');
+
+// FIXME: THIS IS NOT FINISHED, DECIDE BETWEEN 'mongoose-gridfs' or 'GridFSBucket'
+// Let's try 'mongoose-gridfs' for now
 
 module.exports = function createLabsRepository(mongoConnection, sqlConnection) {
-  const gridFs = createGridFS({
+  const gridFS = createGridFS({
     collection: 'reports',
     model: 'LabReportFile',
-    mongooseConnection: mongoConnection.connection,
+    mongooseConnection: mongoConnection,
   });
 
-  const LabReportFile = gridFs.model;
+  const LabReportFile = gridFS.model;
 
   const { LabReport } = sqlConnection.models;
 
@@ -23,18 +28,29 @@ module.exports = function createLabsRepository(mongoConnection, sqlConnection) {
     },
   });
 
-  async function list() {
+  async function list(queryParams) {
+    const { limit, offset } = queryParams;
     return LabReport.findAndCountAll({
+      limit,
+      offset,
       attributes: ['id', 'labTaskId', 'studentId'],
     });
   }
 
   async function view(id) {
     const report = await LabReport.findById(id);
-    const file = await gridFS.files.findOne({
-      _id: report.mongoFileId,
+    if (!report) throw new errors.NotFound('LAB_REPORT_NOT_FOUND');
+    const stream = LabReportFile.readById(report.mongoFileId);
+    const metadata = await new Promise((resolve, reject) => {
+      LabReportFile.findById(report.mongoFileId, (error, result) => {
+        if (error) return reject(error);
+        return resolve(result);
+      });
     });
-    return file;
+    return {
+      metadata,
+      stream,
+    };
   }
 
   async function add(fileId, labTaskId, studentId) {
@@ -48,16 +64,22 @@ module.exports = function createLabsRepository(mongoConnection, sqlConnection) {
       await remove(report.id);
     }
     return LabReport.create({
-      studentId,
       labTaskId,
+      studentId,
       mongoFileId: fileId,
     });
   }
 
   async function remove(id) {
     const report = await LabReport.findById(id);
-    const delRes = await gridFS.remove({
-      _id: report.mongoFileId,
+    await new Promise((resolve, reject) => {
+      LabReportFile.unlinkById(report.mongoFileId, (error, result) => {
+        if (error) {
+          logger.error(error);
+          return reject(error);
+        }
+        return resolve(result);
+      });
     });
     return LabReport.destroy({
       where: {

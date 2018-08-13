@@ -53,8 +53,8 @@
           "mongo",
           "hasher",
           "gridfs",
-          "multer"
-
+          "multer",
+          "metadata"
         ]
       }
     ],
