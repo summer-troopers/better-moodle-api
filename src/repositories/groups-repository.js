@@ -168,7 +168,7 @@ module.exports = function createGroupsRepository(sequelize) {
     return false;
   }
 
-  async function update(id) {
+  async function update(id, form) {
     return Group.update(form, {
       where: { id },
     });
