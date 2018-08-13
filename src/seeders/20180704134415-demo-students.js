@@ -36,7 +36,7 @@ function generateUniqueEmail(i, students) {
   let genEmail;
   const predicate = object => object.email === genEmail;
   while (true) {
-    genEmail = faker.internet.email();
+    genEmail = faker.internet.email().toLocaleLowerCase();
     if (!students.find(predicate)) break;
   }
   return genEmail;
