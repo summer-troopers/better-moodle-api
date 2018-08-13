@@ -68,6 +68,9 @@ module.exports = function createStudentsRepository(connection) {
   }
 
   async function add(form) {
+    const group = Group.findById(form.groupId);
+    if (!group) throw new errors.NotFound('GROUP_NOT_FOUND');
+
     return Student.create(form);
   }
 
@@ -78,6 +81,9 @@ module.exports = function createStudentsRepository(connection) {
   }
 
   async function update(id, form) {
+    const group = Group.findById(form.groupId);
+    if (!group) throw new errors.NotFound('GROUP_NOT_FOUND');
+
     return Student.update(form, {
       where: { id },
     });
@@ -99,13 +105,13 @@ module.exports = function createStudentsRepository(connection) {
   };
 };
 
-function handleId(querryParamId, response, Student, filter, models) {
-  if (querryParamId) {
+function handleId(queryParamId, response, Student, filter, models) {
+  if (queryParamId) {
     const query = {
       ...filter,
       raw: true,
       subQuery: false,
-      ...buildIncludes(querryParamId, models),
+      ...buildIncludes(queryParamId, models),
     };
     response = Student.findAndCountAll(query);
   }

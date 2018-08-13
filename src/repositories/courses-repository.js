@@ -2,6 +2,7 @@
 
 const errors = require('@feathersjs/errors');
 const { Op } = require('sequelize');
+const { buildIncludes } = require('../helpers/util');
 
 module.exports = function createCoursesRepository(sequelize) {
   const {
@@ -37,124 +38,25 @@ module.exports = function createCoursesRepository(sequelize) {
       },
     };
 
-    if (specialtyId) {
-      return Course.findAndCountAll({
-        ...filter,
-        raw: true,
-        subQuery: false,
-        include: [{
-          model: Specialty,
-          required: true,
-          where: {
-            id: specialtyId,
-          },
-        }],
-      });
-    }
+    let response = null;
 
-    if (groupId) {
-      return Course.findAndCountAll({
-        ...filter,
-        raw: true,
-        subQuery: false,
-        include: [{
-          model: Specialty,
-          required: true,
-          include: [{
-            model: Group,
-            required: true,
-            where: {
-              id: groupId,
-            },
-          }],
-        }],
-      });
-    }
+    const modelsCollection1 = [Specialty];
+    const modelsCollection2 = modelsCollection1.concat([Group]);
+    const modelsCollection3 = modelsCollection2.concat([Student]);
+    const modelsCollection4 = [Teacher];
+    const modelsCollection5 = modelsCollection4.concat([LabTask]);
+    const modelsCollection6 = modelsCollection5.concat([LabReport]);
 
-    if (studentId) {
-      return Course.findAndCountAll({
-        ...filter,
-        raw: true,
-        subQuery: false,
-        include: [{
-          model: Specialty,
-          required: true,
-          include: [{
-            model: Group,
-            required: true,
-            include: [{
-              model: Student,
-              required: true,
-              where: {
-                id: studentId,
-              },
-            }],
-          }],
-        }],
-      });
-    }
+    response = handleId(specialtyId, response, Course, filter, modelsCollection1);
+    response = handleId(groupId, response, Course, filter, modelsCollection2);
+    response = handleId(studentId, response, Course, filter, modelsCollection3);
+    response = handleId(teacherId, response, Course, filter, modelsCollection4);
+    response = handleId(taskId, response, Course, filter, modelsCollection5);
+    response = handleId(laboratoryId, response, Course, filter, modelsCollection6);
 
-    if (laboratoryId) {
-      return Course.findAndCountAll({
-        ...filter,
-        raw: true,
-        subQuery: false,
-        include: [{
-          model: Specialty,
-          required: true,
-          include: [{
-            model: Group,
-            required: true,
-            include: [{
-              model: Student,
-              required: true,
-              include: [{
-                model: LabReport,
-                required: true,
-                where: {
-                  id: laboratoryId,
-                },
-              }],
-            }],
-          }],
-        }],
-      });
+    if (response) {
+      return response;
     }
-
-    if (teacherId) {
-      return Course.findAndCountAll({
-        ...filter,
-        raw: true,
-        subQuery: false,
-        include: [{
-          model: Teacher,
-          required: true,
-          where: {
-            id: teacherId,
-          },
-        }],
-      });
-    }
-
-    if (taskId) {
-      return Course.findAndCountAll({
-        ...filter,
-        raw: true,
-        subQuery: false,
-        include: [{
-          model: Teacher,
-          required: true,
-          include: [{
-            model: LabTask,
-            required: true,
-            where: {
-              id: taskId,
-            },
-          }],
-        }],
-      });
-    }
-
     return Course.findAndCountAll(filter);
   }
 
@@ -174,17 +76,17 @@ module.exports = function createCoursesRepository(sequelize) {
 
   async function addTeacher(id, teacherId) {
     const teacher = await Teacher.findById(teacherId);
-    if (!teacher) throw new errors.NotFound();
+    if (!teacher) throw new errors.NotFound('TEACHER_NOT_FOUND');
     const course = await Course.findById(id);
-    if (!course) throw new errors.NotFound();
+    if (!course) throw new errors.NotFound('COURSE_NOT_FOUND');
     return course.addTeacher(teacher);
   }
 
   async function addSpecialty(id, specialtyId) {
     const specialty = await Specialty.findById(specialtyId);
-    if (!specialty) throw new errors.NotFound();
+    if (!specialty) throw new errors.NotFound('SPECIALTY_NOT_FOUND');
     const course = await Course.findById(id);
-    if (!course) throw new errors.NotFound();
+    if (!course) throw new errors.NotFound('COURSE_NOT_FOUND');
     return course.addSpecialty(specialty);
   }
 
@@ -231,3 +133,16 @@ module.exports = function createCoursesRepository(sequelize) {
     exists,
   };
 };
+
+function handleId(queryParamId, response, Course, filter, models) {
+  if (queryParamId) {
+    const query = {
+      ...filter,
+      raw: true,
+      subQuery: false,
+      ...buildIncludes(queryParamId, models),
+    };
+    response = Course.findAndCountAll(query);
+  }
+  return response;
+}

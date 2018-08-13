@@ -2,6 +2,7 @@
 
 const { Op } = require('sequelize');
 const errors = require('@feathersjs/errors');
+const { buildIncludes } = require('../helpers/util');
 
 module.exports = function createGroupsRepository(sequelize) {
   const {
@@ -37,120 +38,25 @@ module.exports = function createGroupsRepository(sequelize) {
       },
     };
 
-    if (specialtyId) {
-      return Group.findAndCountAll({
-        ...filter,
-        raw: true,
-        subQuery: false,
-        include: [{
-          model: Specialty,
-          required: true,
-          where: {
-            id: specialtyId,
-          },
-        }],
-      });
-    }
+    let response = null;
 
-    if (courseId) {
-      return Group.findAndCountAll({
-        ...filter,
-        raw: true,
-        subQuery: false,
-        include: [{
-          model: Specialty,
-          required: true,
-          include: [{
-            model: Course,
-            required: true,
-            where: {
-              id: courseId,
-            },
-          }],
-        }],
-      });
-    }
+    const modelsCollection1 = [Specialty];
+    const modelsCollection2 = modelsCollection1.concat([Course]);
+    const modelsCollection3 = modelsCollection2.concat([Teacher]);
+    const modelsCollection4 = [Student];
+    const modelsCollection5 = modelsCollection4.concat([LabReport]);
+    const modelsCollection6 = modelsCollection5.concat([LabTask]);
 
-    if (teacherId) {
-      return Group.findAndCountAll({
-        ...filter,
-        raw: true,
-        subQuery: false,
-        include: [{
-          model: Specialty,
-          required: true,
-          include: [{
-            model: Course,
-            required: true,
-            include: [{
-              model: Teacher,
-              required: true,
-              where: {
-                id: teacherId,
-              },
-            }],
-          }],
-        }],
-      });
-    }
+    response = handleId(specialtyId, response, Group, filter, modelsCollection1);
+    response = handleId(courseId, response, Group, filter, modelsCollection2);
+    response = handleId(teacherId, response, Group, filter, modelsCollection3);
+    response = handleId(studentId, response, Group, filter, modelsCollection4);
+    response = handleId(laboratoryId, response, Group, filter, modelsCollection5);
+    response = handleId(taskId, response, Group, filter, modelsCollection6);
 
-    if (studentId) {
-      return Group.findAndCountAll({
-        ...filter,
-        raw: true,
-        subQuery: false,
-        include: [{
-          model: Student,
-          required: true,
-          where: {
-            id: studentId,
-          },
-        }],
-      });
+    if (response) {
+      return response;
     }
-
-    if (laboratoryId) {
-      return Group.findAndCountAll({
-        ...filter,
-        raw: true,
-        subQuery: false,
-        include: [{
-          model: Student,
-          required: true,
-          include: [{
-            model: LabReport,
-            required: true,
-            where: {
-              id: laboratoryId,
-            },
-          }],
-        }],
-      });
-    }
-
-    if (taskId) {
-      return Group.findAndCountAll({
-        ...filter,
-        raw: true,
-        subQuery: false,
-        include: [{
-          model: Student,
-          required: true,
-          include: [{
-            model: LabReport,
-            required: true,
-            include: [{
-              model: LabTask,
-              required: true,
-              where: {
-                id: taskId,
-              },
-            }],
-          }],
-        }],
-      });
-    }
-
     return Group.findAndCountAll(filter);
   }
 
@@ -159,6 +65,9 @@ module.exports = function createGroupsRepository(sequelize) {
   }
 
   async function add(form) {
+    const specialty = Specialty.findById(form.specialtyId);
+    if (!specialty) throw new errors.NotFound('SPECIALTY_NOT_FOUND');
+
     return Group.create(form);
   }
 
@@ -169,6 +78,9 @@ module.exports = function createGroupsRepository(sequelize) {
   }
 
   async function update(id, form) {
+    const specialty = Specialty.findById(form.specialtyId);
+    if (!specialty) throw new errors.NotFound('SPECIALTY_NOT_FOUND');
+
     return Group.update(form, {
       where: { id },
     });
@@ -189,3 +101,16 @@ module.exports = function createGroupsRepository(sequelize) {
     exists,
   };
 };
+
+function handleId(queryParamId, response, Group, filter, models) {
+  if (queryParamId) {
+    const query = {
+      ...filter,
+      raw: true,
+      subQuery: false,
+      ...buildIncludes(queryParamId, models),
+    };
+    response = Group.findAndCountAll(query);
+  }
+  return response;
+}

@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const Grid = require('gridfs-stream');
+const { buildIncludes } = require('../helpers/util');
 
 module.exports = function createLabsRepository(connection) {
   const gfs = Grid(connection.db, mongoose.mongo);
@@ -40,125 +41,27 @@ module.exports = function createLabsRepository(connection) {
       },
     };
 
-    if (groupId) {
-      return LabReport.findAndCountAll({
-        ...filter,
-        raw: true,
-        subQuery: false,
-        include: [{
-          model: Student,
-          required: true,
-          include: [{
-            model: Group,
-            required: true,
-            where: {
-              id: groupId,
-            },
-          }],
-        }],
-      });
-    }
+    let response = null;
 
-    if (specialtyId) {
-      return LabReport.findAndCountAll({
-        ...filter,
-        raw: true,
-        subQuery: false,
-        include: [{
-          model: Student,
-          required: true,
-          include: [{
-            model: Group,
-            required: true,
-            include: [{
-              model: Specialty,
-              required: true,
-              where: {
-                id: specialtyId,
-              },
-            }],
-          }],
-        }],
-      });
-    }
+    const modelsCollection1 = [Student];
+    const modelsCollection2 = modelsCollection1.concat([Group]);
+    const modelsCollection3 = modelsCollection2.concat([Specialty]);
+    const modelsCollection4 = modelsCollection2.concat([Course]);
+    const modelsCollection5 = modelsCollection3.concat([Teacher]);
+    const modelsCollection6 = [LabTask];
 
-    if (courseId) {
-      return LabReport.findAndCountAll({
-        ...filter,
-        raw: true,
-        subQuery: false,
-        include: [{
-          model: Student,
-          required: true,
-          include: [{
-            model: Group,
-            required: true,
-            include: [{
-              model: Specialty,
-              required: true,
-              include: [{
-                model: Course,
-                required: true,
-                where: {
-                  id: courseId,
-                },
-              }],
-            }],
-          }],
-        }],
-      });
-    }
+    response = handleId(studentId, response, LabReport, filter, modelsCollection1);
+    response = handleId(groupId, response, LabReport, filter, modelsCollection2);
+    response = handleId(specialtyId, response, LabReport, filter, modelsCollection3);
+    response = handleId(courseId, response, LabReport, filter, modelsCollection4);
+    response = handleId(teacherId, response, LabReport, filter, modelsCollection5);
+    response = handleId(taskId, response, LabReport, filter, modelsCollection6);
 
-    if (teacherId) {
-      return LabReport.findAndCountAll({
-        ...filter,
-        raw: true,
-        subQuery: false,
-        include: [{
-          model: Student,
-          required: true,
-          include: [{
-            model: Group,
-            required: true,
-            include: [{
-              model: Specialty,
-              required: true,
-              include: [{
-                model: Course,
-                required: true,
-                include: [{
-                  model: Teacher,
-                  required: true,
-                  where: {
-                    id: teacherId,
-                  },
-                }],
-              }],
-            }],
-          }],
-        }],
-      });
+    if (response) {
+      return response;
     }
-
-    if (taskId) {
-      return LabReport.findAndCountAll({
-        ...filter,
-        raw: true,
-        subQuery: false,
-        include: [{
-          model: LabTask,
-          required: true,
-          where: {
-            id: taskId,
-          },
-        }],
-      });
-    }
-
-    const result = await gfs.files.findAndCountAll(filter).toArray();
-    return result;
+    return LabReport.findAndCountAll(filter).toArray();
   }
-
 
   async function view(fileName) {
     const result = await gfs.files.findOne({ filename: fileName });
@@ -179,3 +82,16 @@ module.exports = function createLabsRepository(connection) {
     remove,
   };
 };
+
+function handleId(queryParamId, response, LabReport, filter, models) {
+  if (queryParamId) {
+    const query = {
+      ...filter,
+      raw: true,
+      subQuery: false,
+      ...buildIncludes(queryParamId, models),
+    };
+    response = LabReport.findAndCountAll(query);
+  }
+  return response;
+}

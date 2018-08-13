@@ -70,9 +70,9 @@ module.exports = function createTeacherRepository(connection) {
   async function add(form, queryParams) {
     if (queryParams.courseId) {
       const course = await Course.findById(queryParams.courseId);
-      if (!course) throw new errors.NotFound();
+      if (!course) throw new errors.NotFound('COURSE_NOT_FOUND');
       const teacher = await Teacher.findById(form.teacherId);
-      if (!teacher) throw new errors.NotFound();
+      if (!teacher) throw new errors.NotFound('TEACHER_NOT_FOUND');
       return teacher.addCourse(course);
     }
     return Teacher.create(form);
@@ -115,14 +115,13 @@ module.exports = function createTeacherRepository(connection) {
   };
 };
 
-
-function handleId(querryParamId, response, Teacher, filter, models) {
-  if (querryParamId) {
+function handleId(queryParamId, response, Teacher, filter, models) {
+  if (queryParamId) {
     const query = {
       ...filter,
       raw: true,
       subQuery: false,
-      ...buildIncludes(querryParamId, models),
+      ...buildIncludes(queryParamId, models),
     };
     response = Teacher.findAndCountAll(query);
   }
