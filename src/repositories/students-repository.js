@@ -2,6 +2,7 @@
 
 const errors = require('@feathersjs/errors');
 const { Op } = require('sequelize');
+const { buildIncludes } = require('../helpers/util');
 
 module.exports = function createStudentsRepository(connection) {
   const {
@@ -27,6 +28,8 @@ module.exports = function createStudentsRepository(connection) {
       taskId,
     } = queryParams;
 
+    let response = null;
+
     const filter = {
       limit,
       offset,
@@ -40,125 +43,28 @@ module.exports = function createStudentsRepository(connection) {
       },
     };
 
+    const model1 = [Group];
+    const model2 = [Group, Specialty];
+    const model3 = [Group, Specialty, Course];
+    const model4 = [Group, Specialty, Course, Teacher];
+    const model5 = [LabReport];
+    const model6 = [LabReport, LabTask];
 
-    if (groupId) {
-      return Student.findAndCountAll({
-        ...filter,
-        raw: true,
-        subQuery: false,
-        include: [{
-          model: Group,
-          required: true,
-          where: {
-            id: groupId,
-          },
-        }],
-      });
+    response = handleId(groupId, response, Student, filter, model1);
+
+    response = handleId(specialtyId, response, Student, filter, model2);
+
+    response = handleId(courseId, response, Student, filter, model3);
+
+    response = handleId(teacherId, response, Student, filter, model4);
+
+    response = handleId(laboratoryId, response, Student, filter, model5);
+
+    response = handleId(taskId, response, Student, filter, model6);
+
+    if (response) {
+      return response;
     }
-
-    if (specialtyId) {
-      return Student.findAndCountAll({
-        ...filter,
-        raw: true,
-        subQuery: false,
-        include: [{
-          model: Group,
-          required: true,
-          include: [{
-            model: Specialty,
-            required: true,
-            where: {
-              id: specialtyId,
-            },
-          }],
-        }],
-      });
-    }
-
-    if (courseId) {
-      return Student.findAndCountAll({
-        ...filter,
-        raw: true,
-        subQuery: false,
-        include: [{
-          model: Group,
-          required: true,
-          include: [{
-            model: Specialty,
-            required: true,
-            include: [{
-              model: Course,
-              required: true,
-              where: {
-                id: courseId,
-              },
-            }],
-          }],
-        }],
-      });
-    }
-
-    if (teacherId) {
-      return Student.findAndCountAll({
-        ...filter,
-        raw: true,
-        subQuery: false,
-        include: [{
-          model: Group,
-          required: true,
-          include: [{
-            model: Specialty,
-            required: true,
-            include: [{
-              model: Course,
-              required: true,
-              include: [{
-                model: Teacher,
-                required: true,
-                where: {
-                  id: teacherId,
-                },
-              }],
-            }],
-          }],
-        }],
-      });
-    }
-
-    if (laboratoryId) {
-      return Student.findAndCountAll({
-        ...filter,
-        raw: true,
-        subQuery: false,
-        include: [{
-          model: LabReport,
-          required: true,
-          where: {
-            id: laboratoryId,
-          },
-        }],
-      });
-    }
-
-    if (taskId) {
-      return Student.findAndCountAll({
-        ...filter,
-        raw: true,
-        subQuery: false,
-        include: [{
-          model: LabReport,
-          required: true,
-          include: [{
-            model: LabTask,
-            required: true,
-            where: {
-              id: taskId,
-            },
-          }],
-        }],
-      });
-    }
-
     return Student.findAndCountAll(filter);
   }
 
@@ -197,3 +103,17 @@ module.exports = function createStudentsRepository(connection) {
     exists,
   };
 };
+
+function handleId(id, response, Student, filter, models) {
+  if (id) {
+    const query = {
+      ...filter,
+      raw: true,
+      subQuery: false,
+      ...buildIncludes(id, models),
+    };
+    console.log(JSON.stringify(query));
+    response = Student.findAndCountAll(query);
+  }
+  return response;
+}
