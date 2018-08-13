@@ -3,7 +3,7 @@
 const express = require('express');
 const errors = require('@feathersjs/errors');
 const parseQueryParams = require('../middlewares/parse-query');
-const hashPassword = require('../middlewares/hash-password');
+const { hashPassword, hashPasswordOptional } = require('../middlewares/password-hasher');
 
 module.exports = function createRoute(repository, permissions) {
   const router = express.Router();
@@ -16,7 +16,7 @@ module.exports = function createRoute(repository, permissions) {
 
   router.route('/:id')
     .get(view)
-    .put(hashPassword, update)
+    .put(hashPasswordOptional, update)
     .delete(remove);
 
   function validateId(request, response, next, id) {
