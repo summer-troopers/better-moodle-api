@@ -31,29 +31,6 @@ async function generate50Admins() {
   return admins;
 }
 
-/* function generateUniqueNumber(i, admins) {
-  let number = faker.phone.phoneNumberFormat(0);
-  for (let j = 0; j < i; j += 1) {
-    if (number === admins[j].phone_number) {
-      number = faker.phone.phoneNumberFormat(0);
-      return number;
-    }
-  }
-  return number;
-}
-
-function generateUniqueEmail(i, admins) {
-  let email = faker.internet.email();
-  for (let j = 0; j < i; j += 1) {
-    if (email === admins[j].email) {
-      email = faker.internet.email();
-      return email;
-    }
-  }
-  return email;
-} */
-
-
 function generateUniqueEmail(i, admins) {
   let genEmail;
   const predicate = object => object.email === genEmail;
