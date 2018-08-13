@@ -11,7 +11,7 @@ function generate50Groups() {
   const group = [];
   group.push({
     name: 'AI-151',
-    specialty_id: '4',
+    specialty_id: '1',
   });
   for (let i = 1; i <= 50; i += 1) {
     group.push({
