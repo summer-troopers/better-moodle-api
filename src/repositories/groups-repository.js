@@ -20,12 +20,6 @@ module.exports = function createGroupsRepository(sequelize) {
       limit,
       offset,
       contains,
-      courseId,
-      specialtyId,
-      teacherId,
-      studentId,
-      laboratoryId,
-      taskId,
     } = queryParams;
 
     const filter = {

@@ -20,12 +20,6 @@ module.exports = function createCoursesRepository(sequelize) {
       limit,
       offset,
       contains,
-      teacherId,
-      specialtyId,
-      groupId,
-      studentId,
-      laboratoryId,
-      taskId,
     } = queryParams;
 
     const filter = {
