@@ -11,7 +11,7 @@ services:
     container_name: student_moodle
     build: .
     ports:
-      - 8080:8080
+      - 80:8080
     tty: true
     links:
         - db

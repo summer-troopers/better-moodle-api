@@ -44,11 +44,11 @@ module.exports = function createStudentsRepository(connection) {
     let response = null;
 
     const modelsCollection1 = [Group];
-    const modelsCollection2 = modelsCollection1.concat([Specialty]);
-    const modelsCollection3 = modelsCollection2.concat([Course]);
-    const modelsCollection4 = modelsCollection3.concat([Teacher]);
+    const modelsCollection2 = [Specialty, Group];
+    const modelsCollection3 = [Specialty, Group, Course];
+    const modelsCollection4 = [Specialty, Group, Course, Teacher];
     const modelsCollection5 = [LabReport];
-    const modelsCollection6 = modelsCollection5.concat([LabTask]);
+    const modelsCollection6 = [LabReport, LabTask];
 
     response = handleId(groupId, response, Student, filter, modelsCollection1);
     response = handleId(specialtyId, response, Student, filter, modelsCollection2);

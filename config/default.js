@@ -4,7 +4,7 @@ module.exports = {
   mysql: process.env.MYSQL_URI || 'mysql://localhost:3306/moodle',
   mongo: process.env.MONGO_URI || 'mongodb://localhost:27017/uploads',
   sendgridApiKey: process.env.SENDGRID_API_KEY,
-  port: process.env.PORT || 8080,
+  port: process.env.PORT || 80,
   host: process.env.HOST || '0.0.0.0',
   errorEmails: process.env.ERROR_EMAILS || '',
   hashModule: process.env.CRYPTO_ALG || 'CRYPTO',

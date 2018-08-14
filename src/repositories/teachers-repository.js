@@ -6,13 +6,13 @@ const { buildIncludes } = require('../helpers/util');
 
 module.exports = function createTeacherRepository(connection) {
   const {
-    Teacher,
     Course,
     Specialty,
     Group,
     Student,
-    LabTask,
     LabReport,
+    LabTask,
+    Teacher,
   } = connection.models;
 
   async function list(queryParams) {
@@ -20,12 +20,6 @@ module.exports = function createTeacherRepository(connection) {
       limit,
       offset,
       contains,
-      courseId,
-      specialtyId,
-      groupId,
-      studentId,
-      taskId,
-      laboratoryId,
     } = queryParams;
 
     const filter = {
@@ -43,19 +37,10 @@ module.exports = function createTeacherRepository(connection) {
 
     let response = null;
 
-    const modelsCollection1 = [Course];
-    const modelsCollection2 = modelsCollection1.concat([Specialty]);
-    const modelsCollection3 = modelsCollection2.concat([Group]);
-    const modelsCollection4 = modelsCollection3.concat([Student]);
-    const modelsCollection5 = [LabTask];
-    const modelsCollection6 = modelsCollection5.concat([LabReport]);
+    const incomingParamKeys = Object.keys(queryParams);
+    const incomingParamValues = Object.values(queryParams);
 
-    response = handleId(courseId, response, Teacher, filter, modelsCollection1);
-    response = handleId(specialtyId, response, Teacher, filter, modelsCollection2);
-    response = handleId(groupId, response, Teacher, filter, modelsCollection3);
-    response = handleId(studentId, response, Teacher, filter, modelsCollection4);
-    response = handleId(taskId, response, Teacher, filter, modelsCollection5);
-    response = handleId(laboratoryId, response, Teacher, filter, modelsCollection6);
+    response = handleId(incomingParamValues[0], response, Teacher, filter, getModels(incomingParamKeys[0]));
 
     if (response) {
       return response;
@@ -112,7 +97,15 @@ module.exports = function createTeacherRepository(connection) {
     update,
     remove,
     exists,
+    getModels,
   };
+
+  function getModels(key) {
+    const keys = ['courseId', 'specialtyId', 'groupId', 'studentId', 'laboratoryId', 'taskId'];
+    const models = [Course, Specialty, Group, Student, LabReport, LabTask];
+    const i = keys.findIndex(itKey => key === itKey);
+    return models.slice(0, i + 1);
+  }
 };
 
 function handleId(queryParamId, response, Teacher, filter, models) {
