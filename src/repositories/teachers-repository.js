@@ -97,7 +97,6 @@ module.exports = function createTeacherRepository(connection) {
     update,
     remove,
     exists,
-    getModels,
   };
 
   function getModels(key) {

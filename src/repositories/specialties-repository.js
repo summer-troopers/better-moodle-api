@@ -20,12 +20,6 @@ module.exports = function createSpecialtiesRepository(sequelize) {
       limit,
       offset,
       contains,
-      courseId,
-      groupId,
-      teacherId,
-      studentId,
-      laboratoryId,
-      taskId,
     } = queryParams;
 
     const filter = {
@@ -40,19 +34,10 @@ module.exports = function createSpecialtiesRepository(sequelize) {
 
     let response = null;
 
-    const modelsCollection1 = [Course];
-    const modelsCollection2 = modelsCollection1.concat([Teacher]);
-    const modelsCollection3 = [Group];
-    const modelsCollection4 = modelsCollection3.concat([Student]);
-    const modelsCollection5 = modelsCollection4.concat([LabReport]);
-    const modelsCollection6 = modelsCollection5.concat([LabTask]);
+    const incomingParamKeys = Object.keys(queryParams);
+    const incomingParamValues = Object.values(queryParams);
 
-    response = handleId(courseId, response, Specialty, filter, modelsCollection1);
-    response = handleId(teacherId, response, Specialty, filter, modelsCollection2);
-    response = handleId(groupId, response, Specialty, filter, modelsCollection3);
-    response = handleId(studentId, response, Specialty, filter, modelsCollection4);
-    response = handleId(laboratoryId, response, Specialty, filter, modelsCollection5);
-    response = handleId(taskId, response, Specialty, filter, modelsCollection6);
+    response = handleId(incomingParamValues[0], response, Specialties, filter, getModels(incomingParamKeys[0]));
 
     if (response) {
       return response;
@@ -108,6 +93,13 @@ module.exports = function createSpecialtiesRepository(sequelize) {
     remove,
     exists,
   };
+
+  function getModels(key) {
+    const keys = ['courseId', 'teacherId', 'taskId', 'laboratoryId', 'studentId', 'groupId'];
+    const models = [Course, Teacher, LabTask, LabReport, Student, Group];
+    const i = keys.findIndex(itKey => key === itKey);
+    return models.slice(0, i + 1);
+  }
 };
 
 function handleId(queryParamId, response, Specialty, filter, models) {

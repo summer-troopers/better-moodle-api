@@ -40,19 +40,10 @@ module.exports = function createCoursesRepository(sequelize) {
 
     let response = null;
 
-    const modelsCollection1 = [Specialty];
-    const modelsCollection2 = modelsCollection1.concat([Group]);
-    const modelsCollection3 = modelsCollection2.concat([Student]);
-    const modelsCollection4 = [Teacher];
-    const modelsCollection5 = modelsCollection4.concat([LabTask]);
-    const modelsCollection6 = modelsCollection5.concat([LabReport]);
+    const incomingParamKeys = Object.keys(queryParams);
+    const incomingParamValues = Object.values(queryParams);
 
-    response = handleId(specialtyId, response, Course, filter, modelsCollection1);
-    response = handleId(groupId, response, Course, filter, modelsCollection2);
-    response = handleId(studentId, response, Course, filter, modelsCollection3);
-    response = handleId(teacherId, response, Course, filter, modelsCollection4);
-    response = handleId(taskId, response, Course, filter, modelsCollection5);
-    response = handleId(laboratoryId, response, Course, filter, modelsCollection6);
+    response = handleId(incomingParamValues[0], response, Course, filter, getModels(incomingParamKeys[0]));
 
     if (response) {
       return response;
@@ -132,6 +123,13 @@ module.exports = function createCoursesRepository(sequelize) {
     remove,
     exists,
   };
+
+  function getModels(key) {
+    const keys = ['specialtyId', 'groupId', 'studentId', 'laboratoryId', 'taskId', 'teacherId'];
+    const models = [Specialty, Group, Student, LabReport, LabTask, Teacher];
+    const i = keys.findIndex(itKey => key === itKey);
+    return models.slice(0, i + 1);
+  }
 };
 
 function handleId(queryParamId, response, Course, filter, models) {

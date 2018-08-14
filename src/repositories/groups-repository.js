@@ -40,19 +40,10 @@ module.exports = function createGroupsRepository(sequelize) {
 
     let response = null;
 
-    const modelsCollection1 = [Specialty];
-    const modelsCollection2 = modelsCollection1.concat([Course]);
-    const modelsCollection3 = modelsCollection2.concat([Teacher]);
-    const modelsCollection4 = [Student];
-    const modelsCollection5 = modelsCollection4.concat([LabReport]);
-    const modelsCollection6 = modelsCollection5.concat([LabTask]);
+    const incomingParamKeys = Object.keys(queryParams);
+    const incomingParamValues = Object.values(queryParams);
 
-    response = handleId(specialtyId, response, Group, filter, modelsCollection1);
-    response = handleId(courseId, response, Group, filter, modelsCollection2);
-    response = handleId(teacherId, response, Group, filter, modelsCollection3);
-    response = handleId(studentId, response, Group, filter, modelsCollection4);
-    response = handleId(laboratoryId, response, Group, filter, modelsCollection5);
-    response = handleId(taskId, response, Group, filter, modelsCollection6);
+    response = handleId(incomingParamValues[0], response, Group, filter, getModels(incomingParamKeys[0]));
 
     if (response) {
       return response;
@@ -100,6 +91,13 @@ module.exports = function createGroupsRepository(sequelize) {
     remove,
     exists,
   };
+
+  function getModels(key) {
+    const keys = ['specialtyId', 'courseId', 'teacherId', 'taskId', 'laboratoryId', 'studentId'];
+    const models = [Specialty, Course, Teacher, LabTask, LabReport, Student];
+    const i = keys.findIndex(itKey => key === itKey);
+    return models.slice(0, i + 1);
+  }
 };
 
 function handleId(queryParamId, response, Group, filter, models) {

@@ -20,12 +20,6 @@ module.exports = function createStudentsRepository(connection) {
       limit,
       offset,
       contains,
-      groupId,
-      specialtyId,
-      courseId,
-      teacherId,
-      laboratoryId,
-      taskId,
     } = queryParams;
 
     const filter = {
@@ -43,19 +37,10 @@ module.exports = function createStudentsRepository(connection) {
 
     let response = null;
 
-    const modelsCollection1 = [Group];
-    const modelsCollection2 = [Specialty, Group];
-    const modelsCollection3 = [Specialty, Group, Course];
-    const modelsCollection4 = [Specialty, Group, Course, Teacher];
-    const modelsCollection5 = [LabReport];
-    const modelsCollection6 = [LabReport, LabTask];
+    const incomingParamKeys = Object.keys(queryParams);
+    const incomingParamValues = Object.values(queryParams);
 
-    response = handleId(groupId, response, Student, filter, modelsCollection1);
-    response = handleId(specialtyId, response, Student, filter, modelsCollection2);
-    response = handleId(courseId, response, Student, filter, modelsCollection3);
-    response = handleId(teacherId, response, Student, filter, modelsCollection4);
-    response = handleId(laboratoryId, response, Student, filter, modelsCollection5);
-    response = handleId(taskId, response, Student, filter, modelsCollection6);
+    response = handleId(incomingParamValues[0], response, Student, filter, getModels(incomingParamKeys[0]));
 
     if (response) {
       return response;
@@ -103,6 +88,13 @@ module.exports = function createStudentsRepository(connection) {
     remove,
     exists,
   };
+
+  function getModels(key) {
+    const keys = ['groupId', 'specialtyId', 'courseId', 'teacherId', 'taskId', 'laboratoryId'];
+    const models = [Group, Specialty, Course, Teacher, LabTask, LabReport];
+    const i = keys.findIndex(itKey => key === itKey);
+    return models.slice(0, i + 1);
+  }
 };
 
 function handleId(queryParamId, response, Student, filter, models) {
