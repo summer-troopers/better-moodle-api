@@ -13,7 +13,7 @@ function generate10Connections() {
     teacher_id: '1',
     course_id: '1',
   });
-  for (let i = 0; i <= 10; i += 1) {
+  for (let i = 0; i < 10; i += 1) {
     connections.push({
       teacher_id: faker.random.number(40) + 1,
       course_id: faker.random.number(10) + 1,
