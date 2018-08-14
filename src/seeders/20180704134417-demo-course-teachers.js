@@ -9,6 +9,10 @@ module.exports = {
 
 function generate10Connections() {
   const connections = [];
+  connections.push({
+    teacher_id: '1',
+    course_id: '1',
+  });
   for (let i = 0; i <= 10; i += 1) {
     connections.push({
       teacher_id: faker.random.number(40) + 1,

@@ -2,6 +2,7 @@
 
 const errors = require('@feathersjs/errors');
 const { Op } = require('sequelize');
+const { buildIncludes } = require('../helpers/util');
 
 module.exports = function createStudentsRepository(connection) {
   const {
@@ -19,12 +20,6 @@ module.exports = function createStudentsRepository(connection) {
       limit,
       offset,
       contains,
-      groupId,
-      specialtyId,
-      courseId,
-      teacherId,
-      laboratoryId,
-      taskId,
     } = queryParams;
 
     const filter = {
@@ -40,125 +35,16 @@ module.exports = function createStudentsRepository(connection) {
       },
     };
 
+    let response = null;
 
-    if (groupId) {
-      return Student.findAndCountAll({
-        ...filter,
-        raw: true,
-        subQuery: false,
-        include: [{
-          model: Group,
-          required: true,
-          where: {
-            id: groupId,
-          },
-        }],
-      });
+    const incomingParamKeys = Object.keys(queryParams);
+    const incomingParamValues = Object.values(queryParams);
+
+    response = handleId(incomingParamValues[0], response, Student, filter, getModels(incomingParamKeys[0]));
+
+    if (response) {
+      return response;
     }
-
-    if (specialtyId) {
-      return Student.findAndCountAll({
-        ...filter,
-        raw: true,
-        subQuery: false,
-        include: [{
-          model: Group,
-          required: true,
-          include: [{
-            model: Specialty,
-            required: true,
-            where: {
-              id: specialtyId,
-            },
-          }],
-        }],
-      });
-    }
-
-    if (courseId) {
-      return Student.findAndCountAll({
-        ...filter,
-        raw: true,
-        subQuery: false,
-        include: [{
-          model: Group,
-          required: true,
-          include: [{
-            model: Specialty,
-            required: true,
-            include: [{
-              model: Course,
-              required: true,
-              where: {
-                id: courseId,
-              },
-            }],
-          }],
-        }],
-      });
-    }
-
-    if (teacherId) {
-      return Student.findAndCountAll({
-        ...filter,
-        raw: true,
-        subQuery: false,
-        include: [{
-          model: Group,
-          required: true,
-          include: [{
-            model: Specialty,
-            required: true,
-            include: [{
-              model: Course,
-              required: true,
-              include: [{
-                model: Teacher,
-                required: true,
-                where: {
-                  id: teacherId,
-                },
-              }],
-            }],
-          }],
-        }],
-      });
-    }
-
-    if (laboratoryId) {
-      return Student.findAndCountAll({
-        ...filter,
-        raw: true,
-        subQuery: false,
-        include: [{
-          model: LabReport,
-          required: true,
-          where: {
-            id: laboratoryId,
-          },
-        }],
-      });
-    }
-
-    if (taskId) {
-      return Student.findAndCountAll({
-        ...filter,
-        raw: true,
-        subQuery: false,
-        include: [{
-          model: LabReport,
-          required: true,
-          include: [{
-            model: LabTask,
-            required: true,
-            where: {
-              id: taskId,
-            },
-          }],
-        }],
-      });
-    }
-
     return Student.findAndCountAll(filter);
   }
 
@@ -167,6 +53,9 @@ module.exports = function createStudentsRepository(connection) {
   }
 
   async function add(form) {
+    const group = Group.findById(form.groupId);
+    if (!group) throw new errors.NotFound('GROUP_NOT_FOUND');
+
     return Student.create(form);
   }
 
@@ -177,6 +66,9 @@ module.exports = function createStudentsRepository(connection) {
   }
 
   async function update(id, form) {
+    const group = Group.findById(form.groupId);
+    if (!group) throw new errors.NotFound('GROUP_NOT_FOUND');
+
     return Student.update(form, {
       where: { id },
     });
@@ -196,4 +88,24 @@ module.exports = function createStudentsRepository(connection) {
     remove,
     exists,
   };
+
+  function getModels(key) {
+    const keys = ['groupId', 'specialtyId', 'courseId', 'teacherId', 'taskId', 'laboratoryId'];
+    const models = [Group, Specialty, Course, Teacher, LabTask, LabReport];
+    const i = keys.findIndex(itKey => key === itKey);
+    return models.slice(0, i + 1);
+  }
 };
+
+function handleId(queryParamId, response, Student, filter, models) {
+  if (queryParamId) {
+    const query = {
+      ...filter,
+      raw: true,
+      subQuery: false,
+      ...buildIncludes(queryParamId, models),
+    };
+    response = Student.findAndCountAll(query);
+  }
+  return response;
+}

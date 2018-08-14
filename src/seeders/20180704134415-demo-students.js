@@ -8,7 +8,6 @@ module.exports = {
   down(queryInterface, Sequelize) { return queryInterface.bulkDelete('students', null, {}); },
 };
 
-
 async function generate50Students() {
   const students = [];
   students.push({

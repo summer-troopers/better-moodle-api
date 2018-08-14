@@ -38,7 +38,31 @@ function createPermissions(permissions) {
   };
 }
 
+function buildIncludes(param, models) {
+  models.reverse();
+  return models.reduce((accumulator, model, index) => {
+    if (index === 0) {
+      accumulator.include = [{
+        model,
+        required: true,
+        where: {
+          id: param,
+        },
+      }];
+      return accumulator;
+    }
+
+    accumulator.include = [{
+      model,
+      required: true,
+      include: accumulator.include,
+    }];
+    return accumulator;
+  }, {});
+}
+
 module.exports = {
   createMessage,
   permissions: createPermissions,
+  buildIncludes,
 };

@@ -35,4 +35,30 @@ describe('util', () => {
     const result = util.permissions('crud|r|r|');
     assert.deepStrictEqual(result, truePermissions);
   });
+
+  describe('buildIncludes', () => {
+    it('Should return expected models', () => {
+      const models = ['Student', 'Group', 'Specialty'];
+      const param = 1;
+      const expected = {
+        include: [{
+          model: 'Student',
+          required: true,
+          include: [{
+            model: 'Group',
+            required: true,
+            include: [{
+              model: 'Specialty',
+              required: true,
+              where: {
+                id: param,
+              },
+            }],
+          }],
+        }],
+      };
+
+      assert.deepEqual(util.buildIncludes(param, models), expected);
+    });
+  });
 });

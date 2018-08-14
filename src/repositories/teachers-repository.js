@@ -2,16 +2,17 @@
 
 const errors = require('@feathersjs/errors');
 const { Op } = require('sequelize');
+const { buildIncludes } = require('../helpers/util');
 
 module.exports = function createTeacherRepository(connection) {
   const {
-    Teacher,
     Course,
     Specialty,
     Group,
     Student,
-    LabTask,
     LabReport,
+    LabTask,
+    Teacher,
   } = connection.models;
 
   async function list(queryParams) {
@@ -19,12 +20,6 @@ module.exports = function createTeacherRepository(connection) {
       limit,
       offset,
       contains,
-      courseId,
-      specialtyId,
-      groupId,
-      studentId,
-      taskId,
-      laboratoryId,
     } = queryParams;
 
     const filter = {
@@ -40,124 +35,16 @@ module.exports = function createTeacherRepository(connection) {
       },
     };
 
-    if (courseId) {
-      return Teacher.findAndCountAll({
-        ...filter,
-        raw: true,
-        subQuery: false,
-        include: [{
-          model: Course,
-          required: true,
-          where: {
-            id: courseId,
-          },
-        }],
-      });
-    }
+    let response = null;
 
-    if (specialtyId) {
-      return Teacher.findAndCountAll({
-        ...filter,
-        raw: true,
-        subQuery: false,
-        include: [{
-          model: Course,
-          required: true,
-          include: [{
-            model: Specialty,
-            required: true,
-            where: {
-              id: specialtyId,
-            },
-          }],
-        }],
-      });
-    }
+    const incomingParamKeys = Object.keys(queryParams);
+    const incomingParamValues = Object.values(queryParams);
 
-    if (groupId) {
-      return Teacher.findAndCountAll({
-        ...filter,
-        raw: true,
-        subQuery: false,
-        include: [{
-          model: Course,
-          required: true,
-          include: [{
-            model: Specialty,
-            required: true,
-            include: [{
-              model: Group,
-              required: true,
-              where: {
-                id: groupId,
-              },
-            }],
-          }],
-        }],
-      });
-    }
+    response = handleId(incomingParamValues[0], response, Teacher, filter, getModels(incomingParamKeys[0]));
 
-    if (studentId) {
-      return Teacher.findAndCountAll({
-        ...filter,
-        raw: true,
-        subQuery: false,
-        include: [{
-          model: Course,
-          required: true,
-          include: [{
-            model: Specialty,
-            required: true,
-            include: [{
-              model: Group,
-              required: true,
-              include: [{
-                model: Student,
-                required: true,
-                where: {
-                  id: studentId,
-                },
-              }],
-            }],
-          }],
-        }],
-      });
+    if (response) {
+      return response;
     }
-
-    if (taskId) {
-      return Teacher.findAndCountAll({
-        ...filter,
-        raw: true,
-        subQuery: false,
-        include: [{
-          model: LabTask,
-          required: true,
-          where: {
-            id: taskId,
-          },
-        }],
-      });
-    }
-
-    if (laboratoryId) {
-      return Teacher.findAndCountAll({
-        ...filter,
-        raw: true,
-        subQuery: false,
-        include: [{
-          model: LabTask,
-          required: true,
-          include: [{
-            model: LabReport,
-            required: true,
-            where: {
-              id: laboratoryId,
-            },
-          }],
-        }],
-      });
-    }
-
     return Teacher.findAndCountAll(filter);
   }
 
@@ -168,9 +55,9 @@ module.exports = function createTeacherRepository(connection) {
   async function add(form, queryParams) {
     if (queryParams.courseId) {
       const course = await Course.findById(queryParams.courseId);
-      if (!course) throw new errors.NotFound();
+      if (!course) throw new errors.NotFound('COURSE_NOT_FOUND');
       const teacher = await Teacher.findById(form.teacherId);
-      if (!teacher) throw new errors.NotFound();
+      if (!teacher) throw new errors.NotFound('TEACHER_NOT_FOUND');
       return teacher.addCourse(course);
     }
     return Teacher.create(form);
@@ -211,4 +98,24 @@ module.exports = function createTeacherRepository(connection) {
     remove,
     exists,
   };
+
+  function getModels(key) {
+    const keys = ['courseId', 'specialtyId', 'groupId', 'studentId', 'laboratoryId', 'taskId'];
+    const models = [Course, Specialty, Group, Student, LabReport, LabTask];
+    const i = keys.findIndex(itKey => key === itKey);
+    return models.slice(0, i + 1);
+  }
 };
+
+function handleId(queryParamId, response, Teacher, filter, models) {
+  if (queryParamId) {
+    const query = {
+      ...filter,
+      raw: true,
+      subQuery: false,
+      ...buildIncludes(queryParamId, models),
+    };
+    response = Teacher.findAndCountAll(query);
+  }
+  return response;
+}
