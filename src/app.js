@@ -6,6 +6,7 @@ const bodyParser = require('body-parser');
 const morgan = require('morgan');
 const swaggerUi = require('swagger-ui-express');
 const { FeathersError } = require('@feathersjs/errors');
+const config = require('config');
 
 const swaggerDocument = require('../swagger.json');
 const logger = require('../src/services/winston/logger');
@@ -13,8 +14,7 @@ const logger = require('../src/services/winston/logger');
 const importModels = require('./models');
 const createRoute = require('./routes/route-factory');
 const createAuthenticationRoute = require('./routes/authentication-route');
-const createLabReportsRoute = require('./routes/lab_reports-route');
-// const createLabTasksRoute = require('./routes/lab_tasks-route');
+const createLabsRoute = require('./routes/labs-route');
 
 const createUserRepository = require('./repositories/users-repository');
 const createAuthorizationVerifier = require('./middlewares/authorization-verifier');
@@ -35,9 +35,12 @@ module.exports = function getApp(sqlConnection, mongoConnection) {
 
   const userRepository = createUserRepository(sqlConnection);
 
-  const commentsRepository = require('./repositories/lab-comment-repository')(sqlConnection); // eslint-disable-line global-require
+  const labCommentsRepository = require('./repositories/lab-comment-repository')(sqlConnection); // eslint-disable-line global-require
   const labReportsRepository = require('./repositories/lab_reports-repository')(mongoConnection, sqlConnection); // eslint-disable-line global-require
-  // const labTasksRepository = require('./repositories/lab_tasks-repository')(mongoConnection, sqlConnection); // eslint-disable-line global-require
+  const labTasksRepository = require('./repositories/lab_tasks-repository')(mongoConnection, sqlConnection); // eslint-disable-line global-require
+
+  const labReportsRoute = createLabsRoute(labReportsRepository, permissions('crud|r|crud|'), config.labRoutes.labReports);
+  const labTasksRoute = createLabsRoute(labTasksRepository, permissions('crud|crud|r|'), config.labRoutes.labTasks);
 
   app.use(cors());
   app.use(bodyParser.json());
@@ -51,15 +54,15 @@ module.exports = function getApp(sqlConnection, mongoConnection) {
 
   app.use('/api', createAuthorizationVerifier(userRepository).validateUser);
 
-  app.use('/api/v1/admins', createRoute(adminsRepository, permissions('crud|||')));
-  app.use('/api/v1/teachers', createRoute(teachersRepository, permissions('crud|r|r|')));
-  app.use('/api/v1/students', createRoute(studentsRepository, permissions('crud|r|r|')));
-  app.use('/api/v1/courses', createRoute(coursesRepository, permissions('crud|r|r|')));
-  app.use('/api/v1/groups', createRoute(groupsRepository, permissions('crud|r|r|')));
-  app.use('/api/v1/specialties', createRoute(specialtiesRepository, permissions('crud|r|r|')));
-  app.use('/api/v1/lab_comments', createRoute(commentsRepository, permissions('crud|crud|r|')));
-  app.use('/api/v1/lab_reports', createLabReportsRoute(labReportsRepository, permissions('crud|r|cr|')));
-  // app.use('/api/v1/lab_tasks', createLabTasksRoute(labTasksRepository, permissions('crud|cr|r|')));
+  app.use('/api/v1/admins', createRoute(adminsRepository, permissions('crud||')));
+  app.use('/api/v1/teachers', createRoute(teachersRepository, permissions('crud|r|r')));
+  app.use('/api/v1/students', createRoute(studentsRepository, permissions('crud|r|r')));
+  app.use('/api/v1/courses', createRoute(coursesRepository, permissions('crud|r|r')));
+  app.use('/api/v1/groups', createRoute(groupsRepository, permissions('crud|r|r')));
+  app.use('/api/v1/specialties', createRoute(specialtiesRepository, permissions('crud|r|r')));
+  app.use('/api/v1/lab_comments', createRoute(labCommentsRepository, permissions('crud|crud|r')));
+  app.use('/api/v1/lab_reports', labReportsRoute);
+  app.use('/api/v1/lab_tasks', labTasksRoute);
 
   app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
@@ -69,6 +72,7 @@ module.exports = function getApp(sqlConnection, mongoConnection) {
     if (err instanceof FeathersError) {
       error = err.toJSON();
     } else {
+      logger.error(err);
       error = err;
       error.code = err.code || 500;
       error.message = err.message || 'UNKNOWN_SERVER_ERROR';

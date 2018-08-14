@@ -1,42 +1,41 @@
 'use strict';
 
 const express = require('express');
-const errors = require('@feathersjs/errors');
+
 const parseQueryParams = require('../middlewares/parse-query');
 const { hashPasswordOptional } = require('../middlewares/password-hasher');
+const createIdParamValidator = require('../middlewares/id-param-validator');
+const createPermissionVerifier = require('../middlewares/permission-verifier');
 
 module.exports = function createRoute(repository, permissions) {
   const router = express.Router();
 
+  // temporary solution
+  // full implementation is used in 'lab-routes'
+  // if it's good I can implement it completely for this as well
+  const errorMsg = {
+    notFound: 'ID_NOT_FOUND',
+    notReceived: 'ID_NOT_RECEIVED',
+  };
+
+  const validateId = createIdParamValidator(repository, errorMsg);
+
+  const permissionVerifier = createPermissionVerifier(permissions);
+
   router.route('/')
-    .get(parseQueryParams, list)
-    .post(hashPasswordOptional, add);
+    .get(permissionVerifier.read, parseQueryParams, list)
+    .post(permissionVerifier.create, hashPasswordOptional, add);
 
   router.param('id', validateId);
 
   router.route('/:id')
-    .get(view)
-    .put(hashPasswordOptional, update)
-    .delete(remove);
-
-  function validateId(request, response, next, id) {
-    if (!id) return next(new errors.BadRequest('ID_NOT_RECEIVED'));
-
-    return repository.exists(id)
-      .then((result) => {
-        if (!result) return next(new errors.NotFound('ID_NOT_FOUND'));
-
-        return next();
-      })
-      .catch(next);
-  }
+    .get(permissionVerifier.read, view)
+    .put(permissionVerifier.update, hashPasswordOptional, update)
+    .delete(permissionVerifier.delete, remove);
 
   async function list(request, response, next) {
-    if (!permissions[request.token.userRole].read) return next(new errors.Forbidden('READ_PERMISSION_MISSING'));
-
-    return repository.list(request.query)
+    repository.list(request.query)
       .then((result) => {
-        if (result.count === 0) return next(new errors.NotFound('NO_RESULT'));
         return response.json({
           total: result.count,
           limit: request.query.limit,
@@ -48,9 +47,7 @@ module.exports = function createRoute(repository, permissions) {
   }
 
   function view(request, response, next) {
-    if (!permissions[request.token.userRole].read) return next(new errors.Forbidden('READ_PERMISSION_MISSING'));
-
-    return repository.view(request.params.id)
+    repository.view(request.params.id)
       .then((result) => {
         response.json(result);
       })
@@ -58,9 +55,7 @@ module.exports = function createRoute(repository, permissions) {
   }
 
   function add(request, response, next) {
-    if (!permissions[request.token.userRole].create) return next(new errors.Forbidden('CREATE_PERMISSION_MISSING'));
-
-    return repository.add(request.body, request.query)
+    repository.add(request.body, request.query)
       .then((result) => {
         response.json(result);
       })
@@ -68,9 +63,7 @@ module.exports = function createRoute(repository, permissions) {
   }
 
   function remove(request, response, next) {
-    if (!permissions[request.token.userRole].delete) return next(new errors.Forbidden('DELETE_PERMISSION_MISSING'));
-
-    return repository.remove(request.params.id, request.query)
+    repository.remove(request.params.id, request.query)
       .then((result) => {
         response.json(result);
       })
@@ -78,9 +71,7 @@ module.exports = function createRoute(repository, permissions) {
   }
 
   function update(request, response, next) {
-    if (!permissions[request.token.userRole].update) return next(new errors.Forbidden('UPDATE_PERMISSION_MISSING'));
-
-    return repository.update(request.params.id, request.body)
+    repository.update(request.params.id, request.body)
       .then((result) => {
         response.json(result);
       })

@@ -1,13 +1,12 @@
-const errors = require('@feathersjs/errors');
+'use strict';
+
 const createGridFS = require('mongoose-gridfs');
 const GridFsStorage = require('multer-gridfs-storage');
+const errors = require('@feathersjs/errors');
+
 const logger = require('../services/winston/logger');
-// const GridFSBucket = require('mongodb');
 
-// FIXME: THIS IS NOT FINISHED, DECIDE BETWEEN 'mongoose-gridfs' or 'GridFSBucket'
-// Let's try 'mongoose-gridfs' for now
-
-module.exports = function createLabsRepository(mongoConnection, sqlConnection) {
+module.exports = function createLabReportsRepository(mongoConnection, sqlConnection) {
   const gridFS = createGridFS({
     collection: 'reports',
     model: 'LabReportFile',
@@ -16,7 +15,7 @@ module.exports = function createLabsRepository(mongoConnection, sqlConnection) {
 
   const LabReportFile = gridFS.model;
 
-  const { LabReport } = sqlConnection.models;
+  const { LabReport, LabTask, Student } = sqlConnection.models;
 
   const gridFSStorage = new GridFsStorage({
     db: mongoConnection.db,
@@ -39,21 +38,37 @@ module.exports = function createLabsRepository(mongoConnection, sqlConnection) {
 
   async function view(id) {
     const report = await LabReport.findById(id);
-    if (!report) throw new errors.NotFound('LAB_REPORT_NOT_FOUND');
     const stream = LabReportFile.readById(report.mongoFileId);
-    const metadata = await new Promise((resolve, reject) => {
-      LabReportFile.findById(report.mongoFileId, (error, result) => {
-        if (error) return reject(error);
-        return resolve(result);
-      });
-    });
+    const metadata = await getFile(report.mongoFileId);
     return {
       metadata,
       stream,
     };
   }
 
+  function getFile(id) {
+    return new Promise((resolve, reject) => {
+      LabReportFile.findById(id, (error, result) => {
+        if (error) {
+          logger.error(error);
+          return reject(error);
+        }
+        return resolve(result);
+      });
+    });
+  }
+
+  async function exists(id) {
+    const result = await LabReport.findById(id);
+    if (!result) return false;
+    return true;
+  }
+
   async function add(fileId, labTaskId, studentId) {
+    const task = await LabTask.findById(labTaskId);
+    if (!task) throw new errors.NotFound('LAB_TASK_NOT_FOUND');
+    const student = await Student.findById(studentId);
+    if (!student) throw new errors.NotFound('STUDENT_NOT_FOUND');
     const report = await LabReport.findOne({
       where: {
         labTaskId,
@@ -72,15 +87,7 @@ module.exports = function createLabsRepository(mongoConnection, sqlConnection) {
 
   async function remove(id) {
     const report = await LabReport.findById(id);
-    await new Promise((resolve, reject) => {
-      LabReportFile.unlinkById(report.mongoFileId, (error, result) => {
-        if (error) {
-          logger.error(error);
-          return reject(error);
-        }
-        return resolve(result);
-      });
-    });
+    await removeFile(report.mongoFileId);
     return LabReport.destroy({
       where: {
         id: report.id,
@@ -88,11 +95,25 @@ module.exports = function createLabsRepository(mongoConnection, sqlConnection) {
     });
   }
 
+  function removeFile(id) {
+    return new Promise((resolve, reject) => {
+      LabReportFile.unlinkById(id, (error, result) => {
+        if (error) {
+          logger.error(error);
+          return reject(error);
+        }
+        return resolve(result);
+      });
+    });
+  }
+
   return {
     list,
     view,
+    exists,
     add,
     remove,
+    removeFile,
     storage: gridFSStorage,
   };
 };
