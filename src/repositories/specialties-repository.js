@@ -37,7 +37,7 @@ module.exports = function createSpecialtiesRepository(sequelize) {
     const incomingParamKeys = Object.keys(queryParams);
     const incomingParamValues = Object.values(queryParams);
 
-    response = handleId(incomingParamValues[0], response, Specialties, filter, getModels(incomingParamKeys[0]));
+    response = handleId(incomingParamValues[0], response, Specialty, filter, getModels(incomingParamKeys[0]));
 
     if (response) {
       return response;
