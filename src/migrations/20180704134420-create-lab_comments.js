@@ -23,11 +23,6 @@ module.exports = {
         field: 'teacher_comment',
         allowNull: false,
       },
-      studentComment: {
-        type: Sequelize.STRING,
-        field: 'student_comment',
-        allowNull: false,
-      },
     });
   },
   // eslint-disable-next-line no-unused-vars

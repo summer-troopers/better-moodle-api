@@ -18,11 +18,6 @@ module.exports = function defineLabComments(sequelize, DataTypes) {
       field: 'teacher_comment',
       allowNull: false,
     },
-    studentComment: {
-      type: DataTypes.STRING,
-      field: 'student_comment',
-      allowNull: false,
-    },
   },
     {
       tableName: 'lab_comments',
