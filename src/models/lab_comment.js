@@ -13,9 +13,14 @@ module.exports = function defineLabComments(sequelize, DataTypes) {
       field: 'lab_report_id',
       allowNull: false,
     },
-    mongoFileId: {
+    teacherComment: {
       type: DataTypes.STRING,
-      field: 'mongo_file_id',
+      field: 'teacher_comment',
+      allowNull: false,
+    },
+    studentComment: {
+      type: DataTypes.STRING,
+      field: 'student_comment',
       allowNull: false,
     },
   },

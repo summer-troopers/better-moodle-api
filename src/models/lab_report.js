@@ -24,9 +24,9 @@ module.exports = function defineLabReport(sequelize, DataTypes) {
       allowNull: false,
     },
   }, {
-      tableName: 'lab_reports',
-      timestamps: false,
-    });
+    tableName: 'lab_reports',
+    timestamps: false,
+  });
   // eslint-disable-next-line no-unused-vars
   LabReport.associate = function associateLabReport(models) {
     LabReport.belongsTo(models.Student, { foreignKey: 'studentId', targetKey: 'id' });
