@@ -53,7 +53,7 @@ module.exports = function createStudentsRepository(connection) {
   }
 
   async function add(form) {
-    const group = Group.findById(form.groupId);
+    const group = await Group.findById(form.groupId);
     if (!group) throw new errors.NotFound('GROUP_NOT_FOUND');
 
     return Student.create(form);
@@ -66,7 +66,7 @@ module.exports = function createStudentsRepository(connection) {
   }
 
   async function update(id, form) {
-    const group = Group.findById(form.groupId);
+    const group = await Group.findById(form.groupId);
     if (!group) throw new errors.NotFound('GROUP_NOT_FOUND');
 
     return Student.update(form, {

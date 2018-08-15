@@ -91,7 +91,7 @@ module.exports = function createCoursesRepository(sequelize) {
     if (queryParams.teacherId) {
       return CourseTeacher.destroy({
         where: {
-          id,
+          courseId: id,
           teacherId: queryParams.teacherId,
         },
       });
@@ -99,8 +99,8 @@ module.exports = function createCoursesRepository(sequelize) {
     if (queryParams.specialtyId) {
       return CourseSpecialty.destroy({
         where: {
-          specialtyId: queryParams.specialtyId,
           courseId: id,
+          specialtyId: queryParams.specialtyId,
         },
       });
     }

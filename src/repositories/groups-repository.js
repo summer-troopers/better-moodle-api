@@ -50,7 +50,7 @@ module.exports = function createGroupsRepository(sequelize) {
   }
 
   async function add(form) {
-    const specialty = Specialty.findById(form.specialtyId);
+    const specialty = await Specialty.findById(form.specialtyId);
     if (!specialty) throw new errors.NotFound('SPECIALTY_NOT_FOUND');
 
     return Group.create(form);
@@ -63,7 +63,7 @@ module.exports = function createGroupsRepository(sequelize) {
   }
 
   async function update(id, form) {
-    const specialty = Specialty.findById(form.specialtyId);
+    const specialty = await Specialty.findById(form.specialtyId);
     if (!specialty) throw new errors.NotFound('SPECIALTY_NOT_FOUND');
 
     return Group.update(form, {
