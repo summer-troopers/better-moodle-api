@@ -3,6 +3,7 @@
 # 2 : ./bin/deploy.sh
 
   git checkout master
-  git stashgit fetch
+  git stash
+  git fetch
   git reset --hard origin/master
   npm ci
