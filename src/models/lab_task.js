@@ -24,10 +24,10 @@ module.exports = function defineLabTask(sequelize, DataTypes) {
       allowNull: false,
     },
   },
-  {
-    tableName: 'lab_tasks',
-    timestamps: false,
-  });
+    {
+      tableName: 'lab_tasks',
+      timestamps: false,
+    });
   // eslint-disable-next-line no-unused-vars
   LabTask.associate = function associateLabTask(models) {
     LabTask.belongsTo(models.Teacher, { foreignKey: 'teacherId', targetKey: 'id' });
