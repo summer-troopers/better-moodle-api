@@ -15,7 +15,6 @@ module.exports = function createAuthorizationVerifier(userRepository) {
     if (!token) return next(new errors.Forbidden('TOKEN_NOT_RECEIVED'));
     try {
       request.token = jwt.verify(token, config.jwtconf.secret);
-      if (typeof request.token.user !== 'number' || !request.token.userRole) throw new errors.Forbidden('BAD_TOKEN');
     } catch (err) {
       return next(new errors.Forbidden('UNKNOWN_AUTHORIZATION_ERROR'));
     }
