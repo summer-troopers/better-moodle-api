@@ -23,7 +23,7 @@ module.exports = function createAuthenticationRoute(repository) {
       userRole: role,
     };
     response.status(200).json({ token, userData });
-    return next();
+    return null;
   }
 
   async function comparePassword(request, response, next) {
