@@ -6,6 +6,8 @@ const path = require('path');
 const basename = path.basename(__filename);
 
 module.exports = function importModels(sequelize) {
+  // fs.writeFileSync('log456.txt', JSON.stringify(sequelize));
+  console.log(sequelize);
   const db = {};
 
   fs

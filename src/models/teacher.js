@@ -47,7 +47,8 @@ module.exports = function defineTeacher(sequelize, DataTypes) {
   },
   {
     tableName: 'teachers',
-    timestamps: false,
+    timestamps: true,
+    underscored: true,
   });
   // eslint-disable-next-line no-unused-vars
   Teacher.associate = function associateTeacher(models) {

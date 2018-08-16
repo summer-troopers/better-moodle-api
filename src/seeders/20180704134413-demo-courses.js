@@ -4,7 +4,11 @@ const faker = require('faker');
 
 module.exports = {
   // eslint-disable-next-line no-unused-vars, no-use-before-define
-  up(queryInterface, Sequelize) { return queryInterface.bulkInsert('courses', generate20Courses(), {}); },
+  up(queryInterface, Sequelize) {
+    const { sequelize } = queryInterface;
+    const Course = sequelize.import('../models/course.js');
+    return Course.bulkCreate(generate20Courses(), {});
+  },
   // eslint-disable-next-line no-unused-vars
   down(queryInterface, Sequelize) { return queryInterface.bulkDelete('courses', null, {}); },
 };

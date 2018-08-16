@@ -52,7 +52,8 @@ module.exports = function defineStudent(sequelize, DataTypes) {
   },
   {
     tableName: 'students',
-    timestamps: false,
+    timestamps: true,
+    underscored: true,
   });
   Student.associate = function associateStudent(models) {
     Student.belongsTo(models.Group, { foreignKey: 'groupId', targetKey: 'id' });

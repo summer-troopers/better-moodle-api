@@ -23,6 +23,21 @@ module.exports = {
         field: 'teacher_comment',
         allowNull: false,
       },
+      mark: {
+        type: Sequelize.INTEGER,
+        field: 'mark',
+        allowNull: false,
+      },
+      createdAt: {
+        type: Sequelize.DATE,
+        field: 'created_at',
+        allowNull: false,
+      },
+      updatedAt: {
+        type: Sequelize.DATE,
+        field: 'updated_at',
+        allowNull: false,
+      },
     });
   },
   // eslint-disable-next-line no-unused-vars

@@ -26,7 +26,8 @@ module.exports = function defineLabTask(sequelize, DataTypes) {
   },
   {
     tableName: 'lab_tasks',
-    timestamps: false,
+    timestamps: true,
+    underscored: true,
   });
   // eslint-disable-next-line no-unused-vars
   LabTask.associate = function associateLabTask(models) {

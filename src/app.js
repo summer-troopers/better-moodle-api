@@ -10,7 +10,7 @@ const swaggerUi = require('swagger-ui-express');
 const swaggerDocument = require('../swagger.json');
 const logger = require('../src/services/winston/logger');
 
-const importModels = require('./models/import');
+const importModels = require('./models');
 const createRoute = require('./routes/route-factory');
 const createAuthenticationRoute = require('./routes/authentication-route');
 

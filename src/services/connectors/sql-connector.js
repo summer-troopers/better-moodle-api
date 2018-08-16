@@ -10,7 +10,7 @@ module.exports = function getSQLConnector(uri) {
   async function connect() {
     const sequelize = new Sequelize(uri, {
       dialect: 'mysql',
-      logging: false,
+      logging: true,
       define: {
         charset: 'utf8mb4',
       },

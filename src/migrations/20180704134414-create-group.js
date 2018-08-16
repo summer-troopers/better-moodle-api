@@ -23,6 +23,16 @@ module.exports = {
           key: 'id',
         },
       },
+      createdAt: {
+        type: Sequelize.DATE,
+        field: 'created_at',
+        allowNull: false,
+      },
+      updatedAt: {
+        type: Sequelize.DATE,
+        field: 'updated_at',
+        allowNull: false,
+      },
     });
   },
   // eslint-disable-next-line no-unused-vars

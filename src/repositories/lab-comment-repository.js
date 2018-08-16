@@ -8,24 +8,17 @@ module.exports = function createCommentRepository(connection) {
   const {
     LabComment,
     LabReport,
-    Teacher,
   } = connection.models;
 
   async function list(queryParams) {
     const {
       limit,
       offset,
-      contains,
     } = queryParams;
 
     const filter = {
       limit,
       offset,
-      where: {
-        LabComment: {
-          [Op.like]: [`%${contains}%`],
-        },
-      },
     };
 
     let response = null;
@@ -41,55 +34,45 @@ module.exports = function createCommentRepository(connection) {
     return LabComment.findAndCountAll(filter);
   }
 
-  // async function view(id) {
-  //   return LabComment.findById(id);
-  // }
+  async function view(id) {
+    return LabComment.findById(id);
+  }
 
-  // async function add(form, queryParams) {
-  //   if (queryParams.courseId) {
-  //     const course = await Course.findById(queryParams.courseId);
-  //     if (!course) throw new errors.NotFound('COURSE_NOT_FOUND');
-  //     const teacher = await Teacher.findById(form.teacherId);
-  //     if (!teacher) throw new errors.NotFound('TEACHER_NOT_FOUND');
-  //     return teacher.addCourse(course);
-  //   }
-  //   return Teacher.create(form);
-  // }
+  async function add(form) {
+    const labReport = await LabReport.findById(form.labReportId);
+    if (!labReport) throw new errors.NotFound('LAB_REPORT_NOT_FOUND');
 
-  // async function exists(id) {
-  //   const result = await Teacher.findById(id);
-  //   if (result) return true;
-  //   return false;
-  // }
+    return LabComment.create(form);
+  }
 
-  // async function update(id, form) {
-  //   return Teacher.update(form, {
-  //     where: { id },
-  //   });
-  // }
+  async function exists(id) {
+    const result = await LabComment.findById(id);
+    if (result) return true;
+    return false;
+  }
 
-  // function remove(id, queryParams) {
-  //   if (queryParams.courseId) {
-  //     return CourseTeacher.destroy({
-  //       where: {
-  //         courseId: queryParams.courseId,
-  //         teacherId: id,
-  //       },
-  //     });
-  //   }
+  async function update(id, form) {
+    const labReport = await LabReport.findById(form.labReportId);
+    if (!labReport) throw new errors.NotFound('LAB_REPORT_NOT_FOUND');
 
-  //   return Teacher.destroy({
-  //     where: { id },
-  //   });
-  // }
+    return LabComment.update(form, {
+      where: { id },
+    });
+  }
+
+  function remove(id) {
+    return LabComment.destroy({
+      where: { id },
+    });
+  }
 
   return {
     list,
-    // view,
-    // add,
-    // update,
-    // remove,
-    // exists,
+    view,
+    add,
+    update,
+    remove,
+    exists,
   };
 
   function getModels(key) {

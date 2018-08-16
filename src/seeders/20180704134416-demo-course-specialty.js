@@ -2,21 +2,31 @@ const faker = require('faker');
 
 module.exports = {
   // eslint-disable-next-line no-unused-vars, no-use-before-define
-  up(queryInterface, Sequelize) { return queryInterface.bulkInsert('courses_specialties', generate10Connections(), {}); },
+  async up(queryInterface, Sequelize) {
+    const { sequelize } = queryInterface;
+    const CourseSpecialty = sequelize.import('../models/course_specialty.js');
+    const Course = sequelize.import('../models/course.js');
+    const Specialty = sequelize.import('../models/specialty.js');
+    return CourseSpecialty.bulkCreate(await generate10Connections(Course, Specialty), {});
+  },
   // eslint-disable-next-line no-unused-vars
   down(queryInterface, Sequelize) { return queryInterface.bulkDelete('courses_specialties', null, {}); },
 };
 
-function generate10Connections() {
+async function generate10Connections(Course, Specialty) {
+  const courses = await Course.findAll({ attributes: ['id'] });
+  const specialties = await Specialty.findAll({ attributes: ['id'] });
   const connections = [];
   connections.push({
-    specialty_id: '1',
-    course_id: '1',
+    specialtyId: '1',
+    courseId: '1',
   });
   for (let i = 0; i < 10; i += 1) {
+    const specIndex = faker.random.number(specialties.length - 1);
+    const courseIndex = faker.random.number(courses.length - 1);
     connections.push({
-      specialty_id: faker.random.number(10) + 1,
-      course_id: faker.random.number(10) + 1,
+      specialtyId: specialties[specIndex].id,
+      courseId: courses[courseIndex].id,
     });
   }
   return connections;

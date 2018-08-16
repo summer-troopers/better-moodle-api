@@ -2,21 +2,28 @@ const faker = require('faker');
 
 module.exports = {
   // eslint-disable-next-line no-unused-vars, no-use-before-define
-  up(queryInterface, Sequelize) { return queryInterface.bulkInsert('groups', generate50Groups(), {}); },
+  async up(queryInterface, Sequelize) {
+    const { sequelize } = queryInterface;
+    const Group = sequelize.import('../models/group.js');
+    const Specialty = sequelize.import('../models/specialty.js');
+    return Group.bulkCreate(await generate50Groups(Specialty), {});
+  },
   // eslint-disable-next-line no-unused-vars
   down(queryInterface, Sequelize) { return queryInterface.bulkDelete('groups', null, {}); },
 };
 
-function generate50Groups() {
+async function generate50Groups(Specialty) {
+  const specialties = await Specialty.findAll({ attributes: ['id'] });
   const group = [];
   group.push({
     name: 'AI-151',
-    specialty_id: '1',
+    specialtyId: '1',
   });
   for (let i = 1; i <= 50; i += 1) {
+    const specIndex = faker.random.number(specialties.length - 1);
     group.push({
       name: `${getRandomLetters()}${faker.random.number(60)}`, // eslint-disable-line no-unused-vars, no-use-before-define
-      specialty_id: faker.random.number(10) + 1,
+      specialtyId: specialties[specIndex].id,
     });
   }
   return group;
