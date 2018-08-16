@@ -31,6 +31,7 @@ module.exports = function defineLabReport(sequelize, DataTypes) {
   LabReport.associate = function associateLabReport(models) {
     LabReport.belongsTo(models.Student, { foreignKey: 'studentId', targetKey: 'id' });
     LabReport.belongsTo(models.LabTask, { foreignKey: 'labTaskId', targetKey: 'id' });
+    LabReport.hasMany(models.LabComment, { foreignKey: 'labReportId' });
   };
   return LabReport;
 };
