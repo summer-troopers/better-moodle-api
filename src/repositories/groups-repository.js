@@ -45,35 +45,35 @@ module.exports = function createGroupsRepository(sequelize) {
     return Group.findAndCountAll(filter);
   }
 
-  async function view(id) {
-    return Group.findById(id);
+  async function view(groupId) {
+    return Group.findById(groupId);
   }
 
-  async function add(form) {
-    const specialty = Specialty.findById(form.specialtyId);
+  async function add(data) {
+    const specialty = await Specialty.findById(data.specialtyId);
     if (!specialty) throw new errors.NotFound('SPECIALTY_NOT_FOUND');
 
-    return Group.create(form);
+    return Group.create(data);
   }
 
-  async function exists(id) {
-    const result = await Group.findById(id);
+  async function exists(groupId) {
+    const result = await Group.findById(groupId);
     if (result) return true;
     return false;
   }
 
-  async function update(id, form) {
-    const specialty = Specialty.findById(form.specialtyId);
+  async function update(groupId, data) {
+    const specialty = await Specialty.findById(data.specialtyId);
     if (!specialty) throw new errors.NotFound('SPECIALTY_NOT_FOUND');
 
-    return Group.update(form, {
-      where: { id },
+    return Group.update(data, {
+      where: { id: groupId },
     });
   }
 
-  function remove(id) {
+  function remove(groupId) {
     return Group.destroy({
-      where: { id },
+      where: { id: groupId },
     });
   }
 
