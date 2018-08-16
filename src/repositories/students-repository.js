@@ -48,35 +48,40 @@ module.exports = function createStudentsRepository(connection) {
     return Student.findAndCountAll(filter);
   }
 
-  async function view(id) {
-    return Student.findById(id);
+  async function view(studentId) {
+    return Student.findOne({
+      where: { id: studentId },
+      attributes: {
+        exclude: ['password'],
+      },
+    });
   }
 
-  async function add(form) {
-    const group = await Group.findById(form.groupId);
+  async function add(data) {
+    const group = await Group.findById(data.groupId);
     if (!group) throw new errors.NotFound('GROUP_NOT_FOUND');
 
-    return Student.create(form);
+    return Student.create(data);
   }
 
-  async function exists(id) {
-    const result = await Student.findById(id);
+  async function exists(studentId) {
+    const result = await Student.findById(studentId);
     if (result) return true;
     return false;
   }
 
-  async function update(id, form) {
-    const group = await Group.findById(form.groupId);
+  async function update(studentId, data) {
+    const group = await Group.findById(data.groupId);
     if (!group) throw new errors.NotFound('GROUP_NOT_FOUND');
 
-    return Student.update(form, {
-      where: { id },
+    return Student.update(data, {
+      where: { id: studentId },
     });
   }
 
-  function remove(id) {
+  function remove(studentId) {
     return Student.destroy({
-      where: { id },
+      where: { id: studentId },
     });
   }
 

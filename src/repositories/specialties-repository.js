@@ -45,44 +45,44 @@ module.exports = function createSpecialtiesRepository(sequelize) {
     return Specialty.findAndCountAll(filter);
   }
 
-  async function view(id) {
-    return Specialty.findById(id);
+  async function view(specialtyId) {
+    return Specialty.findById(specialtyId);
   }
 
-  async function add(form, queryParams) {
+  async function add(data, queryParams) {
     if (queryParams.courseId) {
       const course = await Course.findById(queryParams.courseId);
       if (!course) throw new errors.NotFound('COURSE_NOT_FOUND');
-      const specialty = await Specialty.findById(form.specialtyId);
+      const specialty = await Specialty.findById(data.specialtyId);
       if (!specialty) throw new errors.NotFound('SPECIALTY_NOT_FOUND');
       return specialty.addCourse(course);
     }
-    return Specialty.create(form);
+    return Specialty.create(data);
   }
 
-  async function exists(id) {
-    const result = await Specialty.findById(id);
+  async function exists(specialtyId) {
+    const result = await Specialty.findById(specialtyId);
     if (result) return true;
     return false;
   }
 
-  async function update(id, form) {
-    return Specialty.update(form, {
-      where: { id },
+  async function update(specialtyId, data) {
+    return Specialty.update(data, {
+      where: { id: specialtyId },
     });
   }
 
-  function remove(id, queryParams) {
+  function remove(specialtyId, queryParams) {
     if (queryParams.courseId) {
       return CourseSpecialty.destroy({
         where: {
-          specialtyId: id,
+          specialtyId,
           courseId: queryParams.courseId,
         },
       });
     }
 
-    return Specialty.destroy({ where: { id } });
+    return Specialty.destroy({ where: { id: specialtyId } });
   }
 
   return {

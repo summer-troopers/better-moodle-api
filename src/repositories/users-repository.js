@@ -10,28 +10,28 @@ module.exports = function getUserRepository(sequelize) {
     return model.findOne({ where: { email: { [Op.eq]: user.email } } });
   }
 
-  async function exists(id, role) { // eslint-disable-line complexity
+  async function exists(userId, role) { // eslint-disable-line complexity
     if (role === roles.STUDENT) {
-      const result = await Student.findById(id);
+      const result = await Student.findById(userId);
       if (result) return true;
     } else if (role === roles.TEACHER) {
-      const result = await Teacher.findById(id);
+      const result = await Teacher.findById(userId);
       if (result) return true;
     } else if (role === roles.ADMIN) {
-      const result = await Admin.findById(id);
+      const result = await Admin.findById(userId);
       if (result) return true;
     }
     return false;
   }
 
-  async function getUser(form) {
-    const student = await selectUserDB(form, Student);
+  async function getUser(data) {
+    const student = await selectUserDB(data, Student);
     if (student) return [roles.STUDENT, student.dataValues];
 
-    const teacher = await selectUserDB(form, Teacher);
+    const teacher = await selectUserDB(data, Teacher);
     if (teacher) return [roles.TEACHER, teacher.dataValues];
 
-    const admin = await selectUserDB(form, Admin);
+    const admin = await selectUserDB(data, Admin);
     if (admin) return [roles.ADMIN, admin.dataValues];
 
     return null;
