@@ -36,19 +36,20 @@ module.exports = function createLabTasksRepository(mongoConnection, sqlConnectio
     });
   }
 
-  async function view(id) {
-    const task = await LabTask.findById(id);
-    const stream = LabTaskFile.readById(task.mongoFileId);
+  async function view(labTaskId) {
+    const task = await LabTask.findById(labTaskId);
     const metadata = await getFile(task.mongoFileId);
+    if (!metadata) throw new errors.NotFound('LAB_TASK_FILE_NOT_FOUND');
+    const stream = LabTaskFile.readById(task.mongoFileId);
     return {
       metadata,
       stream,
     };
   }
 
-  function getFile(id) {
+  function getFile(fileId) {
     return new Promise((resolve, reject) => {
-      LabTaskFile.findById(id, (error, result) => {
+      LabTaskFile.findById(fileId, (error, result) => {
         if (error) {
           logger.error(error);
           return reject(error);
@@ -64,29 +65,35 @@ module.exports = function createLabTasksRepository(mongoConnection, sqlConnectio
     return true;
   }
 
-  async function add(fileId, courseId, teacherId) {
-    const course = await Course.findById(courseId);
+  async function add(data) {
+    const course = await Course.findById(data.courseId);
     if (!course) throw new errors.NotFound('COURSE_NOT_FOUND');
-    const teacher = Teacher.findById(teacherId);
+    const teacher = Teacher.findById(data.teacherId);
     if (!teacher) throw new error.NotFound('TEACHER_NOT_FOUND');
     const task = await LabTask.findOne({
       where: {
-        courseId,
-        teacherId,
+        courseId: data.courseId,
+        teacherId: data.teacherId,
       },
     });
     if (task) {
-      await remove(task.id);
+      await update(task.id, data);
     }
     return LabTask.create({
-      courseId,
-      teacherId,
-      mongoFileId: fileId,
+      courseId: data.courseId,
+      teacherId: data.teacherId,
+      mongoFileId: data.fileId,
     });
   }
 
-  async function remove(id) {
-    const task = await LabTask.findById(id);
+  function update(labTaskId, data) {
+    return LabTask.update(data, {
+      where: { id: labTaskId },
+    });
+  }
+
+  async function remove(labTaskId) {
+    const task = await LabTask.findById(labTaskId);
     await removeFile(task.mongoFileId);
     return LabTask.destroy({
       where: {
@@ -95,9 +102,9 @@ module.exports = function createLabTasksRepository(mongoConnection, sqlConnectio
     });
   }
 
-  function removeFile(id) {
+  function removeFile(fileId) {
     return new Promise((resolve, reject) => {
-      LabTaskFile.unlinkById(id, (error, result) => {
+      LabTaskFile.unlinkById(fileId, (error, result) => {
         if (error) {
           logger.error(error);
           return reject(error);
@@ -112,6 +119,7 @@ module.exports = function createLabTasksRepository(mongoConnection, sqlConnectio
     view,
     exists,
     add,
+    update,
     remove,
     removeFile,
     storage: gridFSStorage,

@@ -34,6 +34,7 @@ module.exports = function createLabsRoute(repository, permissions, routeConfig) 
 
   router.route('/:id')
     .get(permissionVerifier.read, view)
+    .put(permissionVerifier.update, update)
     .delete(permissionVerifier.delete, remove);
 
   return router;
@@ -49,22 +50,6 @@ module.exports = function createLabsRoute(repository, permissions, routeConfig) 
     if (!dependencyId) return next(new errors.BadRequest(msg.err.missing.dependencyId));
 
     return next(new errors.BadRequest(msg.err.missing.field));
-  }
-
-  function add(request, response, next) {
-    let userId = (request.token.userRole === roles.ADMIN) ? request.body[names.userId] : request.token.user;
-    userId = userId || '1';
-
-    repository.add(request.file.id.toString(), request.body[names.dependencyId], userId)
-      .then((result) => {
-        response.json({
-          success: routeConfig.msg.success.add,
-          id: result.id,
-        });
-
-        return next();
-      })
-      .catch(next);
   }
 
   async function list(request, response, next) {
@@ -89,6 +74,32 @@ module.exports = function createLabsRoute(repository, permissions, routeConfig) 
         response.set('Content-Length', file.metadata.length);
         response.set('Content-MD5', file.metadata.md5);
         file.stream.pipe(response);
+      })
+      .catch(next);
+  }
+
+  function add(request, response, next) {
+    let userId = (request.token.userRole === roles.ADMIN) ? request.body[names.userId] : request.token.user;
+    userId = userId || '1';
+
+    repository.add(request.file.id.toString(), request.body[names.dependencyId], userId)
+      .then((result) => {
+        response.json({
+          success: routeConfig.msg.success.add,
+          id: result.id,
+        });
+
+        return next();
+      })
+      .catch(next);
+  }
+
+  function update(request, response, next) {
+    repository.update(request.params.id, request.body)
+      .then((result) => {
+        if (!result || result.length === 0) return next(new errors.GeneralError(msg.err.unknown.update));
+        response.json(msg.success.update);
+        return next();
       })
       .catch(next);
   }
