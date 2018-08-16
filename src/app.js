@@ -34,10 +34,13 @@ module.exports = function getApp(sqlConnection, mongoConnection) {
   const userRepository = createUserRepository(sqlConnection);
 
   const labsRepository = require('./repositories/labs-repository')(mongoConnection); // eslint-disable-line global-require
+  const commentRepository = require('./repositories/lab-comment-repository')(sqlConnection); // eslint-disable-line global-require
 
   const authenticationRoute = createAuthenticationRoute(userRepository);
 
   const labsRoute = require('./routes/labs-route')(labsRepository, permissions('crud|r|cr|')); // eslint-disable-line global-require
+
+  const commentsRoute = require('./routes/comment-route')(commentRepository, permissions('crud|crud|r|')); // eslint-disable-line global-require
 
   app.use(cors());
   app.use(bodyParser.json());
@@ -48,6 +51,7 @@ module.exports = function getApp(sqlConnection, mongoConnection) {
   app.use('/', express.static('dist/better-moodle-ui'));
 
   app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
 
   app.use('/api/v1/login', authenticationRoute);
 
@@ -60,6 +64,8 @@ module.exports = function getApp(sqlConnection, mongoConnection) {
   app.use('/api/v1/groups', createRoute(groupsRepository, permissions('crud|r|r|')));
   app.use('/api/v1/specialties', createRoute(specialtiesRepository, permissions('crud|r|r|')));
   app.use('/api/v1/labs', labsRoute);
+  app.use('/api/v1/comments', commentsRoute);
+
 
   // eslint-disable-next-line no-unused-vars
   app.use((err, request, response, next) => {

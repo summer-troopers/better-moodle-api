@@ -19,10 +19,10 @@ module.exports = function defineLabComments(sequelize, DataTypes) {
       allowNull: false,
     },
   },
-  {
-    tableName: 'lab_comments',
-    timestamps: false,
-  });
+    {
+      tableName: 'lab_comments',
+      timestamps: false,
+    });
   // eslint-disable-next-line no-unused-vars
   LabComment.associate = function associateLabComment(models) {
     LabComment.belongsTo(models.LabReport, { foreignKey: 'labReportId' });

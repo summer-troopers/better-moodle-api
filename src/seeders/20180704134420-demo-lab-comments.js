@@ -16,7 +16,7 @@ function generate10LabComments() {
   });
   for (let i = 0; i < 10; i += 1) {
     labComments.push({
-      lab_report_id: faker.random.number(4) + 1,
+      lab_report_id: faker.random.number(5) + 1,
       teacher_comment: faker.random.word(),
     });
   }
