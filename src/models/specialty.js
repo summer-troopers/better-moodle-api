@@ -15,7 +15,7 @@ module.exports = function defineSpecialty(sequelize, DataTypes) {
   },
   {
     tableName: 'specialties',
-    timestamps: false,
+    timestamps: true,
   });
 
   Specialty.associate = function associateSpecialty(models) {

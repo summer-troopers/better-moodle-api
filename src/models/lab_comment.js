@@ -18,10 +18,15 @@ module.exports = function defineLabComments(sequelize, DataTypes) {
       field: 'teacher_comment',
       allowNull: false,
     },
+    mark: {
+      type: DataTypes.INTEGER,
+      field: 'mark',
+      allowNull: false,
+    },
   },
   {
     tableName: 'lab_comments',
-    timestamps: false,
+    timestamps: true,
   });
   // eslint-disable-next-line no-unused-vars
   LabComment.associate = function associateLabComment(models) {

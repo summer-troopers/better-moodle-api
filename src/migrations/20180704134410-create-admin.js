@@ -32,6 +32,14 @@ module.exports = {
         field: 'phone_number',
         unique: true,
       },
+      createdAt: {
+        type: Sequelize.DATE,
+        allowNull: false,
+      },
+      updatedAt: {
+        type: Sequelize.DATE,
+        allowNull: false,
+      },
     });
   },
   // eslint-disable-next-line no-unused-vars

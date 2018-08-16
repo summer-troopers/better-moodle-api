@@ -17,7 +17,7 @@ module.exports = function defineCourse(sequelize, DataTypes) {
     },
   }, {
     tableName: 'courses',
-    timestamps: false,
+    timestamps: true,
   });
   // eslint-disable-next-line no-unused-vars
   Course.associate = function associateCourse(models) {

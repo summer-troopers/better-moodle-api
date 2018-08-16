@@ -25,7 +25,7 @@ module.exports = function defineLabReport(sequelize, DataTypes) {
     },
   }, {
     tableName: 'lab_reports',
-    timestamps: false,
+    timestamps: true,
   });
   // eslint-disable-next-line no-unused-vars
   LabReport.associate = function associateLabReport(models) {

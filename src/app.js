@@ -10,14 +10,13 @@ const swaggerUi = require('swagger-ui-express');
 const swaggerDocument = require('../swagger.json');
 const logger = require('../src/services/winston/logger');
 
-const importModels = require('./models/import');
+const importModels = require('./models');
 const createRoute = require('./routes/route-factory');
 const createAuthenticationRoute = require('./routes/authentication-route');
 
 const createUserRepository = require('./repositories/users-repository');
 const { permissions } = require('./helpers/util');
 const createAuthorizationVerifier = require('./middlewares/authorization-verifier');
-
 
 module.exports = function getApp(sqlConnection, mongoConnection) {
   const app = express();
@@ -34,6 +33,7 @@ module.exports = function getApp(sqlConnection, mongoConnection) {
   const userRepository = createUserRepository(sqlConnection);
 
   const labsRepository = require('./repositories/labs-repository')(mongoConnection); // eslint-disable-line global-require
+  const commentsRepository = require('./repositories/lab-comment-repository')(sqlConnection); // eslint-disable-line global-require
 
   const authenticationRoute = createAuthenticationRoute(userRepository);
 
@@ -59,6 +59,7 @@ module.exports = function getApp(sqlConnection, mongoConnection) {
   app.use('/api/v1/courses', createRoute(coursesRepository, permissions('crud|r|r|')));
   app.use('/api/v1/groups', createRoute(groupsRepository, permissions('crud|r|r|')));
   app.use('/api/v1/specialties', createRoute(specialtiesRepository, permissions('crud|r|r|')));
+  app.use('/api/v1/lab_comments', createRoute(commentsRepository, permissions('crud|crud|r|')));
   app.use('/api/v1/labs', labsRoute);
 
   // eslint-disable-next-line no-unused-vars
