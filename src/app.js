@@ -59,7 +59,7 @@ module.exports = function getApp(sqlConnection, mongoConnection) {
   app.use('/api/v1/courses', createRoute(coursesRepository, permissions('crud|r|r|')));
   app.use('/api/v1/groups', createRoute(groupsRepository, permissions('crud|r|r|')));
   app.use('/api/v1/specialties', createRoute(specialtiesRepository, permissions('crud|r|r|')));
-  app.use('/api/v1/comments', createRoute(commentsRepository, permissions('crud|crud|r|')));
+  app.use('/api/v1/lab_comments', createRoute(commentsRepository, permissions('crud|crud|r|')));
   app.use('/api/v1/labs', labsRoute);
 
   // eslint-disable-next-line no-unused-vars

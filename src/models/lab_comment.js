@@ -27,7 +27,6 @@ module.exports = function defineLabComments(sequelize, DataTypes) {
   {
     tableName: 'lab_comments',
     timestamps: true,
-    underscored: true,
   });
   // eslint-disable-next-line no-unused-vars
   LabComment.associate = function associateLabComment(models) {

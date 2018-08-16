@@ -24,7 +24,6 @@ module.exports = function defineGroup(sequelize, DataTypes) {
   {
     tableName: 'groups',
     timestamps: true,
-    underscored: true,
   });
   Group.associate = function associateGroup(models) {
     Group.hasMany(models.Student, { foreignKey: 'groupId', sourceKey: 'id' });

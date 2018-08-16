@@ -48,7 +48,6 @@ module.exports = function defineAdmin(sequelize, DataTypes) {
   {
     tableName: 'admins',
     timestamps: true,
-    underscored: true,
   });
   // eslint-disable-next-line no-unused-vars
   Admin.associate = function associateAdmin(models) {
