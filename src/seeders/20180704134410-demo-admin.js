@@ -42,6 +42,7 @@ function generateUniqueEmail(i, admins) {
     genEmail = faker.internet.email().toLocaleLowerCase();
     if (!admins.find(predicate)) break;
   }
+
   return genEmail;
 }
 
@@ -52,5 +53,6 @@ function generateUniqueNumber(i, admins) {
     genNumber = faker.phone.phoneNumberFormat(0);
     if (!admins.find(predicate)) break;
   }
+
   return genNumber;
 }
