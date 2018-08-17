@@ -97,7 +97,7 @@ function handleId(queryParamId, response, LabReport, filter, models) {
     };
     response = LabReport.findAndCountAll(query);
     return response.then((results) => {
-      const x = results.rows.map((item) => {
+      const resultedRows = results.rows.map((item) => {
         return {
           id: item.id,
           studentId: item.studentId,
@@ -105,7 +105,7 @@ function handleId(queryParamId, response, LabReport, filter, models) {
           mongoFileId: item.mongoFileId,
         };
       });
-      results.rows = x;
+      results.rows = resultedRows;
       return results;
     });
   }
