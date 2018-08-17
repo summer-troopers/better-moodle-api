@@ -84,28 +84,29 @@ module.exports = function createCommentRepository(connection) {
 };
 
 function handleId(queryParamId, response, LabComment, filter, models) {
-  if (queryParamId) {
-    const query = {
-      ...filter,
-      raw: true,
-      subQuery: false,
-      ...buildIncludes(queryParamId, models),
-    };
-    response = LabComment.findAndCountAll(query);
-    return response.then((results) => {
-      const x = results.rows.map((item) => {
-        return {
-          id: item.id,
-          labReportId: item.labReportId,
-          teacherComment: item.teacherComment,
-          mark: item.mark,
-          createdAt: item.createdAt,
-          updatedAt: item.updatedAt,
-        };
-      });
-      results.rows = x;
-      return results;
+  if (!queryParamId) return null;
+  const query = {
+    ...filter,
+    subQuery: false,
+    ...buildIncludes(queryParamId, models),
+  };
+  response = LabComment.findAndCountAll(query);
+  return response.then((results) => {
+    if (!Array.isArray(results.rows)) {
+      logger.error('NOT_AN_ARRAY');
+      return null;
+    }
+    const resultedRows = results.rows.map((item) => {
+      return {
+        id: item.id,
+        labReportId: item.labReportId,
+        teacherComment: item.teacherComment,
+        mark: item.mark,
+        createdAt: item.createdAt,
+        updatedAt: item.updatedAt,
+      };
     });
-  }
-  return LabComment.findAndCountAll(query);
+    results.rows = resultedRows;
+    return results;
+  });
 }

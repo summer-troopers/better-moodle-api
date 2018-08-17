@@ -103,23 +103,25 @@ module.exports = function createSpecialtiesRepository(sequelize) {
 };
 
 function handleId(queryParamId, response, Specialty, filter, models) {
-  if (queryParamId) {
-    const query = {
-      ...filter,
-      subQuery: false,
-      ...buildIncludes(queryParamId, models),
-    };
-    response = Specialty.findAndCountAll(query);
-    return response.then((results) => {
-      const resultedRows = results.rows.map((item) => {
-        return {
-          id: item.id,
-          name: item.name,
-        };
-      });
-      results.rows = resultedRows;
-      return results;
+  if (!queryParamId) return null;
+  const query = {
+    ...filter,
+    subQuery: false,
+    ...buildIncludes(queryParamId, models),
+  };
+  response = Specialty.findAndCountAll(query);
+  return response.then((results) => {
+    if (!Array.isArray(results.rows)) {
+      logger.error('NOT_AN_ARRAY');
+      return null;
+    }
+    const resultedRows = results.rows.map((item) => {
+      return {
+        id: item.id,
+        name: item.name,
+      };
     });
-  }
-  return Specialty.findAndCountAll();
+    results.rows = resultedRows;
+    return results;
+  });
 }

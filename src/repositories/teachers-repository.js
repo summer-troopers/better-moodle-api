@@ -108,26 +108,28 @@ module.exports = function createTeacherRepository(connection) {
 };
 
 function handleId(queryParamId, response, Teacher, filter, models) {
-  if (queryParamId) {
-    const query = {
-      ...filter,
-      subQuery: false,
-      ...buildIncludes(queryParamId, models),
-    };
-    response = Teacher.findAndCountAll(query);
-    return response.then((results) => {
-      const resultedRows = results.rows.map((item) => {
-        return {
-          id: item.id,
-          firstName: item.firstName,
-          lastName: item.lastName,
-          email: item.email,
-          phoneNumber: item.phoneNumber,
-        };
-      });
-      results.rows = resultedRows;
-      return results;
+  if (!queryParamId) return null;
+  const query = {
+    ...filter,
+    subQuery: false,
+    ...buildIncludes(queryParamId, models),
+  };
+  response = Teacher.findAndCountAll(query);
+  return response.then((results) => {
+    if (!Array.isArray(results.rows)) {
+      logger.error('NOT_AN_ARRAY');
+      return null;
+    }
+    const resultedRows = results.rows.map((item) => {
+      return {
+        id: item.id,
+        firstName: item.firstName,
+        lastName: item.lastName,
+        email: item.email,
+        phoneNumber: item.phoneNumber,
+      };
     });
-  }
-  return Teacher.findAndCountAll();
+    results.rows = resultedRows;
+    return results;
+  });
 }

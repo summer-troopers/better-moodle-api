@@ -3,6 +3,7 @@
 const { Op } = require('sequelize');
 const errors = require('@feathersjs/errors');
 const { buildIncludes } = require('../helpers/util');
+const logger = require('../services/winston/logger');
 
 module.exports = function createGroupsRepository(sequelize) {
   const {
@@ -95,23 +96,25 @@ module.exports = function createGroupsRepository(sequelize) {
 };
 
 function handleId(queryParamId, response, Group, filter, models) {
-  if (queryParamId) {
-    const query = {
-      ...filter,
-      subQuery: false,
-      ...buildIncludes(queryParamId, models),
-    };
-    response = Group.findAndCountAll(query);
-    return response.then((results) => {
-      const resultedRows = results.rows.map((item) => {
-        return {
-          id: item.id,
-          name: item.name,
-        };
-      });
-      results.rows = resultedRows;
-      return results;
+  if (!queryParamId) return null;
+  const query = {
+    ...filter,
+    subQuery: false,
+    ...buildIncludes(queryParamId, models),
+  };
+  response = Group.findAndCountAll(query);
+  return response.then((results) => {
+    if (!Array.isArray(results.rows)) {
+      logger.error('NOT_AN_ARRAY');
+      return null;
+    }
+    const resultedRows = results.rows.map((item) => {
+      return {
+        id: item.id,
+        name: item.name,
+      };
     });
-  }
-  return Group.findAndCountAll();
+    results.rows = resultedRows;
+    return results;
+  });
 }

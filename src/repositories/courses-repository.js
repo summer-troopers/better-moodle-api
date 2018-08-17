@@ -127,23 +127,25 @@ module.exports = function createCoursesRepository(sequelize) {
 };
 
 function handleId(queryParamId, response, Course, filter, models) {
-  if (queryParamId) {
-    const query = {
-      ...filter,
-      subQuery: false,
-      ...buildIncludes(queryParamId, models),
-    };
-    response = Course.findAndCountAll(query);
-    return response.then((results) => {
-      const x = results.rows.map((item) => {
-        return {
-          id: item.id,
-          name: item.name,
-        };
-      });
-      results.rows = x;
-      return results;
+  if (!queryParamId) return null;
+  const query = {
+    ...filter,
+    subQuery: false,
+    ...buildIncludes(queryParamId, models),
+  };
+  response = Course.findAndCountAll(query);
+  return response.then((results) => {
+    if (!Array.isArray(results.rows)) {
+      logger.error('NOT_AN_ARRAY');
+      return null;
+    }
+    const resultedRows = results.rows.map((item) => {
+      return {
+        id: item.id,
+        name: item.name,
+      };
     });
-  }
-  return Course.findAndCountAll(query);
+    results.rows = resultedRows;
+    return results;
+  });
 }
