@@ -2,7 +2,12 @@
 
 const mongoose = require('mongoose');
 const Grid = require('gridfs-stream');
+<<<<<<< HEAD
 const { handleId } = require('../helpers/util');
+=======
+const { buildIncludes } = require('../helpers/util');
+const logger = require('../services/winston/logger');
+>>>>>>> moved generic function handleId from repositories to util
 
 module.exports = function createLabsRepository(connection) {
   const gfs = Grid(connection.db, mongoose.mongo);
