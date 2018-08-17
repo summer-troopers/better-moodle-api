@@ -34,7 +34,7 @@ module.exports = function createLabsRoute(repository, permissions, routeConfig) 
 
   router.route('/:id')
     .get(permissionVerifier.read, view)
-    .put(permissionVerifier.update, update)
+    .put(permissionVerifier.update, upload.single(names.requiredField), update)
     .delete(permissionVerifier.delete, remove);
 
   return router;
@@ -50,6 +50,15 @@ module.exports = function createLabsRoute(repository, permissions, routeConfig) 
     if (!dependencyId) return next(new errors.BadRequest(msg.err.missing.dependencyId));
 
     return next(new errors.BadRequest(msg.err.missing.field));
+  }
+
+  function buildData(fileId, dependencyId, userId) {
+    const data = {};
+    if (fileId) data.fileId = fileId;
+    if (dependencyId) data[names.dependencyId] = dependencyId;
+    if (userId) data[names.userId] = userId;
+
+    return data;
   }
 
   async function list(request, response, next) {
@@ -82,7 +91,7 @@ module.exports = function createLabsRoute(repository, permissions, routeConfig) 
     let userId = (request.token.userRole === roles.ADMIN) ? request.body[names.userId] : request.token.user;
     userId = userId || '1';
 
-    repository.add(request.file.id.toString(), request.body[names.dependencyId], userId)
+    repository.add(buildData(request.file.id.toString(), request.body[names.dependencyId], userId))
       .then((result) => {
         response.json({
           success: routeConfig.msg.success.add,
@@ -95,7 +104,10 @@ module.exports = function createLabsRoute(repository, permissions, routeConfig) 
   }
 
   function update(request, response, next) {
-    repository.update(request.params.id, request.body)
+    let userId = (request.token.userRole === roles.ADMIN) ? request.body[names.userId] : request.token.user;
+    userId = userId || '1';
+
+    repository.update(request.params.id, buildData(request.file.id.toString(), request.body[names.dependencyId], userId))
       .then((result) => {
         if (!result || result.length === 0) return next(new errors.GeneralError(msg.err.unknown.update));
         response.json(msg.success.update);

@@ -5,7 +5,7 @@ const GridFsStorage = require('multer-gridfs-storage');
 const errors = require('@feathersjs/errors');
 
 const logger = require('../services/winston/logger');
-const { handleId } = require('../helpers/util');
+const { handleId, appendDependentData, projectDatabaseResponse } = require('../helpers/util');
 
 module.exports = function createLabTasksRepository(mongoConnection, sqlConnection) {
   const gridFS = createGridFS({
@@ -35,6 +35,17 @@ module.exports = function createLabTasksRepository(mongoConnection, sqlConnectio
       id: row.id,
       teacherId: row.teacherId,
       courseId: row.courseId,
+      teacher: {
+        id: row.teacher.id,
+        firstName: row.teacher.firstName,
+        lastName: row.teacher.lastName,
+        email: row.teacher.email,
+        phoneNumber: row.teacher.phoneNumber,
+      },
+      course: {
+        id: row.course.id,
+        name: row.course.name,
+      },
     };
   };
 
@@ -54,16 +65,16 @@ module.exports = function createLabTasksRepository(mongoConnection, sqlConnectio
     const filter = {
       limit,
       offset,
-      attributes: {
-        exclude: ['mongoFileId', 'createdAt', 'updatedAt'],
-      },
     };
 
-    const response = handleId(queryParams, LabTask, filter, queryParamsBindings, projector);
+    let tasks = await handleId(queryParams, LabTask, filter, queryParamsBindings);
 
-    if (response) return response;
+    if (!tasks) tasks = await LabTask.findAndCountAll(filter);
 
-    return LabTask.findAndCountAll(filter);
+    await appendDependentData(tasks, Course);
+    await appendDependentData(tasks, Teacher);
+
+    return projectDatabaseResponse(tasks, projector);
   }
 
   async function view(labTaskId) {
@@ -81,6 +92,7 @@ module.exports = function createLabTasksRepository(mongoConnection, sqlConnectio
     return new Promise((resolve, reject) => {
       LabTaskFile.findById(fileId, (error, result) => {
         if (error) {
+          if (error.message === 'not found') error = new errors.NotFound('LAB_TASK_FILE_NOT_FOUND');
           logger.error(error);
           return reject(error);
         }
@@ -89,8 +101,8 @@ module.exports = function createLabTasksRepository(mongoConnection, sqlConnectio
     });
   }
 
-  async function exists(id) {
-    const result = await LabTask.findById(id);
+  async function exists(labTaskId) {
+    const result = await LabTask.findById(labTaskId);
     if (!result) return false;
     return true;
   }
@@ -116,7 +128,12 @@ module.exports = function createLabTasksRepository(mongoConnection, sqlConnectio
     });
   }
 
-  function update(labTaskId, data) {
+  async function update(labTaskId, data) {
+    const task = await LabTask.findById(labTaskId);
+    if (data.fileId) {
+      await removeFile(task.mongoFileId);
+      data.mongoFileId = data.fileId;
+    }
     return LabTask.update(data, {
       where: { id: labTaskId },
     });
@@ -127,7 +144,7 @@ module.exports = function createLabTasksRepository(mongoConnection, sqlConnectio
     await removeFile(task.mongoFileId);
     return LabTask.destroy({
       where: {
-        id: task.id,
+        id: labTaskId,
       },
     });
   }
@@ -136,6 +153,7 @@ module.exports = function createLabTasksRepository(mongoConnection, sqlConnectio
     return new Promise((resolve, reject) => {
       LabTaskFile.unlinkById(fileId, (error, result) => {
         if (error) {
+          if (error.message === 'not found') error = new errors.NotFound('LAB_TASK_FILE_NOT_FOUND');
           logger.error(error);
           return reject(error);
         }

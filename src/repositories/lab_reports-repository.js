@@ -5,7 +5,7 @@ const GridFsStorage = require('multer-gridfs-storage');
 const errors = require('@feathersjs/errors');
 
 const logger = require('../services/winston/logger');
-const { handleId } = require('../helpers/util');
+const { handleId, appendDependentData, projectDatabaseResponse } = require('../helpers/util');
 
 module.exports = function createLabReportsRepository(mongoConnection, sqlConnection) {
   const gridFS = createGridFS({
@@ -34,7 +34,20 @@ module.exports = function createLabReportsRepository(mongoConnection, sqlConnect
     return {
       id: row.id,
       studentId: row.studentId,
-      labReportId: row.labReportId,
+      labTaskId: row.labTaskId,
+      student: {
+        id: row.student.id,
+        firstName: row.student.firstName,
+        lastName: row.student.lastName,
+        email: row.student.email,
+        phoneNumber: row.student.phoneNumber,
+        groupId: row.student.groupId,
+      },
+      labTask: {
+        id: row.labTask.id,
+        teacherId: row.labTask.teacherId,
+        courseId: row.labTask.courseId,
+      },
     };
   };
 
@@ -54,16 +67,17 @@ module.exports = function createLabReportsRepository(mongoConnection, sqlConnect
     const filter = {
       limit,
       offset,
-      attributes: {
-        exclude: ['mongoFileId', 'createdAt', 'updatedAt'],
-      },
     };
 
-    const response = handleId(queryParams, LabReport, filter, queryParamsBindings, projector);
+    let reports = await handleId(queryParams, LabReport, filter, queryParamsBindings, projector);
 
-    if (response) return response;
+    if (!reports) reports = await LabReport.findAndCountAll(filter);
 
-    return LabReport.findAndCountAll(filter);
+    await appendDependentData(reports, Student);
+
+    await appendDependentData(reports, LabTask);
+
+    return projectDatabaseResponse(reports, projector);
   }
 
   async function view(labReportId) {
@@ -81,6 +95,7 @@ module.exports = function createLabReportsRepository(mongoConnection, sqlConnect
     return new Promise((resolve, reject) => {
       LabReportFile.findById(fileId, (error, result) => {
         if (error) {
+          if (error.message === 'not found') error = new errors.NotFound('LAB_REPORT_FILE_NOT_FOUND');
           logger.error(error);
           return reject(error);
         }
@@ -118,10 +133,15 @@ module.exports = function createLabReportsRepository(mongoConnection, sqlConnect
 
   async function update(labReportId, data) {
     const report = await LabReport.findById(labReportId);
-    await removeFile(report.mongoFileId);
-    return LabReport.update(data, {
+    if (data.fileId) {
+      await removeFile(report.mongoFileId);
+      data.mongoFileId = data.fileId;
+    }
+    const result = LabReport.update(data, {
       where: { id: labReportId },
     });
+
+    return result;
   }
 
   async function remove(labReportId) {
@@ -129,7 +149,7 @@ module.exports = function createLabReportsRepository(mongoConnection, sqlConnect
     await removeFile(report.mongoFileId);
     return LabReport.destroy({
       where: {
-        id: report.id,
+        id: labReportId,
       },
     });
   }
@@ -138,6 +158,7 @@ module.exports = function createLabReportsRepository(mongoConnection, sqlConnect
     return new Promise((resolve, reject) => {
       LabReportFile.unlinkById(fileId, (error, result) => {
         if (error) {
+          if (error.message === 'not found') error = new errors.NotFound('LAB_REPORT_FILE_NOT_FOUND');
           logger.error(error);
           return reject(error);
         }

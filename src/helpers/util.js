@@ -1,8 +1,5 @@
 'use strict';
 
-const errors = require('@feathersjs/errors');
-const logger = require('../services/winston/logger');
-
 function createMessage(to, from, subject, text) {
   const message = {
     to,
@@ -77,8 +74,53 @@ async function appendDependentData(initialResults, dependentModel) {
   return initialResults;
 }
 
-function getDependencyName(model) {
-  return model.name.charAt(0).toLowerCase() + model.name.slice(1);
+// This next function is just an experiment for fun :)
+// eslint-disable-next-line complexity
+async function appendDependentDataDeep(initialResults, dependentModels) {
+  const dependencyNames = [];
+  dependentModels.forEach((Model) => {
+    const name = getDependencyName(Model);
+    dependencyNames.push(name);
+  });
+  const resultsAggregate = [initialResults];
+
+  // eslint-disable-next-line complexity
+  async function doWork(dependentModelsParam, index = 0, resultsAggregateParam) {
+    if (index === dependentModelsParam.length) return null;
+
+    const currentResults = resultsAggregateParam[index];
+    const dependencyName = dependencyNames[index];
+
+    const dependentIds = currentResults.rows.map(model => model[`${dependencyName}Id`]);
+
+    const dependencies = await dependentModelsParam[index].findAll({
+      where: { id: { $in: dependentIds } },
+    });
+
+    resultsAggregateParam.push({ count: 0, rows: [] });
+
+    const nextResults = resultsAggregateParam[index + 1];
+
+    for (let i = 0; i < currentResults.rows.length; i += 1) {
+      for (let j = 0; j < dependencies.length; j += 1) {
+        const currentId = currentResults.rows[i][`${dependencyName}Id`];
+        if (currentId === dependencies[j].id) {
+          nextResults.rows.push(dependencies[j]);
+          break;
+        }
+      }
+    }
+    await doWork(dependentModelsParam, index + 1, resultsAggregateParam);
+    for (let i = 0; i < currentResults.rows.length; i += 1) {
+      currentResults.rows[i][dependencyName] = nextResults.rows[i];
+    }
+
+    return null;
+  }
+
+  await doWork(dependentModels, 0, resultsAggregate);
+
+  return initialResults;
 }
 
 function projectDatabaseResponse(response, projector) {
@@ -88,58 +130,36 @@ function projectDatabaseResponse(response, projector) {
   };
 }
 
+function getDependencyName(model) {
+  return model.name.charAt(0).toLowerCase() + model.name.slice(1);
+}
+
 function buildIncludes(param, modelsArg) {
   const models = [...modelsArg];
   models.reverse();
   return models.reduce((accumulator, model, index) => {
     if (index === 0) {
-      accumulator.include = [{
-        model,
-        required: true,
-        where: {
-          id: param,
+      accumulator.include = [
+        {
+          model,
+          required: true,
+          where: {
+            id: param,
+          },
         },
-      }];
+      ];
       return accumulator;
     }
 
-    accumulator.include = [{
-      model,
-      required: true,
-      include: accumulator.include,
-    }];
+    accumulator.include = [
+      {
+        model,
+        required: true,
+        include: accumulator.include,
+      },
+    ];
     return accumulator;
   }, {});
-}
-
-function handleId(queryParams, Model, filter, queryParamsBindings, projector) {
-  if (!queryParams) return null;
-
-  const incomingParamKeys = Object.keys(queryParams);
-  const incomingParamValues = Object.values(queryParams);
-
-  // These 2 need validation
-  const modelChain = queryParamsBindings[incomingParamKeys[0]];
-  const queryParamId = incomingParamValues[0];
-
-  const query = {
-    ...filter,
-    subQuery: false,
-    ...buildIncludes(queryParamId, modelChain),
-  };
-  return Model.findAndCountAll(query)
-    .then((results) => {
-      if (!Array.isArray(results.rows)) {
-        const msg = 'NOT_AN_ARRAY';
-        logger.error(msg);
-        throw new errors.GeneralError(msg);
-      }
-      const newRows = results.rows.map(projector);
-      return {
-        count: results.count,
-        rows: newRows,
-      };
-    });
 }
 
 module.exports = {
@@ -148,5 +168,6 @@ module.exports = {
   buildIncludes,
   handleId,
   appendDependentData,
+  appendDependentDataDeep,
   projectDatabaseResponse,
 };

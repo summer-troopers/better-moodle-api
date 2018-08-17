@@ -2,7 +2,7 @@
   "name": "moodle",
   "version": "1.0.0",
   "description": "summer internship project",
-  "repository": "http://github.com/alxolr/student-moodle",
+  "repository": "https://github.com/summer-troopers/better-moodle-api",
   "main": "index.js",
   "scripts": {
     "test": "mocha --recursive",
