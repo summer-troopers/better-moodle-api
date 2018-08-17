@@ -2,7 +2,7 @@
 
 const errors = require('@feathersjs/errors');
 const { Op } = require('sequelize');
-const { handleId, getDependentData, projectDatabaseResponse } = require('../helpers/util');
+const { handleId, appendDependentData, projectDatabaseResponse } = require('../helpers/util');
 
 module.exports = function createStudentsRepository(connection) {
   const {
@@ -63,9 +63,9 @@ module.exports = function createStudentsRepository(connection) {
 
     if (!students) students = await Student.findAndCountAll(filter);
 
-    const response = getDependentData(students, Group);
+    await appendDependentData(students, Group);
 
-    return projectDatabaseResponse(response, projector);
+    return projectDatabaseResponse(students, projector);
   }
 
 

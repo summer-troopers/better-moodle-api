@@ -2,7 +2,7 @@
 
 const errors = require('@feathersjs/errors');
 const { Op } = require('sequelize');
-const { handleId, getDependentData, projectDatabaseResponse } = require('../helpers/util');
+const { handleId, appendDependentData, projectDatabaseResponse } = require('../helpers/util');
 
 module.exports = function createCommentRepository(connection) {
   const {
@@ -53,9 +53,9 @@ module.exports = function createCommentRepository(connection) {
 
     if (!labComments) labComments = await LabComment.findAndCountAll(filter);
 
-    const response = getDependentData(labComments, LabReport);
+    await appendDependentData(labComments, LabReport);
 
-    return projectDatabaseResponse(response, projector);
+    return projectDatabaseResponse(labComments, projector);
   }
 
   async function view(id) {

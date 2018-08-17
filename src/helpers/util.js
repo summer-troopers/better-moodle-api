@@ -59,7 +59,7 @@ function handleId(queryParams, Model, filter, queryParamsBindings, projector) {
   return Model.findAndCountAll(query);
 }
 
-async function getDependentData(initialResults, dependentModel) {
+async function appendDependentData(initialResults, dependentModel) {
   const dependencyName = getDependencyName(dependentModel);
   const dependentIds = initialResults.rows.map(model => model[`${dependencyName}Id`]);
 
@@ -82,12 +82,10 @@ function getDependencyName(model) {
 }
 
 function projectDatabaseResponse(response, projector) {
-  return response.then((results) => {
-    return {
-      count: results.count,
-      rows: results.rows.map(projector),
-    };
-  });
+  return {
+    count: response.count,
+    rows: response.rows.map(projector),
+  };
 }
 
 function buildIncludes(param, models) {
@@ -118,6 +116,6 @@ module.exports = {
   permissions: createPermissions,
   buildIncludes,
   handleId,
-  getDependentData,
+  appendDependentData,
   projectDatabaseResponse,
 };
