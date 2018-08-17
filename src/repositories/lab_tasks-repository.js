@@ -5,6 +5,7 @@ const GridFsStorage = require('multer-gridfs-storage');
 const errors = require('@feathersjs/errors');
 
 const logger = require('../services/winston/logger');
+const { handleId } = require('../helpers/util');
 
 module.exports = function createLabTasksRepository(mongoConnection, sqlConnection) {
   const gridFS = createGridFS({
@@ -15,7 +16,27 @@ module.exports = function createLabTasksRepository(mongoConnection, sqlConnectio
 
   const LabTaskFile = gridFS.model;
 
-  const { LabTask, Course, Teacher } = sqlConnection.models;
+  const { models } = sqlConnection;
+
+  const { LabTask, Course, Teacher } = models;
+
+  const queryParamsBindings = {
+    courseId: [Course],
+    teacherId: [Teacher],
+    labReportId: [models.LabReport],
+    specialtyId: [Course, models.Specialty],
+    groupId: [Course, models.Specialty, models.Group],
+    labCommentId: [models.LabReport, models.LabComment],
+    studentId: [Course, models.Specialty, models.Group, models.Student],
+  };
+
+  const projector = (row) => {
+    return {
+      id: row.id,
+      teacherId: row.teacherId,
+      courseId: row.courseId,
+    };
+  };
 
   const gridFSStorage = new GridFsStorage({
     db: mongoConnection.db,
@@ -29,11 +50,20 @@ module.exports = function createLabTasksRepository(mongoConnection, sqlConnectio
 
   async function list(queryParams) {
     const { limit, offset } = queryParams;
-    return LabTask.findAndCountAll({
+
+    const filter = {
       limit,
       offset,
-      attributes: ['id', 'courseId', 'teacherId'],
-    });
+      attributes: {
+        exclude: ['mongoFileId', 'createdAt', 'updatedAt'],
+      },
+    };
+
+    const response = handleId(queryParams, LabTask, filter, queryParamsBindings, projector);
+
+    if (response) return response;
+
+    return LabTask.findAndCountAll(filter);
   }
 
   async function view(labTaskId) {

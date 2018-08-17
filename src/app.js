@@ -35,7 +35,7 @@ module.exports = function getApp(sqlConnection, mongoConnection) {
 
   const userRepository = createUserRepository(sqlConnection);
 
-  const labCommentsRepository = require('./repositories/lab-comment-repository')(sqlConnection); // eslint-disable-line global-require
+  const labCommentsRepository = require('./repositories/lab-comments-repository')(sqlConnection); // eslint-disable-line global-require
   const labReportsRepository = require('./repositories/lab_reports-repository')(mongoConnection, sqlConnection); // eslint-disable-line global-require
   const labTasksRepository = require('./repositories/lab_tasks-repository')(mongoConnection, sqlConnection); // eslint-disable-line global-require
 

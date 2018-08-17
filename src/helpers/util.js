@@ -112,6 +112,36 @@ function buildIncludes(param, modelsArg) {
   }, {});
 }
 
+function handleId(queryParams, Model, filter, queryParamsBindings, projector) {
+  if (!queryParams) return null;
+
+  const incomingParamKeys = Object.keys(queryParams);
+  const incomingParamValues = Object.values(queryParams);
+
+  // These 2 need validation
+  const modelChain = queryParamsBindings[incomingParamKeys[0]];
+  const queryParamId = incomingParamValues[0];
+
+  const query = {
+    ...filter,
+    subQuery: false,
+    ...buildIncludes(queryParamId, modelChain),
+  };
+  return Model.findAndCountAll(query)
+    .then((results) => {
+      if (!Array.isArray(results.rows)) {
+        const msg = 'NOT_AN_ARRAY';
+        logger.error(msg);
+        throw new errors.GeneralError(msg);
+      }
+      const newRows = results.rows.map(projector);
+      return {
+        count: results.count,
+        rows: newRows,
+      };
+    });
+}
+
 module.exports = {
   createMessage,
   permissions: createPermissions,
