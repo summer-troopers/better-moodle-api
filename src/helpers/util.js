@@ -48,6 +48,7 @@ function handleId(queryParams, Model, filter, queryParamsBindings, projector) {
   const incomingParamValues = Object.values(queryParams);
 
   const modelChain = queryParamsBindings[incomingParamKeys[0]];
+  if (!modelChain) return null;
   const queryParamId = incomingParamValues[0];
 
   const query = {
@@ -55,18 +56,38 @@ function handleId(queryParams, Model, filter, queryParamsBindings, projector) {
     subQuery: false,
     ...buildIncludes(queryParamId, modelChain),
   };
-  return Model.findAndCountAll(query)
-    .then((results) => {
-      if (!Array.isArray(results.rows)) {
-        logger.error('NOT_AN_ARRAY');
-        throw new errors.GeneralError('NOT_AN_ARRAY');
+  return Model.findAndCountAll(query);
+}
+
+async function getDependentData(initialResults, dependentModel) {
+  const dependencyName = getDependencyName(dependentModel);
+  const dependentIds = initialResults.rows.map(model => model[`${dependencyName}Id`]);
+
+  const dependencies = await dependentModel.findAll({
+    where: { id: { $in: dependentIds } },
+  });
+
+  for (let i = 0; i < initialResults.rows.length; i += 1) {
+    for (let j = 0; j < dependencies.length; j += 1) {
+      if (initialResults.rows[i][`${dependencyName}Id`] === dependencies[j].id) {
+        initialResults.rows[i][dependencyName] = dependencies[j];
       }
-      const newRows = results.rows.map(projector);
-      return {
-        count: results.count,
-        rows: newRows,
-      };
-    });
+    }
+  }
+  return initialResults;
+}
+
+function getDependencyName(model) {
+  return model.name.charAt(0).toLowerCase() + model.name.slice(1);
+}
+
+function projectDatabaseResponse(response, projector) {
+  return response.then((results) => {
+    return {
+      count: results.count,
+      rows: results.rows.map(projector),
+    };
+  });
 }
 
 function buildIncludes(param, models) {
@@ -75,7 +96,6 @@ function buildIncludes(param, models) {
     if (index === 0) {
       accumulator.include = [{
         model,
-        attributes: ['id'],
         required: true,
         where: {
           id: param,
@@ -86,7 +106,6 @@ function buildIncludes(param, models) {
 
     accumulator.include = [{
       model,
-      attributes: ['id'],
       required: true,
       include: accumulator.include,
     }];
@@ -99,4 +118,6 @@ module.exports = {
   permissions: createPermissions,
   buildIncludes,
   handleId,
+  getDependentData,
+  projectDatabaseResponse,
 };

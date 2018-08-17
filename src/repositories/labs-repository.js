@@ -1,21 +1,42 @@
+'use strict';
+
 const mongoose = require('mongoose');
 const Grid = require('gridfs-stream');
-const { buildIncludes } = require('../helpers/util');
-const logger = require('../services/winston/logger');
+const { handleId } = require('../helpers/util');
 
 module.exports = function createLabsRepository(connection) {
   const gfs = Grid(connection.db, mongoose.mongo);
   gfs.collection('fs');
 
   const {
-    LabReport,
     LabTask,
+    LabComment,
     Student,
     Group,
     Specialty,
     Course,
     Teacher,
   } = connection.models;
+
+  const projector = (item) => {
+    return {
+      id: item.id,
+      studentId: item.studentId,
+      labTaskId: item.labTaskId,
+      createdAt: item.createdAt,
+      updatedAt: item.updatedAt,
+    };
+  };
+
+  const queryParamsBindings = {
+    labCommentId: [LabComment],
+    studentId: [Student],
+    groupId: [Student, Group],
+    specialtyId: [Student, Group, Specialty],
+    taskId: [LabTask],
+    teacherId: [LabTask, Teacher],
+    courseId: [LabTask, Teacher, Course],
+  };
 
   async function list(queryParams) {
     const {
@@ -37,12 +58,7 @@ module.exports = function createLabsRepository(connection) {
       },
     };
 
-    let response = null;
-
-    const incomingParamKeys = Object.keys(queryParams);
-    const incomingParamValues = Object.values(queryParams);
-
-    response = handleId(incomingParamValues[0], response, LabReport, filter, getModels(incomingParamKeys[0]));
+    const response = handleId(queryParams, LabReport, filter, queryParamsBindings, projector);
 
     if (response) {
       return response;
@@ -68,36 +84,4 @@ module.exports = function createLabsRepository(connection) {
     add,
     remove,
   };
-
-  function getModels(key) {
-    const keys = ['studentId', 'groupId', 'specialty', 'courseId', 'teacherId', 'taskId'];
-    const models = [Student, Group, Specialty, Course, Teacher, LabTask];
-    const i = keys.findIndex(itKey => key === itKey);
-    return models.slice(0, i + 1);
-  }
 };
-
-function handleId(queryParamId, response, LabReport, filter, models) {
-  if (!queryParamId) return null;
-  const query = {
-    ...filter,
-    subQuery: false,
-    ...buildIncludes(queryParamId, models),
-  };
-  response = LabReport.findAndCountAll(query);
-  return response.then((results) => {
-    if (!Array.isArray(results.rows)) {
-      logger.error('NOT_AN_ARRAY');
-      return null;
-    }
-    const resultedRows = results.rows.map((item) => {
-      return {
-        id: item.id,
-        studentId: item.studentId,
-        labTaskId: item.labTaskId,
-      };
-    });
-    results.rows = resultedRows;
-    return results;
-  });
-}

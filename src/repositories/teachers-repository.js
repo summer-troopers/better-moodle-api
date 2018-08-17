@@ -2,8 +2,7 @@
 
 const errors = require('@feathersjs/errors');
 const { Op } = require('sequelize');
-const { buildIncludes } = require('../helpers/util');
-const logger = require('../services/winston/logger');
+const { handleId } = require('../helpers/util');
 
 module.exports = function createTeacherRepository(connection) {
   const {
@@ -14,7 +13,29 @@ module.exports = function createTeacherRepository(connection) {
     LabReport,
     LabTask,
     Teacher,
+    LabComment,
   } = connection.models;
+
+  const projector = (item) => {
+    return {
+      id: item.id,
+      firstName: item.firstName,
+      lastName: item.lastName,
+      phoneNumber: item.phoneNumber,
+      email: item.email,
+      groupId: item.groupId,
+    };
+  };
+
+  const queryParamsBindings = {
+    labCommentId: [LabReport, LabComment],
+    labReportId: [LabReport],
+    groupId: [Group],
+    courseId: [Group, Specialty, Course],
+    specialtyId: [Group, Specialty],
+    taskId: [LabReport, LabTask],
+    teacherId: [LabReport, LabTask, Teacher],
+  };
 
   async function list(queryParams) {
     const {
@@ -36,12 +57,7 @@ module.exports = function createTeacherRepository(connection) {
       },
     };
 
-    let response = null;
-
-    const incomingParamKeys = Object.keys(queryParams);
-    const incomingParamValues = Object.values(queryParams);
-
-    response = handleId(incomingParamValues[0], response, Teacher, filter, getModels(incomingParamKeys[0]));
+    const response = handleId(queryParams, Group, filter, queryParamsBindings, projector);
 
     if (response) {
       return response;
@@ -99,38 +115,4 @@ module.exports = function createTeacherRepository(connection) {
     remove,
     exists,
   };
-
-  function getModels(key) {
-    const keys = ['courseId', 'specialtyId', 'groupId', 'studentId', 'laboratoryId', 'taskId'];
-    const models = [Course, Specialty, Group, Student, LabReport, LabTask];
-    const i = keys.findIndex(itKey => key === itKey);
-    return models.slice(0, i + 1);
-  }
 };
-
-function handleId(queryParamId, response, Teacher, filter, models) {
-  if (!queryParamId) return null;
-  const query = {
-    ...filter,
-    subQuery: false,
-    ...buildIncludes(queryParamId, models),
-  };
-  response = Teacher.findAndCountAll(query);
-  return response.then((results) => {
-    if (!Array.isArray(results.rows)) {
-      logger.error('NOT_AN_ARRAY');
-      return null;
-    }
-    const resultedRows = results.rows.map((item) => {
-      return {
-        id: item.id,
-        firstName: item.firstName,
-        lastName: item.lastName,
-        email: item.email,
-        phoneNumber: item.phoneNumber,
-      };
-    });
-    results.rows = resultedRows;
-    return results;
-  });
-}

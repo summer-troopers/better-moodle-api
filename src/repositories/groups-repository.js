@@ -2,7 +2,7 @@
 
 const { Op } = require('sequelize');
 const errors = require('@feathersjs/errors');
-const { handleId } = require('../helpers/util');
+const { handleId, getDependentData, projectDatabaseResponse } = require('../helpers/util');
 
 module.exports = function createGroupsRepository(sequelize) {
   const {
@@ -20,6 +20,8 @@ module.exports = function createGroupsRepository(sequelize) {
     return {
       id: item.id,
       name: item.name,
+      specialtyId: item.specialtyId,
+      specialty: item.specialty,
     };
   };
 
@@ -28,12 +30,13 @@ module.exports = function createGroupsRepository(sequelize) {
     courseId: [Specialty, Course],
     teacherId: [Specialty, Course, Teacher],
     studentId: [Student],
-    laboratoryId: [Student, LabReport],
+    labReportId: [Student, LabReport],
     taskId: [Student, LabReport, LabTask],
     labCommentId: [Student, LabReport, LabComment],
   };
 
-  function list(queryParams) {
+  // eslint-disable-next-line complexity
+  async function list(queryParams) {
     const {
       limit,
       offset,
@@ -50,12 +53,13 @@ module.exports = function createGroupsRepository(sequelize) {
       },
     };
 
-    const response = handleId(queryParams, Group, filter, queryParamsBindings, projector);
+    let groups = await handleId(queryParams, Group, filter, queryParamsBindings, projector);
 
-    if (response) {
-      return response;
-    }
-    return Group.findAndCountAll(filter);
+    if (!groups) groups = await Group.findAndCountAll(filter);
+
+    const response = getDependentData(groups, Specialty);
+
+    return projectDatabaseResponse(response, projector);
   }
 
   async function view(id) {
@@ -63,7 +67,7 @@ module.exports = function createGroupsRepository(sequelize) {
   }
 
   async function add(form) {
-    const specialty = Specialty.findById(form.specialtyId);
+    const specialty = await Specialty.findById(form.specialtyId);
     if (!specialty) throw new errors.NotFound('SPECIALTY_NOT_FOUND');
 
     return Group.create(form);
@@ -76,7 +80,7 @@ module.exports = function createGroupsRepository(sequelize) {
   }
 
   async function update(id, form) {
-    const specialty = Specialty.findById(form.specialtyId);
+    const specialty = await Specialty.findById(form.specialtyId);
     if (!specialty) throw new errors.NotFound('SPECIALTY_NOT_FOUND');
 
     return Group.update(form, {

@@ -29,7 +29,7 @@ module.exports = function createCoursesRepository(sequelize) {
     studentId: [Specialty, Group, Student],
     teacherId: [Teacher],
     taskId: [Teacher, LabTask],
-    laboratoryId: [Teacher, LabTask, LabReport],
+    labReportId: [Teacher, LabTask, LabReport],
     labCommentId: [Teacher, LabTask, LabReport, LabComment],
   };
 
@@ -50,11 +50,7 @@ module.exports = function createCoursesRepository(sequelize) {
       },
     };
 
-    const incomingParamKeys = Object.keys(queryParams);
-    const incomingParamValues = Object.values(queryParams);
-    const modelChain = queryParamsBindings[incomingParamKeys[0]];
-
-    const response = handleId(incomingParamValues[0], Course, filter, modelChain, projector);
+    const response = handleId(queryParams, Course, filter, queryParamsBindings, projector);
 
     if (response) {
       return response;
@@ -108,7 +104,7 @@ module.exports = function createCoursesRepository(sequelize) {
     if (queryParams.teacherId) {
       return CourseTeacher.destroy({
         where: {
-          id,
+          courseId: id,
           teacherId: queryParams.teacherId,
         },
       });

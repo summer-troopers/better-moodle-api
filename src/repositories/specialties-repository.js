@@ -2,8 +2,7 @@
 
 const { Op } = require('sequelize');
 const errors = require('@feathersjs/errors');
-const { buildIncludes } = require('../helpers/util');
-const logger = require('../services/winston/logger');
+const { handleId } = require('../helpers/util');
 
 module.exports = function createSpecialtiesRepository(sequelize) {
   const {
@@ -14,7 +13,25 @@ module.exports = function createSpecialtiesRepository(sequelize) {
     Student,
     LabReport,
     LabTask,
+    LabComment,
   } = sequelize.models;
+
+  const projector = (item) => {
+    return {
+      id: item.id,
+      name: item.name,
+    };
+  };
+
+  const queryParamsBindings = {
+    courseId: [Course],
+    teacherId: [Specialty, Course, Teacher],
+    groupId: [Group],
+    studentId: [Group, Student],
+    labReportId: [Group, Student, LabReport],
+    taskId: [Group, Student, LabReport, LabTask],
+    labCommentId: [Group, Student, LabReport, LabComment],
+  };
 
   async function list(queryParams) {
     const {
@@ -33,12 +50,8 @@ module.exports = function createSpecialtiesRepository(sequelize) {
       },
     };
 
-    let response = null;
+    const response = handleId(queryParams, Specialty, filter, queryParamsBindings, projector);
 
-    const incomingParamKeys = Object.keys(queryParams);
-    const incomingParamValues = Object.values(queryParams);
-
-    response = handleId(incomingParamValues[0], response, Specialty, filter, getModels(incomingParamKeys[0]));
 
     if (response) {
       return response;
@@ -94,35 +107,4 @@ module.exports = function createSpecialtiesRepository(sequelize) {
     remove,
     exists,
   };
-
-  function getModels(key) {
-    const keys = ['courseId', 'teacherId', 'taskId', 'laboratoryId', 'studentId', 'groupId'];
-    const models = [Course, Teacher, LabTask, LabReport, Student, Group];
-    const i = keys.findIndex(itKey => key === itKey);
-    return models.slice(0, i + 1);
-  }
 };
-
-function handleId(queryParamId, response, Specialty, filter, models) {
-  if (!queryParamId) return null;
-  const query = {
-    ...filter,
-    subQuery: false,
-    ...buildIncludes(queryParamId, models),
-  };
-  response = Specialty.findAndCountAll(query);
-  return response.then((results) => {
-    if (!Array.isArray(results.rows)) {
-      logger.error('NOT_AN_ARRAY');
-      return null;
-    }
-    const resultedRows = results.rows.map((item) => {
-      return {
-        id: item.id,
-        name: item.name,
-      };
-    });
-    results.rows = resultedRows;
-    return results;
-  });
-}
