@@ -2,7 +2,7 @@
 
 const errors = require('@feathersjs/errors');
 const { Op } = require('sequelize');
-const { buildIncludes } = require('../helpers/util');
+const { handleId, projectDatabaseResponse } = require('../helpers/util');
 
 module.exports = function createTeacherRepository(connection) {
   const {
@@ -13,7 +13,29 @@ module.exports = function createTeacherRepository(connection) {
     LabReport,
     LabTask,
     Teacher,
+    LabComment,
   } = connection.models;
+
+  const projector = (item) => {
+    return {
+      id: item.id,
+      firstName: item.firstName,
+      lastName: item.lastName,
+      phoneNumber: item.phoneNumber,
+      email: item.email,
+      groupId: item.groupId,
+    };
+  };
+
+  const queryParamsBindings = {
+    taskId: [LabTask],
+    labReportId: [LabTask, LabReport],
+    labCommentId: [LabTask, LabReport, LabComment],
+    courseId: [Course],
+    specialtyId: [Course, Specialty],
+    groupId: [Course, Specialty, Group],
+    studentId: [Course, Specialty, Group, Student],
+  };
 
   async function list(queryParams) {
     const {
@@ -35,17 +57,11 @@ module.exports = function createTeacherRepository(connection) {
       },
     };
 
-    let response = null;
+    let response = await handleId(queryParams, Teacher, filter, queryParamsBindings);
 
-    const incomingParamKeys = Object.keys(queryParams);
-    const incomingParamValues = Object.values(queryParams);
+    if (response) response = await Teacher.findAndCountAll(filter);
 
-    response = handleId(incomingParamValues[0], response, Teacher, filter, getModels(incomingParamKeys[0]));
-
-    if (response) {
-      return response;
-    }
-    return Teacher.findAndCountAll(filter);
+    return projectDatabaseResponse(response, projector);
   }
 
   async function view(id) {
@@ -98,24 +114,4 @@ module.exports = function createTeacherRepository(connection) {
     remove,
     exists,
   };
-
-  function getModels(key) {
-    const keys = ['courseId', 'specialtyId', 'groupId', 'studentId', 'laboratoryId', 'taskId'];
-    const models = [Course, Specialty, Group, Student, LabReport, LabTask];
-    const i = keys.findIndex(itKey => key === itKey);
-    return models.slice(0, i + 1);
-  }
 };
-
-function handleId(queryParamId, response, Teacher, filter, models) {
-  if (queryParamId) {
-    const query = {
-      ...filter,
-      raw: true,
-      subQuery: false,
-      ...buildIncludes(queryParamId, models),
-    };
-    response = Teacher.findAndCountAll(query);
-  }
-  return response;
-}

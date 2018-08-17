@@ -2,7 +2,7 @@
 
 const errors = require('@feathersjs/errors');
 const { Op } = require('sequelize');
-const { buildIncludes } = require('../helpers/util');
+const { handleId, projectDatabaseResponse } = require('../helpers/util');
 
 module.exports = function createCoursesRepository(sequelize) {
   const {
@@ -13,7 +13,25 @@ module.exports = function createCoursesRepository(sequelize) {
     Student,
     LabReport,
     LabTask,
+    LabComment,
   } = sequelize.models;
+
+  const projector = (item) => {
+    return {
+      id: item.id,
+      name: item.name,
+    };
+  };
+
+  const queryParamsBindings = {
+    specialtyId: [Specialty],
+    groupId: [Specialty, Group],
+    studentId: [Specialty, Group, Student],
+    teacherId: [Teacher],
+    taskId: [Teacher, LabTask],
+    labReportId: [Teacher, LabTask, LabReport],
+    labCommentId: [Teacher, LabTask, LabReport, LabComment],
+  };
 
   async function list(queryParams) {
     const {
@@ -32,17 +50,11 @@ module.exports = function createCoursesRepository(sequelize) {
       },
     };
 
-    let response = null;
+    let response = await handleId(queryParams, Course, filter, queryParamsBindings);
 
-    const incomingParamKeys = Object.keys(queryParams);
-    const incomingParamValues = Object.values(queryParams);
+    if (!response) response = await Course.findAndCountAll(filter);
 
-    response = handleId(incomingParamValues[0], response, Course, filter, getModels(incomingParamKeys[0]));
-
-    if (response) {
-      return response;
-    }
-    return Course.findAndCountAll(filter);
+    return projectDatabaseResponse(response, projector);
   }
 
   async function view(id) {
@@ -91,7 +103,7 @@ module.exports = function createCoursesRepository(sequelize) {
     if (queryParams.teacherId) {
       return CourseTeacher.destroy({
         where: {
-          id,
+          courseId: id,
           teacherId: queryParams.teacherId,
         },
       });
@@ -117,24 +129,4 @@ module.exports = function createCoursesRepository(sequelize) {
     remove,
     exists,
   };
-
-  function getModels(key) {
-    const keys = ['specialtyId', 'groupId', 'studentId', 'laboratoryId', 'taskId', 'teacherId'];
-    const models = [Specialty, Group, Student, LabReport, LabTask, Teacher];
-    const i = keys.findIndex(itKey => key === itKey);
-    return models.slice(0, i + 1);
-  }
 };
-
-function handleId(queryParamId, response, Course, filter, models) {
-  if (queryParamId) {
-    const query = {
-      ...filter,
-      raw: true,
-      subQuery: false,
-      ...buildIncludes(queryParamId, models),
-    };
-    response = Course.findAndCountAll(query);
-  }
-  return response;
-}

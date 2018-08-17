@@ -2,7 +2,7 @@
 
 const errors = require('@feathersjs/errors');
 const { Op } = require('sequelize');
-const { buildIncludes } = require('../helpers/util');
+const { handleId, appendDependentData, projectDatabaseResponse } = require('../helpers/util');
 
 module.exports = function createStudentsRepository(connection) {
   const {
@@ -13,8 +13,32 @@ module.exports = function createStudentsRepository(connection) {
     Teacher,
     LabReport,
     LabTask,
+    LabComment,
   } = connection.models;
 
+  const projector = (item) => {
+    return {
+      id: item.id,
+      firstName: item.firstName,
+      lastName: item.lastName,
+      phoneNumber: item.phoneNumber,
+      email: item.email,
+      groupId: item.groupId,
+      group: item.group,
+    };
+  };
+
+  const queryParamsBindings = {
+    labCommentId: [LabReport, LabComment],
+    labReportId: [LabReport],
+    groupId: [Group],
+    courseId: [Group, Specialty, Course],
+    specialtyId: [Group, Specialty],
+    taskId: [LabReport, LabTask],
+    teacherId: [LabReport, LabTask, Teacher],
+  };
+
+  // eslint-disable-next-line complexity
   async function list(queryParams) {
     const {
       limit,
@@ -35,25 +59,22 @@ module.exports = function createStudentsRepository(connection) {
       },
     };
 
-    let response = null;
+    let students = await handleId(queryParams, Student, filter, queryParamsBindings, projector);
 
-    const incomingParamKeys = Object.keys(queryParams);
-    const incomingParamValues = Object.values(queryParams);
+    if (!students) students = await Student.findAndCountAll(filter);
 
-    response = handleId(incomingParamValues[0], response, Student, filter, getModels(incomingParamKeys[0]));
+    await appendDependentData(students, Group);
 
-    if (response) {
-      return response;
-    }
-    return Student.findAndCountAll(filter);
+    return projectDatabaseResponse(students, projector);
   }
+
 
   async function view(id) {
     return Student.findById(id);
   }
 
   async function add(form) {
-    const group = Group.findById(form.groupId);
+    const group = await Group.findById(form.groupId);
     if (!group) throw new errors.NotFound('GROUP_NOT_FOUND');
 
     return Student.create(form);
@@ -66,7 +87,7 @@ module.exports = function createStudentsRepository(connection) {
   }
 
   async function update(id, form) {
-    const group = Group.findById(form.groupId);
+    const group = await Group.findById(form.groupId);
     if (!group) throw new errors.NotFound('GROUP_NOT_FOUND');
 
     return Student.update(form, {
@@ -88,24 +109,4 @@ module.exports = function createStudentsRepository(connection) {
     remove,
     exists,
   };
-
-  function getModels(key) {
-    const keys = ['groupId', 'specialtyId', 'courseId', 'teacherId', 'taskId', 'laboratoryId'];
-    const models = [Group, Specialty, Course, Teacher, LabTask, LabReport];
-    const i = keys.findIndex(itKey => key === itKey);
-    return models.slice(0, i + 1);
-  }
 };
-
-function handleId(queryParamId, response, Student, filter, models) {
-  if (queryParamId) {
-    const query = {
-      ...filter,
-      raw: true,
-      subQuery: false,
-      ...buildIncludes(queryParamId, models),
-    };
-    response = Student.findAndCountAll(query);
-  }
-  return response;
-}

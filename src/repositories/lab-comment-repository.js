@@ -2,13 +2,41 @@
 
 const errors = require('@feathersjs/errors');
 const { Op } = require('sequelize');
-const { buildIncludes } = require('../helpers/util');
+const { handleId, appendDependentData, projectDatabaseResponse } = require('../helpers/util');
 
 module.exports = function createCommentRepository(connection) {
   const {
+    Group,
+    Specialty,
+    Course,
+    Teacher,
+    Student,
     LabComment,
+    LabTask,
     LabReport,
   } = connection.models;
+
+  const projector = (item) => {
+    return {
+      id: item.id,
+      labReportId: item.labReportId,
+      teacherComment: item.teacherComment,
+      mark: item.mark,
+      createdAt: item.createdAt,
+      updatedAt: item.updatedAt,
+      labReport: item.labReport,
+    };
+  };
+
+  const queryParamsBindings = {
+    labReportId: [LabReport],
+    studentId: [LabReport, Student],
+    groupId: [LabReport, Student, Group],
+    specialtyId: [LabReport, Student, Group, Specialty],
+    courseId: [LabReport, LabTask, Course],
+    teacherId: [LabReport, LabTask, Teacher],
+    taskId: [LabReport, LabTask],
+  };
 
   async function list(queryParams) {
     const {
@@ -21,17 +49,13 @@ module.exports = function createCommentRepository(connection) {
       offset,
     };
 
-    let response = null;
+    let labComments = await handleId(queryParams, LabComment, filter, queryParamsBindings, projector);
 
-    const incomingParamKeys = Object.keys(queryParams);
-    const incomingParamValues = Object.values(queryParams);
+    if (!labComments) labComments = await LabComment.findAndCountAll(filter);
 
-    response = handleId(incomingParamValues[0], response, LabComment, filter, getModels(incomingParamKeys[0]));
+    await appendDependentData(labComments, LabReport);
 
-    if (response) {
-      return response;
-    }
-    return LabComment.findAndCountAll(filter);
+    return projectDatabaseResponse(labComments, projector);
   }
 
   async function view(id) {
@@ -74,24 +98,4 @@ module.exports = function createCommentRepository(connection) {
     remove,
     exists,
   };
-
-  function getModels(key) {
-    const keys = ['laboratoryId'];
-    const models = [LabReport];
-    const i = keys.findIndex(itKey => key === itKey);
-    return models.slice(0, i + 1);
-  }
 };
-
-function handleId(queryParamId, response, LabComment, filter, models) {
-  if (queryParamId) {
-    const query = {
-      ...filter,
-      raw: true,
-      subQuery: false,
-      ...buildIncludes(queryParamId, models),
-    };
-    response = LabComment.findAndCountAll(query);
-  }
-  return response;
-}

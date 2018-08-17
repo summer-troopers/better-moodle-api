@@ -2,7 +2,7 @@
 
 const { Op } = require('sequelize');
 const errors = require('@feathersjs/errors');
-const { buildIncludes } = require('../helpers/util');
+const { handleId, projectDatabaseResponse } = require('../helpers/util');
 
 module.exports = function createSpecialtiesRepository(sequelize) {
   const {
@@ -13,7 +13,18 @@ module.exports = function createSpecialtiesRepository(sequelize) {
     Student,
     LabReport,
     LabTask,
+    LabComment,
   } = sequelize.models;
+
+  const queryParamsBindings = {
+    courseId: [Course],
+    teacherId: [Course, Teacher],
+    groupId: [Group],
+    studentId: [Group, Student],
+    labReportId: [Group, Student, LabReport],
+    taskId: [Group, Student, LabReport, LabTask],
+    labCommentId: [Group, Student, LabReport, LabComment],
+  };
 
   async function list(queryParams) {
     const {
@@ -32,17 +43,11 @@ module.exports = function createSpecialtiesRepository(sequelize) {
       },
     };
 
-    let response = null;
+    let response = await handleId(queryParams, Specialty, filter, queryParamsBindings);
 
-    const incomingParamKeys = Object.keys(queryParams);
-    const incomingParamValues = Object.values(queryParams);
+    if (!response) response = await Specialty.findAndCountAll(filter);
 
-    response = handleId(incomingParamValues[0], response, Specialty, filter, getModels(incomingParamKeys[0]));
-
-    if (response) {
-      return response;
-    }
-    return Specialty.findAndCountAll(filter);
+    return projectDatabaseResponse(response, projector);
   }
 
   async function view(id) {
@@ -93,24 +98,4 @@ module.exports = function createSpecialtiesRepository(sequelize) {
     remove,
     exists,
   };
-
-  function getModels(key) {
-    const keys = ['courseId', 'teacherId', 'taskId', 'laboratoryId', 'studentId', 'groupId'];
-    const models = [Course, Teacher, LabTask, LabReport, Student, Group];
-    const i = keys.findIndex(itKey => key === itKey);
-    return models.slice(0, i + 1);
-  }
 };
-
-function handleId(queryParamId, response, Specialty, filter, models) {
-  if (queryParamId) {
-    const query = {
-      ...filter,
-      raw: true,
-      subQuery: false,
-      ...buildIncludes(queryParamId, models),
-    };
-    response = Specialty.findAndCountAll(query);
-  }
-  return response;
-}
