@@ -92,6 +92,20 @@ function handleId(queryParamId, response, LabComment, filter, models) {
       ...buildIncludes(queryParamId, models),
     };
     response = LabComment.findAndCountAll(query);
+    return response.then((results) => {
+      const x = results.rows.map((item) => {
+        return {
+          id: item.id,
+          labReportId: item.labReportId,
+          teacherComment: item.teacherComment,
+          mark: item.mark,
+          createdAt: item.createdAt,
+          updatedAt: item.updatedAt,
+        };
+      });
+      results.rows = x;
+      return results;
+    });
   }
-  return response;
+  return LabComment.findAndCountAll(query);
 }

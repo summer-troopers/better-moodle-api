@@ -116,7 +116,7 @@ function handleId(queryParamId, response, Teacher, filter, models) {
     };
     response = Teacher.findAndCountAll(query);
     return response.then((results) => {
-      const x = results.rows.map((item) => {
+      const resultedRows = results.rows.map((item) => {
         return {
           id: item.id,
           firstName: item.firstName,
@@ -125,7 +125,7 @@ function handleId(queryParamId, response, Teacher, filter, models) {
           phoneNumber: item.phoneNumber,
         };
       });
-      results.rows = x;
+      results.rows = resultedRows;
       return results;
     });
   }

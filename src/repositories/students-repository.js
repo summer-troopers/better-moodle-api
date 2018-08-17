@@ -106,7 +106,7 @@ function handleId(queryParamId, response, Student, filter, models) {
     };
     response = Student.findAndCountAll(query);
     return response.then((results) => {
-      const x = results.rows.map((item) => {
+      const resultedRows = results.rows.map((item) => {
         return {
           id: item.id,
           firstName: item.firstName,
@@ -116,7 +116,7 @@ function handleId(queryParamId, response, Student, filter, models) {
           groupId: item.groupId,
         };
       });
-      results.rows = x;
+      results.rows = resultedRows;
       return results;
     });
   }
