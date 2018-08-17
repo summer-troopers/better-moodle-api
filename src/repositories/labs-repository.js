@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const Grid = require('gridfs-stream');
 const { buildIncludes } = require('../helpers/util');
+const logger = require('../services/winston/logger');
 
 module.exports = function createLabsRepository(connection) {
   const gfs = Grid(connection.db, mongoose.mongo);

@@ -1,5 +1,7 @@
 'use strict';
 
+const logger = require('../services/winston/logger');
+
 function createMessage(to, from, subject, text) {
   const message = {
     to,
@@ -38,6 +40,25 @@ function createPermissions(permissions) {
   };
 }
 
+function handleId(queryParamId, Model, filter, models, projector) {
+  if (!queryParamId) return null;
+  const query = {
+    ...filter,
+    subQuery: false,
+    ...buildIncludes(queryParamId, models),
+  };
+  return Model.findAndCountAll(query)
+    .then((results) => {
+      if (!Array.isArray(results.rows)) {
+        logger.error('NOT_AN_ARRAY');
+        return null;
+      }
+      const resultedRows = results.rows.map(projector);
+      results.rows = resultedRows;
+      return results;
+    });
+}
+
 function buildIncludes(param, models) {
   models.reverse();
   return models.reduce((accumulator, model, index) => {
@@ -67,4 +88,5 @@ module.exports = {
   createMessage,
   permissions: createPermissions,
   buildIncludes,
+  handleId,
 };

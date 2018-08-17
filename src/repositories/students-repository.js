@@ -3,6 +3,7 @@
 const errors = require('@feathersjs/errors');
 const { Op } = require('sequelize');
 const { buildIncludes } = require('../helpers/util');
+const logger = require('../services/winston/logger');
 
 module.exports = function createStudentsRepository(connection) {
   const {
