@@ -83,7 +83,7 @@ function handleId(queryParamId, response, LabReport, filter, models) {
     subQuery: false,
     ...buildIncludes(queryParamId, models),
   };
-  response = Labreport.findAndCountAll(query);
+  response = LabReport.findAndCountAll(query);
   return response.then((results) => {
     if (!Array.isArray(results.rows)) {
       logger.error('NOT_AN_ARRAY');
@@ -94,7 +94,6 @@ function handleId(queryParamId, response, LabReport, filter, models) {
         id: item.id,
         studentId: item.studentId,
         labTaskId: item.labTaskId,
-        mongoFileId: item.mongoFileId,
       };
     });
     results.rows = resultedRows;
