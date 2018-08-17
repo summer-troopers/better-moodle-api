@@ -2,7 +2,7 @@
 
 const errors = require('@feathersjs/errors');
 const { Op } = require('sequelize');
-const { handleId } = require('../helpers/util');
+const { handleId, projectDatabaseResponse } = require('../helpers/util');
 
 module.exports = function createTeacherRepository(connection) {
   const {
@@ -28,13 +28,13 @@ module.exports = function createTeacherRepository(connection) {
   };
 
   const queryParamsBindings = {
-    labCommentId: [LabReport, LabComment],
-    labReportId: [LabReport],
-    groupId: [Group],
-    courseId: [Group, Specialty, Course],
-    specialtyId: [Group, Specialty],
-    taskId: [LabReport, LabTask],
-    teacherId: [LabReport, LabTask, Teacher],
+    taskId: [LabTask],
+    labReportId: [LabTask, LabReport],
+    labCommentId: [LabTask, LabReport, LabComment],
+    courseId: [Course],
+    specialtyId: [Course, Specialty],
+    groupId: [Course, Specialty, Group],
+    studentId: [Course, Specialty, Group, Student],
   };
 
   async function list(queryParams) {
@@ -57,12 +57,11 @@ module.exports = function createTeacherRepository(connection) {
       },
     };
 
-    const response = handleId(queryParams, Group, filter, queryParamsBindings, projector);
+    let response = await handleId(queryParams, Teacher, filter, queryParamsBindings);
 
-    if (response) {
-      return response;
-    }
-    return Teacher.findAndCountAll(filter);
+    if (response) response = await Teacher.findAndCountAll(filter);
+
+    return projectDatabaseResponse(response, projector);
   }
 
   async function view(id) {

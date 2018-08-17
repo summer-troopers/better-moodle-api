@@ -33,8 +33,8 @@ module.exports = function createCommentRepository(connection) {
     studentId: [LabReport, Student],
     groupId: [LabReport, Student, Group],
     specialtyId: [LabReport, Student, Group, Specialty],
-    courseId: [LabReport, Student, Group, Specialty, Course],
-    teacherId: [LabReport, Student, Group, Specialty, Course, Teacher],
+    courseId: [LabReport, LabTask, Course],
+    teacherId: [LabReport, LabTask, Teacher],
     taskId: [LabReport, LabTask],
   };
 

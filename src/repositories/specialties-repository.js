@@ -2,7 +2,7 @@
 
 const { Op } = require('sequelize');
 const errors = require('@feathersjs/errors');
-const { handleId } = require('../helpers/util');
+const { handleId, projectDatabaseResponse } = require('../helpers/util');
 
 module.exports = function createSpecialtiesRepository(sequelize) {
   const {
@@ -16,16 +16,9 @@ module.exports = function createSpecialtiesRepository(sequelize) {
     LabComment,
   } = sequelize.models;
 
-  const projector = (item) => {
-    return {
-      id: item.id,
-      name: item.name,
-    };
-  };
-
   const queryParamsBindings = {
     courseId: [Course],
-    teacherId: [Specialty, Course, Teacher],
+    teacherId: [Course, Teacher],
     groupId: [Group],
     studentId: [Group, Student],
     labReportId: [Group, Student, LabReport],
@@ -50,13 +43,11 @@ module.exports = function createSpecialtiesRepository(sequelize) {
       },
     };
 
-    const response = handleId(queryParams, Specialty, filter, queryParamsBindings, projector);
+    let response = await handleId(queryParams, Specialty, filter, queryParamsBindings);
 
+    if (!response) response = await Specialty.findAndCountAll(filter);
 
-    if (response) {
-      return response;
-    }
-    return Specialty.findAndCountAll(filter);
+    return projectDatabaseResponse(response, projector);
   }
 
   async function view(id) {

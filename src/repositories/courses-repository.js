@@ -2,7 +2,7 @@
 
 const errors = require('@feathersjs/errors');
 const { Op } = require('sequelize');
-const { handleId } = require('../helpers/util');
+const { handleId, projectDatabaseResponse } = require('../helpers/util');
 
 module.exports = function createCoursesRepository(sequelize) {
   const {
@@ -50,12 +50,11 @@ module.exports = function createCoursesRepository(sequelize) {
       },
     };
 
-    const response = handleId(queryParams, Course, filter, queryParamsBindings, projector);
+    let response = await handleId(queryParams, Course, filter, queryParamsBindings);
 
-    if (response) {
-      return response;
-    }
-    return Course.findAndCountAll(filter);
+    if (!response) response = await Course.findAndCountAll(filter);
+
+    return projectDatabaseResponse(response, projector);
   }
 
   async function view(id) {
