@@ -95,7 +95,6 @@ function buildIncludes(param, modelsArg) {
     if (index === 0) {
       accumulator.include = [{
         model,
-        attributes: ['id'],
         required: true,
         where: {
           id: param,
@@ -106,7 +105,6 @@ function buildIncludes(param, modelsArg) {
 
     accumulator.include = [{
       model,
-      attributes: ['id'],
       required: true,
       include: accumulator.include,
     }];
