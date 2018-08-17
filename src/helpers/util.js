@@ -41,7 +41,7 @@ function createPermissions(permissions) {
   };
 }
 
-function handleId(queryParams, Model, filter, queryParamsBindings, projector) {
+function handleId(queryParams, Model, filter, queryParamsBindings) {
   if (!queryParams) return null;
 
   const incomingParamKeys = Object.keys(queryParams);
@@ -94,6 +94,7 @@ function buildIncludes(param, models) {
     if (index === 0) {
       accumulator.include = [{
         model,
+        attributes: ['id'],
         required: true,
         where: {
           id: param,
@@ -104,6 +105,7 @@ function buildIncludes(param, models) {
 
     accumulator.include = [{
       model,
+      attributes: ['id'],
       required: true,
       include: accumulator.include,
     }];

@@ -85,3 +85,30 @@ module.exports = function createLabsRepository(connection) {
     remove,
   };
 };
+<<<<<<< HEAD
+=======
+
+function handleId(queryParamId, response, LabReport, filter, models) {
+  if (queryParamId) {
+    const query = {
+      ...filter,
+      subQuery: false,
+      ...buildIncludes(queryParamId, models),
+    };
+    response = LabReport.findAndCountAll(query);
+    return response.then((results) => {
+      const x = results.rows.map((item) => {
+        return {
+          id: item.id,
+          studentId: item.studentId,
+          labTaskId: item.labTaskId,
+          mongoFileId: item.mongoFileId,
+        };
+      });
+      results.rows = x;
+      return results;
+    });
+  }
+  return LabReport.findAndCountAll(query);
+}
+>>>>>>> removed extra properties from conditioned view of models
