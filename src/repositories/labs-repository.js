@@ -3,11 +3,15 @@
 const mongoose = require('mongoose');
 const Grid = require('gridfs-stream');
 <<<<<<< HEAD
+<<<<<<< HEAD
 const { handleId } = require('../helpers/util');
 =======
 const { buildIncludes } = require('../helpers/util');
 const logger = require('../services/winston/logger');
 >>>>>>> moved generic function handleId from repositories to util
+=======
+const { handleId } = require('../helpers/util');
+>>>>>>> refactored generic functions in repository, added connection to tables with oneToMany bindings(labComment, student and group)
 
 module.exports = function createLabsRepository(connection) {
   const gfs = Grid(connection.db, mongoose.mongo);
@@ -91,6 +95,7 @@ module.exports = function createLabsRepository(connection) {
   };
 };
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 
 function handleId(queryParamId, response, LabReport, filter, models) {
@@ -118,3 +123,5 @@ function handleId(queryParamId, response, LabReport, filter, models) {
   });
 }
 >>>>>>> removed extra properties from conditioned view of models
+=======
+>>>>>>> refactored generic functions in repository, added connection to tables with oneToMany bindings(labComment, student and group)
