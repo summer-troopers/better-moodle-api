@@ -44,15 +44,15 @@ describe('util', () => {
         include: [{
           model: 'Student',
           required: true,
-          attributes: ["id"],
+          attributes: ['id'],
           include: [{
             model: 'Group',
             required: true,
-            attributes: ["id"],
+            attributes: ['id'],
             include: [{
               model: 'Specialty',
               required: true,
-              attributes: ["id"],
+              attributes: ['id'],
               where: {
                 id: param,
               },
