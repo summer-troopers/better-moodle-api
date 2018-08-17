@@ -50,11 +50,7 @@ module.exports = function createGroupsRepository(sequelize) {
       },
     };
 
-    const incomingParamKeys = Object.keys(queryParams);
-    const incomingParamValues = Object.values(queryParams);
-    const modelChain = queryParamsBindings[incomingParamKeys[0]];
-
-    const response = handleId(incomingParamValues[0], Group, filter, modelChain, projector);
+    const response = handleId(queryParams, Group, filter, queryParamsBindings, projector);
 
     if (response) {
       return response;

@@ -1,5 +1,6 @@
 'use strict';
 
+const errors = require('@feathersjs/errors');
 const logger = require('../services/winston/logger');
 
 function createMessage(to, from, subject, text) {
@@ -40,22 +41,31 @@ function createPermissions(permissions) {
   };
 }
 
-function handleId(queryParamId, Model, filter, models, projector) {
-  if (!queryParamId) return null;
+function handleId(queryParams, Model, filter, queryParamsBindings, projector) {
+  if (!queryParams) return null;
+
+  const incomingParamKeys = Object.keys(queryParams);
+  const incomingParamValues = Object.values(queryParams);
+
+  const modelChain = queryParamsBindings[incomingParamKeys[0]];
+  const queryParamId = incomingParamValues[0];
+
   const query = {
     ...filter,
     subQuery: false,
-    ...buildIncludes(queryParamId, models),
+    ...buildIncludes(queryParamId, modelChain),
   };
   return Model.findAndCountAll(query)
     .then((results) => {
       if (!Array.isArray(results.rows)) {
         logger.error('NOT_AN_ARRAY');
-        return null;
+        throw new errors.GeneralError('NOT_AN_ARRAY');
       }
-      const resultedRows = results.rows.map(projector);
-      results.rows = resultedRows;
-      return results;
+      const newRows = results.rows.map(projector);
+      return {
+        count: results.count,
+        rows: newRows,
+      };
     });
 }
 
