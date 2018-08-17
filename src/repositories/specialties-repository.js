@@ -106,11 +106,20 @@ function handleId(queryParamId, response, Specialty, filter, models) {
   if (queryParamId) {
     const query = {
       ...filter,
-      raw: true,
       subQuery: false,
       ...buildIncludes(queryParamId, models),
     };
     response = Specialty.findAndCountAll(query);
+    return response.then((results) => {
+      const x = results.rows.map((item) => {
+        return {
+          id: item.id,
+          name: item.name,
+        };
+      });
+      results.rows = x;
+      return results;
+    });
   }
-  return response;
+  return Specialty.findAndCountAll();
 }

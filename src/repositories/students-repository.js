@@ -101,11 +101,24 @@ function handleId(queryParamId, response, Student, filter, models) {
   if (queryParamId) {
     const query = {
       ...filter,
-      raw: true,
       subQuery: false,
       ...buildIncludes(queryParamId, models),
     };
     response = Student.findAndCountAll(query);
+    return response.then((results) => {
+      const x = results.rows.map((item) => {
+        return {
+          id: item.id,
+          firstName: item.firstName,
+          lastName: item.lastName,
+          email: item.email,
+          phoneNumber: item.phoneNumber,
+          groupId: item.groupId,
+        };
+      });
+      results.rows = x;
+      return results;
+    });
   }
-  return response;
+  return Student.findAndCountAll();
 }

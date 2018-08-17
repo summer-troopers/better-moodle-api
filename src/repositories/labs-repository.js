@@ -80,11 +80,22 @@ function handleId(queryParamId, response, LabReport, filter, models) {
   if (queryParamId) {
     const query = {
       ...filter,
-      raw: true,
       subQuery: false,
       ...buildIncludes(queryParamId, models),
     };
     response = LabReport.findAndCountAll(query);
+    return response.then((results) => {
+      const x = results.rows.map((item) => {
+        return {
+          id: item.id,
+          studentId: item.studentId,
+          labTaskId: item.labTaskId,
+          mongoFileId: item.mongoFileId,
+        };
+      });
+      results.rows = x;
+      return results;
+    });
   }
-  return response;
+  return LabReport.findAndCountAll(query);
 }

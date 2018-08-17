@@ -130,11 +130,20 @@ function handleId(queryParamId, response, Course, filter, models) {
   if (queryParamId) {
     const query = {
       ...filter,
-      raw: true,
       subQuery: false,
       ...buildIncludes(queryParamId, models),
     };
     response = Course.findAndCountAll(query);
+    return response.then((results) => {
+      const x = results.rows.map((item) => {
+        return {
+          id: item.id,
+          name: item.name,
+        };
+      });
+      results.rows = x;
+      return results;
+    });
   }
-  return response;
+  return Course.findAndCountAll(query);
 }
