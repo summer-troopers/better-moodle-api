@@ -98,10 +98,17 @@ module.exports = function createCommentRepository(connection) {
     });
   }
 
-  function remove(labCommentId) {
-    return LabComment.destroy({
-      where: { id: labCommentId },
-    });
+  async function remove(labCommentId) {
+    try {
+      return await LabComment.destroy({
+        where: { id: labCommentId },
+      });
+    } catch (error) {
+      if (error.name === 'SequelizeForeignKeyConstraintError') {
+        throw new errors.Forbidden('CANNOT_DELETE_COMMENT');
+      }
+      throw error;
+    }
   }
 
   return {

@@ -84,7 +84,7 @@ module.exports = function createSpecialtiesRepository(sequelize) {
     });
   }
 
-  function remove(id, queryParams) {
+  async function remove(id, queryParams) {
     if (queryParams.courseId) {
       return CourseSpecialty.destroy({
         where: {
@@ -94,7 +94,16 @@ module.exports = function createSpecialtiesRepository(sequelize) {
       });
     }
 
-    return Specialty.destroy({ where: { id } });
+    try {
+      return await Specialty.destroy({
+        where: { id },
+      });
+    } catch (error) {
+      if (error.name === 'SequelizeForeignKeyConstraintError') {
+        throw new errors.Forbidden('CANNOT_DELETE_SPECIALTY');
+      }
+      throw error;
+    }
   }
 
   return {

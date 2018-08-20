@@ -142,11 +142,17 @@ module.exports = function createLabTasksRepository(mongoConnection, sqlConnectio
   async function remove(labTaskId) {
     const task = await LabTask.findById(labTaskId);
     await removeFile(task.mongoFileId);
-    return LabTask.destroy({
-      where: {
-        id: labTaskId,
-      },
-    });
+
+    try {
+      return await LabTask.destroy({
+        where: { id: labTaskId },
+      });
+    } catch (error) {
+      if (error.name === 'SequelizeForeignKeyConstraintError') {
+        throw new errors.Forbidden('CANNOT_DELETE_LAB_TASK');
+      }
+      throw error;
+    }
   }
 
   function removeFile(fileId) {

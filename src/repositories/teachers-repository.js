@@ -91,7 +91,7 @@ module.exports = function createTeacherRepository(connection) {
     });
   }
 
-  function remove(id, queryParams) {
+  async function remove(id, queryParams) {
     if (queryParams.courseId) {
       return CourseTeacher.destroy({
         where: {
@@ -101,9 +101,16 @@ module.exports = function createTeacherRepository(connection) {
       });
     }
 
-    return Teacher.destroy({
-      where: { id },
-    });
+    try {
+      return await Teacher.destroy({
+        where: { id },
+      });
+    } catch (error) {
+      if (error.name === 'SequelizeForeignKeyConstraintError') {
+        throw new errors.Forbidden('CANNOT_DELETE_TECHER');
+      }
+      throw error;
+    }
   }
 
   return {

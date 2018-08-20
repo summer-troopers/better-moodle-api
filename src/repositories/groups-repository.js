@@ -99,10 +99,17 @@ module.exports = function createGroupsRepository(sequelize) {
     });
   }
 
-  function remove(id) {
-    return Group.destroy({
-      where: { id },
-    });
+  async function remove(id) {
+    try {
+      return await Group.destroy({
+        where: { id },
+      });
+    } catch (error) {
+      if (error.name === 'SequelizeForeignKeyConstraintError') {
+        throw new errors.Forbidden('CANNOT_DELETE_GROUP');
+      }
+      throw error;
+    }
   }
 
   return {

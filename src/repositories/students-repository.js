@@ -107,10 +107,17 @@ module.exports = function createStudentsRepository(connection) {
     });
   }
 
-  function remove(id) {
-    return Student.destroy({
-      where: { id },
-    });
+  async function remove(id) {
+    try {
+      return await Student.destroy({
+        where: { id },
+      });
+    } catch (error) {
+      if (error.name === 'SequelizeForeignKeyConstraintError') {
+        throw new errors.Forbidden('CANNOT_DELETE_STUDENT');
+      }
+      throw error;
+    }
   }
 
   return {
