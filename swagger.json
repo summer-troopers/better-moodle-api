@@ -755,9 +755,6 @@
           },
           "404": {
             "description": "Laboratory comment not found"
-          },
-          "405": {
-            "description": "Validation exception"
           }
         }
       }
