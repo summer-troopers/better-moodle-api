@@ -112,9 +112,6 @@
             "schema": {
               "type": "string"
             }
-          },
-          "400": {
-            "description": "error"
           }
         }
       },
