@@ -42,7 +42,9 @@ module.exports = function getApp(sqlConnection, mongoConnection) {
   const labReportsRoute = createLabsRoute(labReportsRepository, permissions('crud|r|crud|'), config.labRoutes.labReports);
   const labTasksRoute = createLabsRoute(labTasksRepository, permissions('crud|crud|r|'), config.labRoutes.labTasks);
 
-  app.use(cors());
+  app.use(cors({
+    exposedHeaders: 'Content-Disposition',
+  }));
   app.use(bodyParser.json());
   app.use(bodyParser.urlencoded({ extended: true }));
 
