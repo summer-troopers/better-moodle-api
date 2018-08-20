@@ -59,7 +59,7 @@ module.exports = function createStudentsRepository(connection) {
       },
     };
 
-    let students = await handleId(queryParams, Student, filter, queryParamsBindings, projector);
+    let students = await handleId(queryParams, Student, filter, queryParamsBindings);
 
     if (!students) students = await Student.findAndCountAll(filter);
 

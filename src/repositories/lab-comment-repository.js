@@ -49,7 +49,7 @@ module.exports = function createCommentRepository(connection) {
       offset,
     };
 
-    let labComments = await handleId(queryParams, LabComment, filter, queryParamsBindings, projector);
+    let labComments = await handleId(queryParams, LabComment, filter, queryParamsBindings);
 
     if (!labComments) labComments = await LabComment.findAndCountAll(filter);
 

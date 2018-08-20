@@ -88,7 +88,8 @@ function projectDatabaseResponse(response, projector) {
   };
 }
 
-function buildIncludes(param, models) {
+function buildIncludes(param, modelsArg) {
+  const models = [...modelsArg];
   models.reverse();
   return models.reduce((accumulator, model, index) => {
     if (index === 0) {

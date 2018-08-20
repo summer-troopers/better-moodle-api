@@ -53,7 +53,7 @@ module.exports = function createGroupsRepository(sequelize) {
       },
     };
 
-    let groups = await handleId(queryParams, Group, filter, queryParamsBindings, projector);
+    let groups = await handleId(queryParams, Group, filter, queryParamsBindings);
 
     if (!groups) groups = await Group.findAndCountAll(filter);
 
