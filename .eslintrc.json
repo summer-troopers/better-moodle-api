@@ -51,7 +51,14 @@
           "middlewares",
           "verifier",
           "mongo",
-          "hasher"
+          "hasher",
+          "gridfs",
+          "multer",
+          "metadata",
+          "normalizer",
+          "validator",
+          "md5",
+          "unlink"
         ]
       }
     ],
@@ -67,6 +74,7 @@
     "arrow-body-style": "off",
     "strict": "off",
     "max-len": "off",
+    "no-param-reassign": "off",
     "complexity": [
       "error",
       4

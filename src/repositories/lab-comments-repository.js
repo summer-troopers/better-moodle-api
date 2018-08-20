@@ -76,31 +76,31 @@ module.exports = function createCommentRepository(connection) {
     return projectedLabComments.rows[0];
   }
 
-  async function add(form) {
-    const labReport = await LabReport.findById(form.labReportId);
+  async function add(data) {
+    const labReport = await LabReport.findById(data.labReportId);
     if (!labReport) throw new errors.NotFound('LAB_REPORT_NOT_FOUND');
 
-    return LabComment.create(form);
+    return LabComment.create(data);
   }
 
-  async function exists(id) {
-    const result = await LabComment.findById(id);
+  async function exists(labCommentId) {
+    const result = await LabComment.findById(labCommentId);
     if (result) return true;
     return false;
   }
 
-  async function update(id, form) {
-    const labReport = await LabReport.findById(form.labReportId);
+  async function update(labCommentId, data) {
+    const labReport = await LabReport.findById(data.labReportId);
     if (!labReport) throw new errors.NotFound('LAB_REPORT_NOT_FOUND');
 
-    return LabComment.update(form, {
-      where: { id },
+    return LabComment.update(data, {
+      where: { id: labCommentId },
     });
   }
 
-  function remove(id) {
+  function remove(labCommentId) {
     return LabComment.destroy({
-      where: { id },
+      where: { id: labCommentId },
     });
   }
 
