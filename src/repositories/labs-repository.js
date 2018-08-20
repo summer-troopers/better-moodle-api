@@ -67,7 +67,7 @@ module.exports = function createLabsRepository(connection) {
       },
     };
 
-    const response = handleId(queryParams, LabReport, filter, queryParamsBindings, projector);
+    const response = handleId(queryParams, LabReport, filter, queryParamsBindings);
 
     if (response) {
       return response;
