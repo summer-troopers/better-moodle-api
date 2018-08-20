@@ -34,7 +34,7 @@
       "description": "Everything about Specialties"
     },
     {
-      "name": "laboratories",
+      "name": "laboratory",
       "description": "Everything about Laboratories"
     }
   ],
@@ -82,7 +82,7 @@
     "/api/v1/lab_comments": {
       "get": {
         "tags": [
-          "laboratories"
+          "laboratory"
         ],
         "summary": "Get all lab comments",
         "produces": [
@@ -120,7 +120,7 @@
       },
       "post": {
         "tags": [
-          "laboratories"
+          "laboratory"
         ],
         "summary": "Add a comment in the DB.",
         "consumes": [
@@ -692,7 +692,7 @@
     "/api/v1/lab_comments/{id}": {
       "delete": {
         "tags": [
-          "laboratories"
+          "laboratory"
         ],
         "summary": "Delete a laboratory comment by ID.",
         "produces": [
@@ -718,7 +718,7 @@
       },
       "put": {
         "tags": [
-          "laboratories"
+          "laboratory"
         ],
         "summary": "Update the comment laboratory.",
         "consumes": [
