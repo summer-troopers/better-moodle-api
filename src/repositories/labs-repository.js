@@ -2,16 +2,7 @@
 
 const mongoose = require('mongoose');
 const Grid = require('gridfs-stream');
-<<<<<<< HEAD
-<<<<<<< HEAD
 const { handleId } = require('../helpers/util');
-=======
-const { buildIncludes } = require('../helpers/util');
-const logger = require('../services/winston/logger');
->>>>>>> moved generic function handleId from repositories to util
-=======
-const { handleId } = require('../helpers/util');
->>>>>>> refactored generic functions in repository, added connection to tables with oneToMany bindings(labComment, student and group)
 
 module.exports = function createLabsRepository(connection) {
   const gfs = Grid(connection.db, mongoose.mongo);
@@ -67,7 +58,7 @@ module.exports = function createLabsRepository(connection) {
       },
     };
 
-    const response = handleId(queryParams, LabReport, filter, queryParamsBindings);
+    const response = handleId(queryParams, LabReport, filter, queryParamsBindings, projector);
 
     if (response) {
       return response;
@@ -94,34 +85,3 @@ module.exports = function createLabsRepository(connection) {
     remove,
   };
 };
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-
-function handleId(queryParamId, response, LabReport, filter, models) {
-  if (!queryParamId) return null;
-  const query = {
-    ...filter,
-    subQuery: false,
-    ...buildIncludes(queryParamId, models),
-  };
-  response = LabReport.findAndCountAll(query);
-  return response.then((results) => {
-    if (!Array.isArray(results.rows)) {
-      logger.error('NOT_AN_ARRAY');
-      return null;
-    }
-    const resultedRows = results.rows.map((item) => {
-      return {
-        id: item.id,
-        studentId: item.studentId,
-        labTaskId: item.labTaskId,
-      };
-    });
-    results.rows = resultedRows;
-    return results;
-  });
-}
->>>>>>> removed extra properties from conditioned view of models
-=======
->>>>>>> refactored generic functions in repository, added connection to tables with oneToMany bindings(labComment, student and group)
