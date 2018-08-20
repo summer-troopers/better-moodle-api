@@ -16,13 +16,20 @@ module.exports = function createSpecialtiesRepository(sequelize) {
     LabComment,
   } = sequelize.models;
 
+  const projector = (item) => {
+    return {
+      id: item.id,
+      name: item.name,
+    };
+  };
+
   const queryParamsBindings = {
     courseId: [Course],
     teacherId: [Course, Teacher],
     groupId: [Group],
     studentId: [Group, Student],
     labReportId: [Group, Student, LabReport],
-    taskId: [Group, Student, LabReport, LabTask],
+    labTaskId: [Group, Student, LabReport, LabTask],
     labCommentId: [Group, Student, LabReport, LabComment],
   };
 

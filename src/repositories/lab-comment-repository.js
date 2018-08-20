@@ -24,7 +24,13 @@ module.exports = function createCommentRepository(connection) {
       mark: item.mark,
       createdAt: item.createdAt,
       updatedAt: item.updatedAt,
-      labReport: item.labReport,
+      labReport: {
+        id: item.labReport.id,
+        studentId: item.labReport.studentId,
+        labTaskId: item.labReport.labTaskId,
+        createdAt: item.labReport.createdAt,
+        updatedAt: item.labReport.updatedAt,
+      },
     };
   };
 
@@ -35,7 +41,7 @@ module.exports = function createCommentRepository(connection) {
     specialtyId: [LabReport, Student, Group, Specialty],
     courseId: [LabReport, LabTask, Course],
     teacherId: [LabReport, LabTask, Teacher],
-    taskId: [LabReport, LabTask],
+    labTaskId: [LabReport, LabTask],
   };
 
   async function list(queryParams) {
@@ -49,7 +55,7 @@ module.exports = function createCommentRepository(connection) {
       offset,
     };
 
-    let labComments = await handleId(queryParams, LabComment, filter, queryParamsBindings, projector);
+    let labComments = await handleId(queryParams, LabComment, filter, queryParamsBindings);
 
     if (!labComments) labComments = await LabComment.findAndCountAll(filter);
 
@@ -59,7 +65,15 @@ module.exports = function createCommentRepository(connection) {
   }
 
   async function view(id) {
-    return LabComment.findById(id);
+    const labComments = await LabComment.findAndCountAll({
+      where: { id },
+    });
+
+    await appendDependentData(labComments, LabReport);
+
+    const projectedLabComments = await projectDatabaseResponse(labComments, projector);
+
+    return projectedLabComments.rows[0];
   }
 
   async function add(form) {

@@ -24,7 +24,11 @@ module.exports = function createStudentsRepository(connection) {
       phoneNumber: item.phoneNumber,
       email: item.email,
       groupId: item.groupId,
-      group: item.group,
+      group: {
+        id: item.group.id,
+        name: item.group.name,
+        specialtyId: item.group.specialtyId,
+      },
     };
   };
 
@@ -34,7 +38,7 @@ module.exports = function createStudentsRepository(connection) {
     groupId: [Group],
     courseId: [Group, Specialty, Course],
     specialtyId: [Group, Specialty],
-    taskId: [LabReport, LabTask],
+    labTaskId: [LabReport, LabTask],
     teacherId: [LabReport, LabTask, Teacher],
   };
 
@@ -59,7 +63,7 @@ module.exports = function createStudentsRepository(connection) {
       },
     };
 
-    let students = await handleId(queryParams, Student, filter, queryParamsBindings, projector);
+    let students = await handleId(queryParams, Student, filter, queryParamsBindings);
 
     if (!students) students = await Student.findAndCountAll(filter);
 
@@ -70,7 +74,15 @@ module.exports = function createStudentsRepository(connection) {
 
 
   async function view(id) {
-    return Student.findById(id);
+    const students = await Student.findAndCountAll({
+      where: { id },
+    });
+
+    await appendDependentData(students, Group);
+
+    const projectedStudents = await projectDatabaseResponse(students, projector);
+
+    return projectedStudents.rows[0];
   }
 
   async function add(form) {

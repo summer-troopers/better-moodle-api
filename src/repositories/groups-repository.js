@@ -21,7 +21,10 @@ module.exports = function createGroupsRepository(sequelize) {
       id: item.id,
       name: item.name,
       specialtyId: item.specialtyId,
-      specialty: item.specialty,
+      specialty: {
+        id: item.specialty.id,
+        name: item.specialty.name,
+      },
     };
   };
 
@@ -31,7 +34,7 @@ module.exports = function createGroupsRepository(sequelize) {
     teacherId: [Specialty, Course, Teacher],
     studentId: [Student],
     labReportId: [Student, LabReport],
-    taskId: [Student, LabReport, LabTask],
+    labTaskId: [Student, LabReport, LabTask],
     labCommentId: [Student, LabReport, LabComment],
   };
 
@@ -53,7 +56,7 @@ module.exports = function createGroupsRepository(sequelize) {
       },
     };
 
-    let groups = await handleId(queryParams, Group, filter, queryParamsBindings, projector);
+    let groups = await handleId(queryParams, Group, filter, queryParamsBindings);
 
     if (!groups) groups = await Group.findAndCountAll(filter);
 
@@ -63,7 +66,15 @@ module.exports = function createGroupsRepository(sequelize) {
   }
 
   async function view(id) {
-    return Group.findById(id);
+    const groups = await Group.findAndCountAll({
+      where: { id },
+    });
+
+    await appendDependentData(groups, Specialty);
+
+    const projectedGroups = await projectDatabaseResponse(groups, projector);
+
+    return projectedGroups.rows[0];
   }
 
   async function add(form) {
