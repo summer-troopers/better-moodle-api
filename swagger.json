@@ -32,6 +32,10 @@
     {
       "name": "specialty",
       "description": "Everything about Specialties"
+    },
+    {
+      "name": "laboratory",
+      "description": "Everything about Laboratories"
     }
   ],
   "schemes": [
@@ -70,6 +74,76 @@
             "description": "success"
           },
           "400": {
+            "description": "error"
+          }
+        }
+      }
+    },
+    "/api/v1/lab_comments": {
+      "get": {
+        "tags": [
+          "laboratory"
+        ],
+        "summary": "Get all lab comments",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "offset",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Nr. of items to skip before starting to collect results"
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Nr. of items to return"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "success",
+            "schema": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "laboratory"
+        ],
+        "summary": "Add a comment in the DB.",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Laboratories"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "success"
+          },
+          "400": {
+            "description": "error"
+          },
+          "404": {
             "description": "error"
           }
         }
@@ -611,6 +685,73 @@
           },
           "405": {
             "description": "Validation exception"
+          }
+        }
+      }
+    },
+    "/api/v1/lab_comments/{id}": {
+      "delete": {
+        "tags": [
+          "laboratory"
+        ],
+        "summary": "Delete a laboratory comment by ID.",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of the laboratory comment to be deleted.",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "success"
+          },
+          "404": {
+            "description": "error"
+          },
+          "403": {
+            "description": "error"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "laboratory"
+        ],
+        "summary": "Update the comment laboratory.",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/Laboratories"
+            }
+          }
+        ],
+        "responses": {
+          "400": {
+            "description": "Invalid ID supplied"
+          },
+          "404": {
+            "description": "Laboratory comment not found"
           }
         }
       }
@@ -1242,6 +1383,25 @@
       "properties": {
         "name": {
           "type": "string"
+        }
+      }
+    },
+    "Laboratories": {
+      "type": "object",
+      "required": [
+        "labReportId",
+        "teacherComment",
+        "mark"
+      ],
+      "properties": {
+        "labReportId": {
+          "type": "number"
+        },
+        "teacherComment": {
+          "type": "string"
+        },
+        "mark": {
+          "type": "number"
         }
       }
     }
