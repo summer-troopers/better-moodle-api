@@ -22,6 +22,10 @@ module.exports = function defineLabComments(sequelize, DataTypes) {
       type: DataTypes.INTEGER,
       field: 'mark',
       allowNull: false,
+      validate: {
+        min: 4,
+        max: 10,
+      },
     },
   },
   {
