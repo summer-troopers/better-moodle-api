@@ -29,7 +29,7 @@ module.exports = function createSpecialtiesRepository(sequelize) {
     groupId: [Group],
     studentId: [Group, Student],
     labReportId: [Group, Student, LabReport],
-    taskId: [Group, Student, LabReport, LabTask],
+    labTaskId: [Group, Student, LabReport, LabTask],
     labCommentId: [Group, Student, LabReport, LabComment],
   };
 

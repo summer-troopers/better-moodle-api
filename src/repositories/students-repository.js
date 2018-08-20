@@ -38,7 +38,7 @@ module.exports = function createStudentsRepository(connection) {
     groupId: [Group],
     courseId: [Group, Specialty, Course],
     specialtyId: [Group, Specialty],
-    taskId: [LabReport, LabTask],
+    labTaskId: [LabReport, LabTask],
     teacherId: [LabReport, LabTask, Teacher],
   };
 

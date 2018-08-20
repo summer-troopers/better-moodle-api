@@ -33,7 +33,7 @@ module.exports = function createLabsRepository(connection) {
     studentId: [Student],
     groupId: [Student, Group],
     specialtyId: [Student, Group, Specialty],
-    taskId: [LabTask],
+    labTaskId: [LabTask],
     teacherId: [LabTask, Teacher],
     courseId: [LabTask, Teacher, Course],
   };

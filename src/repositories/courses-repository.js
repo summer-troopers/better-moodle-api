@@ -28,7 +28,7 @@ module.exports = function createCoursesRepository(sequelize) {
     groupId: [Specialty, Group],
     studentId: [Specialty, Group, Student],
     teacherId: [Teacher],
-    taskId: [Teacher, LabTask],
+    labTaskId: [Teacher, LabTask],
     labReportId: [Teacher, LabTask, LabReport],
     labCommentId: [Teacher, LabTask, LabReport, LabComment],
   };

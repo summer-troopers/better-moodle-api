@@ -28,7 +28,7 @@ module.exports = function createTeacherRepository(connection) {
   };
 
   const queryParamsBindings = {
-    taskId: [LabTask],
+    labTaskId: [LabTask],
     labReportId: [LabTask, LabReport],
     labCommentId: [LabTask, LabReport, LabComment],
     courseId: [Course],

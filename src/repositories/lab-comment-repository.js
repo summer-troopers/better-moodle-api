@@ -41,7 +41,7 @@ module.exports = function createCommentRepository(connection) {
     specialtyId: [LabReport, Student, Group, Specialty],
     courseId: [LabReport, LabTask, Course],
     teacherId: [LabReport, LabTask, Teacher],
-    taskId: [LabReport, LabTask],
+    labTaskId: [LabReport, LabTask],
   };
 
   async function list(queryParams) {
