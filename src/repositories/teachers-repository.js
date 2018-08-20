@@ -59,7 +59,7 @@ module.exports = function createTeacherRepository(connection) {
 
     let response = await handleId(queryParams, Teacher, filter, queryParamsBindings);
 
-    if (response) response = await Teacher.findAndCountAll(filter);
+    if (!response) response = await Teacher.findAndCountAll(filter);
 
     return projectDatabaseResponse(response, projector);
   }
