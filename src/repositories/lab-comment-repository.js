@@ -24,7 +24,13 @@ module.exports = function createCommentRepository(connection) {
       mark: item.mark,
       createdAt: item.createdAt,
       updatedAt: item.updatedAt,
-      labReport: item.labReport,
+      labReport: {
+        id: item.labReport.id,
+        studentId: item.labReport.studentId,
+        labTaskId: item.labReport.labTaskId,
+        createdAt: item.labReport.createdAt,
+        updatedAt: item.labReport.updatedAt,
+      },
     };
   };
 
@@ -59,7 +65,15 @@ module.exports = function createCommentRepository(connection) {
   }
 
   async function view(id) {
-    return LabComment.findById(id);
+    const labComments = await LabComment.findAndCountAll({
+      where: { id },
+    });
+
+    await appendDependentData(labComments, LabReport);
+
+    const projectedLabComments = await projectDatabaseResponse(labComments, projector);
+
+    return projectedLabComments.rows[0];
   }
 
   async function add(form) {

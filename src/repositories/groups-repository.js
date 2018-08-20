@@ -21,7 +21,10 @@ module.exports = function createGroupsRepository(sequelize) {
       id: item.id,
       name: item.name,
       specialtyId: item.specialtyId,
-      specialty: item.specialty,
+      specialty: {
+        id: item.specialty.id,
+        name: item.specialty.name,
+      },
     };
   };
 
@@ -63,7 +66,15 @@ module.exports = function createGroupsRepository(sequelize) {
   }
 
   async function view(id) {
-    return Group.findById(id);
+    const groups = await Group.findAndCountAll({
+      where: { id },
+    });
+
+    await appendDependentData(groups, Specialty);
+
+    const projectedGroups = await projectDatabaseResponse(groups, projector);
+
+    return projectedGroups.rows[0];
   }
 
   async function add(form) {
