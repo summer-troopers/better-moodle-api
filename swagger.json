@@ -145,6 +145,9 @@
           },
           "400": {
             "description": "error"
+          },
+          "404": {
+            "description": "error"
           }
         }
       }
@@ -713,6 +716,9 @@
           },
           "404": {
             "description": "error"
+          },
+          "403": {
+            "description": "error"
           }
         }
       },
@@ -748,7 +754,7 @@
             "description": "Invalid ID supplied"
           },
           "404": {
-            "description": "Admin not found"
+            "description": "Laboratory comment not found"
           },
           "405": {
             "description": "Validation exception"
