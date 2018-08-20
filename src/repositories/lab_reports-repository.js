@@ -147,11 +147,18 @@ module.exports = function createLabReportsRepository(mongoConnection, sqlConnect
   async function remove(labReportId) {
     const report = await LabReport.findById(labReportId);
     await removeFile(report.mongoFileId);
-    return LabReport.destroy({
-      where: {
-        id: labReportId,
-      },
-    });
+    try {
+      return await LabReport.destroy({
+        where: {
+          id: labReportId,
+        },
+      });
+    } catch (error) {
+      if (error.name === 'SequelizeForeignKeyConstraintError') {
+        throw new errors.Forbidden('CANNOT_DELETE_REPORT');
+      }
+      throw error;
+    }
   }
 
   function removeFile(fileId) {
