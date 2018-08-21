@@ -1,36 +1,41 @@
-const faker = require('faker');
+
+const config = require('config');
+const createGridFS = require('mongoose-gridfs');
+const fs = require('fs');
+
+const mongooseConnector = require('../services/connectors/mongo-connector')(config.mongo);
 
 module.exports = {
   // eslint-disable-next-line no-unused-vars, no-use-before-define
   async up(queryInterface, Sequelize) {
+    const connection = await mongooseConnector.connect();
+    const gridFS = createGridFS({
+      collection: 'reports',
+      model: 'LabReportFile',
+      mongooseConnection: connection,
+    });
+    const LabReportFile = gridFS.model;
+
+    const file = await new Promise((resolve, reject) => {
+      LabReportFile.write({
+        filename: 'Dockerfile',
+        contentType: 'text/plain',
+      },
+      fs.createReadStream('./Dockerfile'),
+      (error, createdFile) => {
+        if (error) return reject(error);
+        return resolve(createdFile);
+      });
+    });
+
     const { sequelize } = queryInterface;
     const LabReport = sequelize.import('../models/lab_report.js');
-    const Student = sequelize.import('../models/teacher.js');
-    const LabTask = sequelize.import('../models/lab_task.js');
-    return LabReport.bulkCreate(await generate10LabReports(LabTask, Student), {});
+    return LabReport.bulkCreate([{
+      studentId: 1,
+      labTaskId: 1,
+      mongoFileId: file.id,
+    }], {});
   },
   // eslint-disable-next-line no-unused-vars
   down(queryInterface, Sequelize) { return queryInterface.bulkDelete('lab_reports', null, {}); },
 };
-
-async function generate10LabReports(LabTask, Student) {
-  const tasks = await LabTask.findAll({ attributes: ['id'] });
-  const students = await Student.findAll({ attributes: ['id'] });
-  const labReports = [];
-  labReports.push({
-    id: 1,
-    studentId: '1',
-    labTaskId: '1',
-    mongoFileId: '1',
-  });
-  for (let i = 0; i < 10; i += 1) {
-    const taskIndex = faker.random.number(tasks.length - 1);
-    const studentIndex = faker.random.number(students.length - 1);
-    labReports.push({
-      studentId: students[studentIndex].id,
-      labTaskId: tasks[taskIndex].id,
-      mongoFileId: faker.random.number(10) + 1,
-    });
-  }
-  return labReports;
-}
