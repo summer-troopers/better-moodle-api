@@ -18,7 +18,7 @@ module.exports = function createLabsRoute(repository, permissions, routeConfig) 
 
   const { names, msg } = routeConfig;
 
-  const validateId = createIdParamValidator(repository, msg.err);
+  const validateId = createIdParamValidator(repository, msg.error);
 
   const permissionVerifier = createPermissionVerifier(permissions);
 
@@ -41,15 +41,22 @@ module.exports = function createLabsRoute(repository, permissions, routeConfig) 
 
   // eslint-disable-next-line complexity
   function assertInputFields(request, response, next) {
-    let dependencyId = request.body[names.dependencyId];
-    dependencyId = (dependencyId) ? dependencyId.trim() : dependencyId;
-    const { fieldname } = request.file;
-    if (dependencyId && fieldname === names.requiredField) return next();
+    const { file } = request;
+    if (!file) return next(new errors.BadRequest(msg.error.notReceived.file));
 
-    repository.removeFile(request.file.id);
-    if (!dependencyId) return next(new errors.BadRequest(msg.err.missing.dependencyId));
+    try {
+      let dependencyId = request.body[names.dependencyId];
+      dependencyId = (dependencyId) ? dependencyId.trim() : dependencyId;
+      if (!dependencyId) throw new errors.BadRequest(msg.error.notReceived.dependencyId);
 
-    return next(new errors.BadRequest(msg.err.missing.field));
+      const { fieldname } = file;
+      if (fieldname !== names.requiredField) throw new errors.BadRequest(msg.error.notReceived.file);
+    } catch (error) {
+      repository.removeFile(request.file.id);
+      return next(error);
+    }
+
+    return next();
   }
 
   function buildData(fileId, dependencyId, userId) {
@@ -109,7 +116,7 @@ module.exports = function createLabsRoute(repository, permissions, routeConfig) 
 
     repository.update(request.params.id, buildData(request.file.id.toString(), request.body[names.dependencyId], userId))
       .then((result) => {
-        if (!result || result.length === 0) return next(new errors.GeneralError(msg.err.unknown.update));
+        if (!result || result.length === 0) return next(new errors.GeneralError(msg.error.unknown.update));
         response.json(msg.success.update);
         return next();
       })
@@ -119,7 +126,7 @@ module.exports = function createLabsRoute(repository, permissions, routeConfig) 
   function remove(request, response, next) {
     repository.remove(request.params.id)
       .then((result) => {
-        if (result !== 1) return next(new errors.GeneralError(msg.err.unknown.delete));
+        if (result !== 1) return next(new errors.GeneralError(msg.error.unknown.delete));
         response.json(msg.success.delete);
         return next();
       })
