@@ -5,7 +5,8 @@ const GridFsStorage = require('multer-gridfs-storage');
 const errors = require('@feathersjs/errors');
 
 const logger = require('../services/winston/logger');
-const { handleId, appendDependentData, projectDatabaseResponse } = require('../helpers/util');
+// eslint-disable-next-line object-curly-newline
+const { handleId, appendDependentData, appendDependentDataDeep, projectDatabaseResponse } = require('../helpers/util');
 
 module.exports = function createLabReportsRepository(mongoConnection, sqlConnection) {
   const gridFS = createGridFS({
@@ -47,6 +48,10 @@ module.exports = function createLabReportsRepository(mongoConnection, sqlConnect
         id: row.labTask.id,
         teacherId: row.labTask.teacherId,
         courseId: row.labTask.courseId,
+        course: {
+          id: row.labTask.course.id,
+          name: row.labTask.course.name,
+        },
       },
     };
   };
@@ -75,7 +80,7 @@ module.exports = function createLabReportsRepository(mongoConnection, sqlConnect
 
     await appendDependentData(reports, Student);
 
-    await appendDependentData(reports, LabTask);
+    await appendDependentDataDeep(reports, [LabTask, models.Course]);
 
     return projectDatabaseResponse(reports, projector);
   }
