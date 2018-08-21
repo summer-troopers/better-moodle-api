@@ -1,5 +1,7 @@
 'use strict';
 
+const faker = require('faker');
+
 function createMessage(to, from, subject, text) {
   const message = {
     to,
@@ -185,6 +187,44 @@ function buildIncludes(param, modelsArg) {
   }, {});
 }
 
+function generatePhoneNumber() {
+  const prefixes = ['06', '07'];
+  const chosenPrefix = faker.random.arrayElement(prefixes);
+  const rest = faker.random.number({ min: 1000000, max: 9999999 });
+
+  return `${chosenPrefix}${rest}`;
+}
+
+function generateUniqueEmail(students) {
+  let genEmail;
+  const predicate = object => object.email === genEmail;
+  while (true) {
+    genEmail = faker.internet.email().toLocaleLowerCase();
+    if (!students.find(predicate)) break;
+  }
+  return genEmail;
+}
+
+function generateUniqueNumber(students) {
+  let genNumber;
+  const predicate = object => object.phone_number === genNumber;
+  while (true) {
+    genNumber = generatePhoneNumber();
+    if (!students.find(predicate)) break;
+  }
+  return genNumber;
+}
+
+function detectDuplicate(array) {
+  const sorted = array.slice().sort();
+
+  for (let i = 0; i < sorted.length - 1; i += 1) {
+    if (sorted[i] === sorted[i + 1]) return true;
+  }
+
+  return false;
+}
+
 module.exports = {
   createMessage,
   permissions: createPermissions,
@@ -194,4 +234,8 @@ module.exports = {
   appendParentDataDeep,
   appendDependentCount,
   projectDatabaseResponse,
+  generatePhoneNumber,
+  generateUniqueEmail,
+  generateUniqueNumber,
+  detectDuplicate,
 };

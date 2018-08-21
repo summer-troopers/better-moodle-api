@@ -2,6 +2,7 @@
 
 const faker = require('faker');
 const hashFactory = require('../helpers/hash/hash-factory')();
+const { generateUniqueEmail, generateUniqueNumber } = require('../helpers/util');
 
 module.exports = {
   // eslint-disable-next-line no-unused-vars, no-use-before-define
@@ -21,7 +22,7 @@ async function generate50Admins() {
     lastName: 'admin',
     email: 'administrator@moodle.com',
     password: await hashFactory.encrypt('administrator'), // 'administrator' - original password
-    phoneNumber: '000-581-5483',
+    phoneNumber: '060060060',
   });
   for (let i = 1; i <= 50; i += 1) {
     admins.push({
@@ -33,26 +34,4 @@ async function generate50Admins() {
     });
   }
   return admins;
-}
-
-function generateUniqueEmail(i, admins) {
-  let genEmail;
-  const predicate = object => object.email === genEmail;
-  while (true) {
-    genEmail = faker.internet.email().toLocaleLowerCase();
-    if (!admins.find(predicate)) break;
-  }
-
-  return genEmail;
-}
-
-function generateUniqueNumber(i, admins) {
-  let genNumber;
-  const predicate = object => object.phone_number === genNumber;
-  while (true) {
-    genNumber = faker.phone.phoneNumberFormat(0);
-    if (!admins.find(predicate)) break;
-  }
-
-  return genNumber;
 }

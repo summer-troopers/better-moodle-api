@@ -2,6 +2,7 @@
 
 const faker = require('faker');
 const hashFactory = require('../helpers/hash/hash-factory')();
+const { generateUniqueEmail, generateUniqueNumber } = require('../helpers/util');
 
 
 module.exports = {
@@ -22,7 +23,7 @@ async function generate50Teachers() {
     lastName: 'teacher',
     email: 'teacher@email.com',
     password: await hashFactory.encrypt('teacher'),
-    phoneNumber: '689-689-0681',
+    phoneNumber: '068115681',
   });
   for (let i = 1; i <= 50; i += 1) {
     teachers.push({
@@ -34,24 +35,4 @@ async function generate50Teachers() {
     });
   }
   return teachers;
-}
-
-function generateUniqueEmail(i, teachers) {
-  let genEmail;
-  const predicate = object => object.email === genEmail;
-  while (true) {
-    genEmail = faker.internet.email().toLocaleLowerCase();
-    if (!teachers.find(predicate)) break;
-  }
-  return genEmail;
-}
-
-function generateUniqueNumber(i, teachers) {
-  let genNumber;
-  const predicate = object => object.phone_number === genNumber;
-  while (true) {
-    genNumber = faker.phone.phoneNumberFormat(0);
-    if (!teachers.find(predicate)) break;
-  }
-  return genNumber;
 }
