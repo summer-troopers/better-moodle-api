@@ -94,7 +94,7 @@ module.exports = function createLabsRoute(repository, permissions, routeConfig) 
     repository.add(buildData(request.file.id.toString(), request.body[names.dependencyId], userId))
       .then((result) => {
         response.json({
-          success: routeConfig.msg.success.add,
+          success: msg.success.add,
           id: result.id,
         });
 
