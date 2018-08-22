@@ -30,7 +30,7 @@ async function generate50Students(Group) {
     students.push({
       firstName: faker.name.firstName(),
       lastName: faker.name.lastName(),
-      email: generateUniqueEmail(i, students),
+      email: generateUniqueEmail(students),
       password: faker.random.alphaNumeric(60),
       phoneNumber: generateUniqueNumber(i, students),
       groupId: groups[groupIndex].id,

@@ -12,6 +12,7 @@ module.exports = function createAdminsRepository(sequelize) {
       offset,
       limit,
       where: { firstName: { [Op.like]: [`%${contains}%`] } },
+      attributes: { exclude: ['password', 'createdAt', 'updatedAt'] },
     });
   }
 

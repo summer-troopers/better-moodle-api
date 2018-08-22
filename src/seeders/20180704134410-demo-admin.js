@@ -28,7 +28,7 @@ async function generate50Admins() {
     admins.push({
       firstName: faker.name.firstName(),
       lastName: faker.name.lastName(),
-      email: generateUniqueEmail(i, admins),
+      email: generateUniqueEmail(admins),
       password: faker.random.alphaNumeric(60),
       phoneNumber: generateUniqueNumber(i, admins),
     });

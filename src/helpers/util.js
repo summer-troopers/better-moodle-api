@@ -195,22 +195,22 @@ function generatePhoneNumber() {
   return `${chosenPrefix}${rest}`;
 }
 
-function generateUniqueEmail(students) {
+function generateUniqueEmail(emails) {
   let genEmail;
   const predicate = object => object.email === genEmail;
   while (true) {
     genEmail = faker.internet.email().toLocaleLowerCase();
-    if (!students.find(predicate)) break;
+    if (!emails.find(predicate)) break;
   }
   return genEmail;
 }
 
-function generateUniqueNumber(students) {
+function generateUniqueNumber(phoneNumbers) {
   let genNumber;
   const predicate = object => object.phone_number === genNumber;
   while (true) {
     genNumber = generatePhoneNumber();
-    if (!students.find(predicate)) break;
+    if (!phoneNumbers.find(predicate)) break;
   }
   return genNumber;
 }

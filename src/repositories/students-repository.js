@@ -82,7 +82,7 @@ module.exports = function createStudentsRepository(connection) {
     });
 
     await appendParentData(students.rows, Group);
-    await appendDependentCount(student.rows, Student, LabReport);
+    await appendDependentCount(students.rows, Student, LabReport);
 
     const projectedStudents = await projectDatabaseResponse(students, projector);
 

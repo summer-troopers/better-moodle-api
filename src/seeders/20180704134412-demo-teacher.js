@@ -29,7 +29,7 @@ async function generate50Teachers() {
     teachers.push({
       firstName: faker.name.firstName(),
       lastName: faker.name.lastName(),
-      email: generateUniqueEmail(i, teachers),
+      email: generateUniqueEmail(teachers),
       password: faker.random.alphaNumeric(60),
       phoneNumber: generateUniqueNumber(i, teachers),
     });
