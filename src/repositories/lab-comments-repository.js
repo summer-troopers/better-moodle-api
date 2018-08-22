@@ -20,7 +20,7 @@ module.exports = function createCommentRepository(connection) {
     return {
       id: item.id,
       labReportId: item.labReportId,
-      teacherComment: item.teacherComment,
+      content: item.content,
       mark: item.mark,
       createdAt: item.createdAt,
       updatedAt: item.updatedAt,
