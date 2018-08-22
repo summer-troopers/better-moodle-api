@@ -149,7 +149,7 @@ module.exports = function createLabTasksRepository(mongoConnection, sqlConnectio
       });
     } catch (error) {
       if (error.name === 'SequelizeForeignKeyConstraintError') {
-        throw new errors.Forbidden('CANNOT_DELETE_LAB_TASK');
+        throw new errors.Conflict('CANNOT_DELETE_LAB_TASK');
       }
       throw error;
     }

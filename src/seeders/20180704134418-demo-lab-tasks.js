@@ -6,7 +6,7 @@ const fs = require('fs');
 const mongooseConnector = require('../services/connectors/mongo-connector')(config.mongo);
 
 module.exports = {
-  // eslint-disable-next-line no-unused-vars, no-use-before-define
+  // eslint-disable-next-line no-unused-vars
   async up(queryInterface, Sequelize) {
     const connection = await mongooseConnector.connect();
     const gridFS = createGridFS({

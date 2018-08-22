@@ -57,57 +57,57 @@ module.exports = function createCoursesRepository(sequelize) {
     return projectDatabaseResponse(response, projector);
   }
 
-  async function view(id) {
+  async function view(courseId) {
     return Course.findOne({
-      where: { id },
+      where: { id: courseId },
       attributes: { exclude: ['createdAt', 'updatedAt'] },
     });
   }
 
-  function add(form, queryParams) {
+  function add(data, queryParams) {
     if (queryParams.teacherId) {
-      return addTeacher(form.courseId, queryParams.teacherId);
+      return addTeacher(data.courseId, queryParams.teacherId);
     }
     if (queryParams.specialtyId) {
-      return addSpecialty(form.courseId, queryParams.specialtyId);
+      return addSpecialty(data.courseId, queryParams.specialtyId);
     }
-    return Course.create(form);
+    return Course.create(data);
   }
 
-  async function addTeacher(id, teacherId) {
+  async function addTeacher(courseId, teacherId) {
     const teacher = await Teacher.findById(teacherId);
     if (!teacher) throw new errors.NotFound('TEACHER_NOT_FOUND');
-    const course = await Course.findById(id);
+    const course = await Course.findById(courseId);
     if (!course) throw new errors.NotFound('COURSE_NOT_FOUND');
     return course.addTeacher(teacher);
   }
 
-  async function addSpecialty(id, specialtyId) {
+  async function addSpecialty(courseId, specialtyId) {
     const specialty = await Specialty.findById(specialtyId);
     if (!specialty) throw new errors.NotFound('SPECIALTY_NOT_FOUND');
-    const course = await Course.findById(id);
+    const course = await Course.findById(courseId);
     if (!course) throw new errors.NotFound('COURSE_NOT_FOUND');
     return course.addSpecialty(specialty);
   }
 
-  async function exists(id) {
-    const result = await Course.findById(id);
+  async function exists(courseId) {
+    const result = await Course.findById(courseId);
     if (result) return true;
     return false;
   }
 
-  async function update(id, form) {
-    return Course.update(form, {
-      where: { id },
+  async function update(courseId, data) {
+    return Course.update(data, {
+      where: { id: courseId },
     });
   }
 
   /* eslint-disable complexity */
-  async function remove(id, queryParams) {
+  async function remove(courseId, queryParams) {
     if (queryParams.teacherId) {
       return CourseTeacher.destroy({
         where: {
-          courseId: id,
+          courseId,
           teacherId: queryParams.teacherId,
         },
       });
@@ -115,15 +115,15 @@ module.exports = function createCoursesRepository(sequelize) {
     if (queryParams.specialtyId) {
       return CourseSpecialty.destroy({
         where: {
+          courseId,
           specialtyId: queryParams.specialtyId,
-          courseId: id,
         },
       });
     }
 
     try {
       return await Course.destroy({
-        where: { id },
+        where: { id: courseId },
       });
     } catch (error) {
       if (error.name === 'SequelizeForeignKeyConstraintError') {

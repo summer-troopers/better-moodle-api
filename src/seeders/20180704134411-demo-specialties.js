@@ -3,7 +3,7 @@
 const faker = require('faker');
 
 module.exports = {
-  // eslint-disable-next-line no-unused-vars, no-use-before-define
+  // eslint-disable-next-line no-unused-vars
   up(queryInterface, Sequelize) {
     const { sequelize } = queryInterface;
     const Specialty = sequelize.import('../models/specialty.js');

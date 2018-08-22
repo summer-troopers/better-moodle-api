@@ -76,45 +76,45 @@ module.exports = function createStudentsRepository(connection) {
   }
 
 
-  async function view(id) {
+  async function view(studentId) {
     const students = await Student.findAndCountAll({
-      where: { id },
+      where: { id: studentId },
     });
 
     await appendParentData(students.rows, Group);
-    await appendDependentCount(student.rows, Student, LabReport);
+    await appendDependentCount(students.rows, Student, LabReport);
 
     const projectedStudents = await projectDatabaseResponse(students, projector);
 
     return projectedStudents.rows[0];
   }
 
-  async function add(form) {
-    const group = await Group.findById(form.groupId);
+  async function add(data) {
+    const group = await Group.findById(data.groupId);
     if (!group) throw new errors.NotFound('GROUP_NOT_FOUND');
 
-    return Student.create(form);
+    return Student.create(data);
   }
 
-  async function exists(id) {
-    const result = await Student.findById(id);
+  async function exists(studentId) {
+    const result = await Student.findById(studentId);
     if (result) return true;
     return false;
   }
 
-  async function update(id, form) {
-    const group = await Group.findById(form.groupId);
+  async function update(studentId, data) {
+    const group = await Group.findById(data.groupId);
     if (!group) throw new errors.NotFound('GROUP_NOT_FOUND');
 
-    return Student.update(form, {
-      where: { id },
+    return Student.update(data, {
+      where: { id: studentId },
     });
   }
 
-  async function remove(id) {
+  async function remove(studentId) {
     try {
       return await Student.destroy({
-        where: { id },
+        where: { id: studentId },
       });
     } catch (error) {
       if (error.name === 'SequelizeForeignKeyConstraintError') {

@@ -6,7 +6,7 @@ const { generateUniqueEmail, generateUniqueNumber } = require('../helpers/util')
 
 
 module.exports = {
-  // eslint-disable-next-line no-unused-vars, no-use-before-define
+  // eslint-disable-next-line no-unused-vars
   async up(queryInterface, Sequelize) {
     const { sequelize } = queryInterface;
     const Teacher = sequelize.import('../models/teacher.js');
@@ -29,9 +29,9 @@ async function generate50Teachers() {
     teachers.push({
       firstName: faker.name.firstName(),
       lastName: faker.name.lastName(),
-      email: generateUniqueEmail(i, teachers),
+      email: generateUniqueEmail(teachers),
       password: faker.random.alphaNumeric(60),
-      phoneNumber: generateUniqueNumber(i, teachers),
+      phoneNumber: generateUniqueNumber(teachers),
     });
   }
   return teachers;

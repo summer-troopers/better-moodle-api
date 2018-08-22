@@ -64,49 +64,49 @@ module.exports = function createTeacherRepository(connection) {
     return projectDatabaseResponse(response, projector);
   }
 
-  async function view(id) {
+  async function view(teacherId) {
     return Teacher.findOne({
-      where: { id },
+      where: { id: teacherId },
       attributes: { exclude: ['password', 'createdAt', 'updatedAt'] },
     });
   }
 
-  async function add(form, queryParams) {
+  async function add(data, queryParams) {
     if (queryParams.courseId) {
       const course = await Course.findById(queryParams.courseId);
       if (!course) throw new errors.NotFound('COURSE_NOT_FOUND');
-      const teacher = await Teacher.findById(form.teacherId);
+      const teacher = await Teacher.findById(data.teacherId);
       if (!teacher) throw new errors.NotFound('TEACHER_NOT_FOUND');
       return teacher.addCourse(course);
     }
-    return Teacher.create(form);
+    return Teacher.create(data);
   }
 
-  async function exists(id) {
-    const result = await Teacher.findById(id);
+  async function exists(teacherId) {
+    const result = await Teacher.findById(teacherId);
     if (result) return true;
     return false;
   }
 
-  async function update(id, form) {
-    return Teacher.update(form, {
-      where: { id },
+  async function update(teacherId, data) {
+    return Teacher.update(data, {
+      where: { id: teacherId },
     });
   }
 
-  async function remove(id, queryParams) {
+  async function remove(teacherId, queryParams) {
     if (queryParams.courseId) {
       return CourseTeacher.destroy({
         where: {
+          teacherId,
           courseId: queryParams.courseId,
-          teacherId: id,
         },
       });
     }
 
     try {
       return await Teacher.destroy({
-        where: { id },
+        where: { id: teacherId },
       });
     } catch (error) {
       if (error.name === 'SequelizeForeignKeyConstraintError') {

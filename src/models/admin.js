@@ -32,7 +32,7 @@ module.exports = function defineAdmin(sequelize, DataTypes) {
       type: DataTypes.STRING,
       field: 'phone_number',
       validate: {
-        is: ['^0\s?[67]\d{1}\s?\d{3}\s?\d{3}$', 'i'], // examples: ['0 61 371 625', '067843961']
+        is: ['^0\\s?[67]\\d{1}\\s?\\d{3}\\s?\\d{3}$', 'i'], // examples: ['0 61 371 625', '067843961']
       },
     },
     email: {

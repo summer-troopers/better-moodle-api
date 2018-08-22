@@ -5,7 +5,7 @@ const hashFactory = require('../helpers/hash/hash-factory')();
 const { generateUniqueEmail, generateUniqueNumber } = require('../helpers/util');
 
 module.exports = {
-  // eslint-disable-next-line no-unused-vars, no-use-before-define
+  // eslint-disable-next-line no-unused-vars
   async up(queryInterface, Sequelize) {
     const { sequelize } = queryInterface;
     const Admin = sequelize.import('../models/admin');
@@ -28,9 +28,9 @@ async function generate50Admins() {
     admins.push({
       firstName: faker.name.firstName(),
       lastName: faker.name.lastName(),
-      email: generateUniqueEmail(i, admins),
+      email: generateUniqueEmail(admins),
       password: faker.random.alphaNumeric(60),
-      phoneNumber: generateUniqueNumber(i, admins),
+      phoneNumber: generateUniqueNumber(admins),
     });
   }
   return admins;

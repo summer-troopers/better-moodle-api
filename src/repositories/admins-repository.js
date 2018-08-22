@@ -12,34 +12,35 @@ module.exports = function createAdminsRepository(sequelize) {
       offset,
       limit,
       where: { firstName: { [Op.like]: [`%${contains}%`] } },
-    });
-  }
-
-  async function view(id) {
-    return Admin.findOne({
-      where: { id },
       attributes: { exclude: ['password', 'createdAt', 'updatedAt'] },
     });
   }
 
-  function add(form) {
-    return Admin.create(form);
+  async function view(adminId) {
+    return Admin.findOne({
+      where: { id: adminId },
+      attributes: { exclude: ['password', 'createdAt', 'updatedAt'] },
+    });
   }
 
-  async function exists(id) {
-    const result = await Admin.findById(id);
+  function add(data) {
+    return Admin.create(data);
+  }
+
+  async function exists(adminId) {
+    const result = await Admin.findById(adminId);
     if (result) return true;
     return false;
   }
 
-  async function update(id, form) {
-    return Admin.update(form, {
-      where: { id },
+  async function update(adminId, data) {
+    return Admin.update(data, {
+      where: { id: adminId },
     });
   }
 
-  function remove(id) {
-    return Admin.destroy({ where: { id } });
+  function remove(adminId) {
+    return Admin.destroy({ where: { id: adminId } });
   }
 
   return {
