@@ -60,6 +60,14 @@ describe('util', () => {
     assert.strictEqual(util.detectDuplicate(phoneNumbers), false);
   });
 
+  it('Should create 10 unique emails', () => {
+    const emails = [];
+    for (let i = 0; i < 10; i += 1) {
+      emails.push(util.generateUniqueNumber(emails));
+    }
+    assert.strictEqual(util.detectDuplicate(emails), false);
+  });
+
   describe('buildIncludes', () => {
     it('Should return expected models', () => {
       const models = ['Student', 'Group', 'Specialty'];
