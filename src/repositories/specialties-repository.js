@@ -103,7 +103,7 @@ module.exports = function createSpecialtiesRepository(sequelize) {
       });
     } catch (error) {
       if (error.name === 'SequelizeForeignKeyConstraintError') {
-        throw new errors.Forbidden('CANNOT_DELETE_SPECIALTY');
+        throw new errors.Conflict('CANNOT_DELETE_SPECIALTY');
       }
       throw error;
     }
