@@ -30,7 +30,7 @@ async function generate50Admins() {
       lastName: faker.name.lastName(),
       email: generateUniqueEmail(admins),
       password: faker.random.alphaNumeric(60),
-      phoneNumber: generateUniqueNumber(i, admins),
+      phoneNumber: generateUniqueNumber(admins),
     });
   }
   return admins;

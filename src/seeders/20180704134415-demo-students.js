@@ -32,7 +32,7 @@ async function generate50Students(Group) {
       lastName: faker.name.lastName(),
       email: generateUniqueEmail(students),
       password: faker.random.alphaNumeric(60),
-      phoneNumber: generateUniqueNumber(i, students),
+      phoneNumber: generateUniqueNumber(students),
       groupId: groups[groupIndex].id,
     });
   }

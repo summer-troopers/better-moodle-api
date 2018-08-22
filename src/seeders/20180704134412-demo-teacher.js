@@ -31,7 +31,7 @@ async function generate50Teachers() {
       lastName: faker.name.lastName(),
       email: generateUniqueEmail(teachers),
       password: faker.random.alphaNumeric(60),
-      phoneNumber: generateUniqueNumber(i, teachers),
+      phoneNumber: generateUniqueNumber(teachers),
     });
   }
   return teachers;
