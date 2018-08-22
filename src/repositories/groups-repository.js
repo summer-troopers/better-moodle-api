@@ -65,9 +65,9 @@ module.exports = function createGroupsRepository(sequelize) {
     return projectDatabaseResponse(groups, projector);
   }
 
-  async function view(id) {
+  async function view(groupId) {
     const groups = await Group.findAndCountAll({
-      where: { id },
+      where: { id: groupId },
     });
 
     await appendParentData(groups.rows, Specialty);
@@ -77,32 +77,32 @@ module.exports = function createGroupsRepository(sequelize) {
     return projectedGroups.rows[0];
   }
 
-  async function add(form) {
-    const specialty = await Specialty.findById(form.specialtyId);
+  async function add(data) {
+    const specialty = await Specialty.findById(data.specialtyId);
     if (!specialty) throw new errors.NotFound('SPECIALTY_NOT_FOUND');
 
-    return Group.create(form);
+    return Group.create(data);
   }
 
-  async function exists(id) {
-    const result = await Group.findById(id);
+  async function exists(groupId) {
+    const result = await Group.findById(groupId);
     if (result) return true;
     return false;
   }
 
-  async function update(id, form) {
-    const specialty = await Specialty.findById(form.specialtyId);
+  async function update(groupId, data) {
+    const specialty = await Specialty.findById(data.specialtyId);
     if (!specialty) throw new errors.NotFound('SPECIALTY_NOT_FOUND');
 
-    return Group.update(form, {
-      where: { id },
+    return Group.update(data, {
+      where: { id: groupId },
     });
   }
 
-  async function remove(id) {
+  async function remove(groupId) {
     try {
       return await Group.destroy({
-        where: { id },
+        where: { id: groupId },
       });
     } catch (error) {
       if (error.name === 'SequelizeForeignKeyConstraintError') {

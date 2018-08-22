@@ -6,7 +6,7 @@ const { generateUniqueEmail, generateUniqueNumber } = require('../helpers/util')
 
 
 module.exports = {
-  // eslint-disable-next-line no-unused-vars, no-use-before-define
+  // eslint-disable-next-line no-unused-vars
   async up(queryInterface, Sequelize) {
     const { sequelize } = queryInterface;
     const Teacher = sequelize.import('../models/teacher.js');

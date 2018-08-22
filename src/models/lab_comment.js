@@ -13,9 +13,9 @@ module.exports = function defineLabComments(sequelize, DataTypes) {
       field: 'lab_report_id',
       allowNull: false,
     },
-    teacherComment: {
+    content: {
       type: DataTypes.STRING,
-      field: 'teacher_comment',
+      field: 'content',
       allowNull: false,
     },
     mark: {

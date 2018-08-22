@@ -5,7 +5,7 @@ const hashFactory = require('../helpers/hash/hash-factory')();
 const { generateUniqueEmail, generateUniqueNumber } = require('../helpers/util');
 
 module.exports = {
-  // eslint-disable-next-line no-unused-vars, no-use-before-define
+  // eslint-disable-next-line no-unused-vars
   async up(queryInterface, Sequelize) {
     const { sequelize } = queryInterface;
     const Admin = sequelize.import('../models/admin');

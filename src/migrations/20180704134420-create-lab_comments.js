@@ -18,9 +18,9 @@ module.exports = {
           key: 'id',
         },
       },
-      teacherComment: {
+      content: {
         type: Sequelize.STRING,
-        field: 'teacher_comment',
+        field: 'content',
         allowNull: false,
       },
       mark: {

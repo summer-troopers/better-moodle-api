@@ -16,31 +16,31 @@ module.exports = function createAdminsRepository(sequelize) {
     });
   }
 
-  async function view(id) {
+  async function view(adminId) {
     return Admin.findOne({
-      where: { id },
+      where: { id: adminId },
       attributes: { exclude: ['password', 'createdAt', 'updatedAt'] },
     });
   }
 
-  function add(form) {
-    return Admin.create(form);
+  function add(data) {
+    return Admin.create(data);
   }
 
-  async function exists(id) {
-    const result = await Admin.findById(id);
+  async function exists(adminId) {
+    const result = await Admin.findById(adminId);
     if (result) return true;
     return false;
   }
 
-  async function update(id, form) {
-    return Admin.update(form, {
-      where: { id },
+  async function update(adminId, data) {
+    return Admin.update(data, {
+      where: { id: adminId },
     });
   }
 
-  function remove(id) {
-    return Admin.destroy({ where: { id } });
+  function remove(adminId) {
+    return Admin.destroy({ where: { id: adminId } });
   }
 
   return {

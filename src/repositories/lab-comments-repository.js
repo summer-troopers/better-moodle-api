@@ -64,9 +64,9 @@ module.exports = function createCommentRepository(connection) {
     return projectDatabaseResponse(labComments, projector);
   }
 
-  async function view(id) {
+  async function view(labCommentId) {
     const labComments = await LabComment.findAndCountAll({
-      where: { id },
+      where: { labCommentId },
     });
 
     await appendParentData(labComments.rows, LabReport);
@@ -105,7 +105,7 @@ module.exports = function createCommentRepository(connection) {
       });
     } catch (error) {
       if (error.name === 'SequelizeForeignKeyConstraintError') {
-        throw new errors.Conflict('CANNOT_DELETE_COMMENT');
+        throw new errors.Conflict('CANNOT_DELETE_LAB_COMMENT');
       }
       throw error;
     }
