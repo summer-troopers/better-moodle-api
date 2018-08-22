@@ -2,6 +2,7 @@
 
 const errors = require('@feathersjs/errors');
 const { Op } = require('sequelize');
+// eslint-disable-next-line object-curly-newline
 const { handleId, appendParentData, appendDependentCount, projectDatabaseResponse } = require('../helpers/util');
 
 module.exports = function createStudentsRepository(connection) {

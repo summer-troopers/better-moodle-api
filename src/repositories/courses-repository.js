@@ -58,7 +58,10 @@ module.exports = function createCoursesRepository(sequelize) {
   }
 
   async function view(id) {
-    return Course.findById(id);
+    return Course.findOne({
+      where: { id },
+      attributes: { exclude: ['createdAt', 'updatedAt'] },
+    });
   }
 
   function add(form, queryParams) {

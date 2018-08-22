@@ -16,7 +16,10 @@ module.exports = function createAdminsRepository(sequelize) {
   }
 
   async function view(id) {
-    return Admin.findById(id);
+    return Admin.findOne({
+      where: { id },
+      attributes: { exclude: ['password', 'createdAt', 'updatedAt'] },
+    });
   }
 
   function add(form) {
