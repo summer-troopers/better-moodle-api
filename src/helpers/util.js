@@ -56,69 +56,92 @@ function handleId(queryParams, Model, filter, queryParamsBindings) {
   return Model.findAndCountAll(query);
 }
 
-async function appendDependentData(initialResults, dependentModel) {
-  const dependencyName = getDependencyName(dependentModel);
-  const dependentIds = initialResults.rows.map(model => model[`${dependencyName}Id`]);
+// eslint-disable-next-line complexity
+async function appendParentData(initialResults, parentModel) {
+  if (!initialResults || initialResults.length === 0) return initialResults;
+  const parentColumnName = getLowerCaseName(parentModel);
+  const parentsIds = initialResults.map(model => model[`${parentColumnName}Id`]);
 
-  const dependencies = await dependentModel.findAll({
-    where: { id: { $in: dependentIds } },
+  const parents = await parentModel.findAll({
+    where: { id: { $in: parentsIds } },
   });
 
-  for (let i = 0; i < initialResults.rows.length; i += 1) {
-    for (let j = 0; j < dependencies.length; j += 1) {
-      if (initialResults.rows[i][`${dependencyName}Id`] === dependencies[j].id) {
-        initialResults.rows[i][dependencyName] = dependencies[j];
+  for (let i = 0; i < initialResults.length; i += 1) {
+    for (let j = 0; j < parents.length; j += 1) {
+      if (initialResults[i][`${parentColumnName}Id`] === parents[j].id) {
+        initialResults[i][parentColumnName] = parents[j];
       }
     }
   }
   return initialResults;
 }
 
+async function appendDependentCount(initialResults, parentModel, dependentModel) {
+  if (!initialResults || initialResults.length === 0) return initialResults;
+
+  const parentName = getLowerCaseName(parentModel);
+  const dependentName = getLowerCaseName(dependentModel);
+  const parentsIds = initialResults.map(model => model.id);
+
+  const dependencies = await dependentModel.findAll({
+    where: { [`${parentName}Id`]: { $in: parentsIds } },
+  });
+
+  initialResults.forEach((model) => {
+    const matchingDependencies = dependencies.filter((iterModel) => {
+      return (iterModel[`${parentName}Id`] === model.id);
+    });
+    model[`${dependentName}Count`] = matchingDependencies.length;
+  });
+
+  return initialResults;
+}
+
 // This next function is just an experiment for fun :)
 // eslint-disable-next-line complexity
-async function appendDependentDataDeep(initialResults, dependentModels) {
-  const dependencyNames = [];
-  dependentModels.forEach((Model) => {
-    const name = getDependencyName(Model);
-    dependencyNames.push(name);
+async function appendParentDataDeep(initialResults, parentModelChain) {
+  const parentsNames = [];
+  parentModelChain.forEach((Model) => {
+    const name = getLowerCaseName(Model);
+    parentsNames.push(name);
   });
   const resultsAggregate = [initialResults];
 
   // eslint-disable-next-line complexity
-  async function doWork(dependentModelsParam, index = 0, resultsAggregateParam) {
-    if (index === dependentModelsParam.length) return null;
+  async function doWork(parentModelChainParam, index = 0, resultsAggregateParam) {
+    if (index === parentModelChainParam.length) return null;
 
     const currentResults = resultsAggregateParam[index];
-    const dependencyName = dependencyNames[index];
+    const parentColumnName = parentsNames[index];
 
-    const dependentIds = currentResults.rows.map(model => model[`${dependencyName}Id`]);
+    const parentsIds = currentResults.map(model => model[`${parentColumnName}Id`]);
 
-    const dependencies = await dependentModelsParam[index].findAll({
-      where: { id: { $in: dependentIds } },
+    const dependencies = await parentModelChainParam[index].findAll({
+      where: { id: { $in: parentsIds } },
     });
 
-    resultsAggregateParam.push({ count: 0, rows: [] });
+    resultsAggregateParam.push([]);
 
     const nextResults = resultsAggregateParam[index + 1];
 
-    for (let i = 0; i < currentResults.rows.length; i += 1) {
+    for (let i = 0; i < currentResults.length; i += 1) {
       for (let j = 0; j < dependencies.length; j += 1) {
-        const currentId = currentResults.rows[i][`${dependencyName}Id`];
+        const currentId = currentResults[i][`${parentColumnName}Id`];
         if (currentId === dependencies[j].id) {
-          nextResults.rows.push(dependencies[j]);
+          nextResults.push(dependencies[j]);
           break;
         }
       }
     }
-    await doWork(dependentModelsParam, index + 1, resultsAggregateParam);
-    for (let i = 0; i < currentResults.rows.length; i += 1) {
-      currentResults.rows[i][dependencyName] = nextResults.rows[i];
+    await doWork(parentModelChainParam, index + 1, resultsAggregateParam);
+    for (let i = 0; i < currentResults.length; i += 1) {
+      currentResults[i][parentColumnName] = nextResults[i];
     }
 
     return null;
   }
 
-  await doWork(dependentModels, 0, resultsAggregate);
+  await doWork(parentModelChain, 0, resultsAggregate);
 
   return initialResults;
 }
@@ -130,7 +153,7 @@ function projectDatabaseResponse(response, projector) {
   };
 }
 
-function getDependencyName(model) {
+function getLowerCaseName(model) {
   return model.name.charAt(0).toLowerCase() + model.name.slice(1);
 }
 
@@ -167,7 +190,8 @@ module.exports = {
   permissions: createPermissions,
   buildIncludes,
   handleId,
-  appendDependentData,
-  appendDependentDataDeep,
+  appendParentData,
+  appendParentDataDeep,
+  appendDependentCount,
   projectDatabaseResponse,
 };
