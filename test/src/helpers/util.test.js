@@ -36,6 +36,38 @@ describe('util', () => {
     assert.deepStrictEqual(result, truePermissions);
   });
 
+  it('Should detect a duplicate', () => {
+    const arr = ['a', 'b', 'b', 'c'];
+    assert.strictEqual(util.detectDuplicate(arr), true);
+  });
+
+  it('Should not detect any duplicates', () => {
+    const arr = ['a', 'b', 'c'];
+    assert.strictEqual(util.detectDuplicate(arr), false);
+  });
+
+  it('Should return a phone number according to the format /^0\s?[67]\d{1}\s?\d{3}\s?\d{3}$/', () => {
+    const phoneNumber = util.generatePhoneNumber();
+    const regex = /^0\s?[67]\d{1}\s?\d{3}\s?\d{3}$/;
+    assert.strictEqual(regex.test(phoneNumber), true);
+  });
+
+  it('Should create 10 unique phone numbers', () => {
+    const phoneNumbers = [];
+    for (let i = 0; i < 10; i += 1) {
+      phoneNumbers.push(util.generateUniqueNumber(phoneNumbers));
+    }
+    assert.strictEqual(util.detectDuplicate(phoneNumbers), false);
+  });
+
+  it('Should create 10 unique emails', () => {
+    const emails = [];
+    for (let i = 0; i < 10; i += 1) {
+      emails.push(util.generateUniqueNumber(emails));
+    }
+    assert.strictEqual(util.detectDuplicate(emails), false);
+  });
+
   describe('buildIncludes', () => {
     it('Should return expected models', () => {
       const models = ['Student', 'Group', 'Specialty'];
