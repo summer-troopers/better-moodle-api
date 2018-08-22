@@ -58,7 +58,10 @@ module.exports = function createSpecialtiesRepository(sequelize) {
   }
 
   async function view(id) {
-    return Specialty.findById(id);
+    return Specialty.findOne({
+      where: { id },
+      attributes: { exclude: ['createdAt', 'updatedAt'] },
+    });
   }
 
   async function add(form, queryParams) {

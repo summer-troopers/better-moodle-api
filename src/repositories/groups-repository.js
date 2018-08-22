@@ -2,7 +2,7 @@
 
 const { Op } = require('sequelize');
 const errors = require('@feathersjs/errors');
-const { handleId, appendDependentData, projectDatabaseResponse } = require('../helpers/util');
+const { handleId, appendParentData, projectDatabaseResponse } = require('../helpers/util');
 
 module.exports = function createGroupsRepository(sequelize) {
   const {
@@ -60,7 +60,7 @@ module.exports = function createGroupsRepository(sequelize) {
 
     if (!groups) groups = await Group.findAndCountAll(filter);
 
-    await appendDependentData(groups, Specialty);
+    await appendParentData(groups.rows, Specialty);
 
     return projectDatabaseResponse(groups, projector);
   }
@@ -70,7 +70,7 @@ module.exports = function createGroupsRepository(sequelize) {
       where: { id },
     });
 
-    await appendDependentData(groups, Specialty);
+    await appendParentData(groups.rows, Specialty);
 
     const projectedGroups = await projectDatabaseResponse(groups, projector);
 

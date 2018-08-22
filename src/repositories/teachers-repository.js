@@ -65,7 +65,10 @@ module.exports = function createTeacherRepository(connection) {
   }
 
   async function view(id) {
-    return Teacher.findById(id);
+    return Teacher.findOne({
+      where: { id },
+      attributes: { exclude: ['password', 'createdAt', 'updatedAt'] },
+    });
   }
 
   async function add(form, queryParams) {

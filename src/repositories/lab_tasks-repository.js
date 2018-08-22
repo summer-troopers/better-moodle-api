@@ -5,7 +5,7 @@ const GridFsStorage = require('multer-gridfs-storage');
 const errors = require('@feathersjs/errors');
 
 const logger = require('../services/winston/logger');
-const { handleId, appendDependentData, projectDatabaseResponse } = require('../helpers/util');
+const { handleId, appendParentData, projectDatabaseResponse } = require('../helpers/util');
 
 module.exports = function createLabTasksRepository(mongoConnection, sqlConnection) {
   const gridFS = createGridFS({
@@ -71,8 +71,8 @@ module.exports = function createLabTasksRepository(mongoConnection, sqlConnectio
 
     if (!tasks) tasks = await LabTask.findAndCountAll(filter);
 
-    await appendDependentData(tasks, Course);
-    await appendDependentData(tasks, Teacher);
+    await appendParentData(tasks.rows, Course);
+    await appendParentData(tasks.rows, Teacher);
 
     return projectDatabaseResponse(tasks, projector);
   }

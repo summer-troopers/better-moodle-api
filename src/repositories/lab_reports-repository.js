@@ -6,7 +6,7 @@ const errors = require('@feathersjs/errors');
 
 const logger = require('../services/winston/logger');
 // eslint-disable-next-line object-curly-newline
-const { handleId, appendDependentData, appendDependentDataDeep, projectDatabaseResponse } = require('../helpers/util');
+const { handleId, appendParentData, appendParentDataDeep, projectDatabaseResponse } = require('../helpers/util');
 
 module.exports = function createLabReportsRepository(mongoConnection, sqlConnection) {
   const gridFS = createGridFS({
@@ -78,9 +78,9 @@ module.exports = function createLabReportsRepository(mongoConnection, sqlConnect
 
     if (!reports) reports = await LabReport.findAndCountAll(filter);
 
-    await appendDependentData(reports, Student);
+    await appendParentData(reports.rows, Student);
 
-    await appendDependentDataDeep(reports, [LabTask, models.Course]);
+    await appendParentDataDeep(reports.rows, [LabTask, models.Course]);
 
     return projectDatabaseResponse(reports, projector);
   }

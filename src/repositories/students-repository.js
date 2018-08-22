@@ -2,7 +2,8 @@
 
 const errors = require('@feathersjs/errors');
 const { Op } = require('sequelize');
-const { handleId, appendDependentData, projectDatabaseResponse } = require('../helpers/util');
+// eslint-disable-next-line object-curly-newline
+const { handleId, appendParentData, appendDependentCount, projectDatabaseResponse } = require('../helpers/util');
 
 module.exports = function createStudentsRepository(connection) {
   const {
@@ -29,6 +30,7 @@ module.exports = function createStudentsRepository(connection) {
         name: item.group.name,
         specialtyId: item.group.specialtyId,
       },
+      labReportCount: item.labReportCount,
     };
   };
 
@@ -67,7 +69,8 @@ module.exports = function createStudentsRepository(connection) {
 
     if (!students) students = await Student.findAndCountAll(filter);
 
-    await appendDependentData(students, Group);
+    await appendParentData(students.rows, Group);
+    await appendDependentCount(students.rows, Student, LabReport);
 
     return projectDatabaseResponse(students, projector);
   }
@@ -78,7 +81,8 @@ module.exports = function createStudentsRepository(connection) {
       where: { id },
     });
 
-    await appendDependentData(students, Group);
+    await appendParentData(students.rows, Group);
+    await appendDependentCount(student.rows, Student, LabReport);
 
     const projectedStudents = await projectDatabaseResponse(students, projector);
 
