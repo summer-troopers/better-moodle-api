@@ -127,7 +127,7 @@ module.exports = function createCoursesRepository(sequelize) {
       });
     } catch (error) {
       if (error.name === 'SequelizeForeignKeyConstraintError') {
-        throw new errors.MethodNotAllowed();
+        throw new errors.Conflict('CANNOT_DELETE_COURSE');
       }
       throw error;
     }

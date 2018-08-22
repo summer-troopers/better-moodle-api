@@ -110,7 +110,7 @@ module.exports = function createTeacherRepository(connection) {
       });
     } catch (error) {
       if (error.name === 'SequelizeForeignKeyConstraintError') {
-        throw new errors.Forbidden('CANNOT_DELETE_TECHER');
+        throw new errors.Conflict('CANNOT_DELETE_TEACHER');
       }
       throw error;
     }

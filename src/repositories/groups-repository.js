@@ -106,7 +106,7 @@ module.exports = function createGroupsRepository(sequelize) {
       });
     } catch (error) {
       if (error.name === 'SequelizeForeignKeyConstraintError') {
-        throw new errors.Forbidden('CANNOT_DELETE_GROUP');
+        throw new errors.Conflict('CANNOT_DELETE_GROUP');
       }
       throw error;
     }

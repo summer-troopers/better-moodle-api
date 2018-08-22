@@ -105,7 +105,7 @@ module.exports = function createCommentRepository(connection) {
       });
     } catch (error) {
       if (error.name === 'SequelizeForeignKeyConstraintError') {
-        throw new errors.Forbidden('CANNOT_DELETE_COMMENT');
+        throw new errors.Conflict('CANNOT_DELETE_COMMENT');
       }
       throw error;
     }
