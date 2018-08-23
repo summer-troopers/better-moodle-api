@@ -53,6 +53,9 @@ module.exports = function createCommentRepository(connection) {
     const filter = {
       limit,
       offset,
+      order: [
+        ['updatedAt', 'DESC'],
+      ],
     };
 
     let labComments = await handleId(queryParams, LabComment, filter, queryParamsBindings);

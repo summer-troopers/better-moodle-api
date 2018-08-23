@@ -2,8 +2,12 @@
 
 const errors = require('@feathersjs/errors');
 const { Op } = require('sequelize');
-// eslint-disable-next-line object-curly-newline
-const { handleId, appendParentData, appendDependentCount, projectDatabaseResponse } = require('../helpers/util');
+const {
+  handleId,
+  appendParentData, appendDependentCount,
+  projectDatabaseResponse,
+  assertEmailNotTaken,
+} = require('../helpers/util');
 
 module.exports = function createStudentsRepository(connection) {
   const {
@@ -60,9 +64,9 @@ module.exports = function createStudentsRepository(connection) {
           [Op.like]: [`%${contains}%`],
         },
       },
-      attributes: {
-        exclude: ['password'],
-      },
+      order: [
+        ['updatedAt', 'DESC'],
+      ],
     };
 
     let students = await handleId(queryParams, Student, filter, queryParamsBindings);
@@ -90,6 +94,8 @@ module.exports = function createStudentsRepository(connection) {
   }
 
   async function add(data) {
+    assertEmailNotTaken(data.email, [models.Admin, models.Teacher, Student]);
+
     const group = await Group.findById(data.groupId);
     if (!group) throw new errors.NotFound('GROUP_NOT_FOUND');
 

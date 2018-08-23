@@ -2,7 +2,7 @@
 
 const errors = require('@feathersjs/errors');
 const { Op } = require('sequelize');
-const { handleId, projectDatabaseResponse } = require('../helpers/util');
+const { handleId, assertEmailNotTaken, projectDatabaseResponse } = require('../helpers/util');
 
 module.exports = function createTeacherRepository(connection) {
   const {
@@ -52,9 +52,9 @@ module.exports = function createTeacherRepository(connection) {
           [Op.like]: [`%${contains}%`],
         },
       },
-      attributes: {
-        exclude: ['password'],
-      },
+      order: [
+        ['updatedAt', 'DESC'],
+      ],
     };
 
     let response = await handleId(queryParams, Teacher, filter, queryParamsBindings);
@@ -79,6 +79,9 @@ module.exports = function createTeacherRepository(connection) {
       if (!teacher) throw new errors.NotFound('TEACHER_NOT_FOUND');
       return teacher.addCourse(course);
     }
+
+    assertEmailNotTaken(data.email, [models.Admin, Teacher, models.Student]);
+
     return Teacher.create(data);
   }
 

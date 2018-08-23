@@ -1,9 +1,12 @@
 'use strict';
 
 const { Op } = require('sequelize');
+const errors = require('@feathersjs/errors');
+const { assertEmailNotTaken } = require('../helpers/util');
 
 module.exports = function createAdminsRepository(sequelize) {
-  const { Admin } = sequelize.models;
+  const { models } = sequelize;
+  const { Admin } = models;
 
   function list(queryParams) {
     const { limit, offset, contains } = queryParams;
@@ -13,6 +16,9 @@ module.exports = function createAdminsRepository(sequelize) {
       limit,
       where: { firstName: { [Op.like]: [`%${contains}%`] } },
       attributes: { exclude: ['password', 'createdAt', 'updatedAt'] },
+      order: [
+        ['updatedAt', 'DESC'],
+      ],
     });
   }
 
@@ -23,7 +29,9 @@ module.exports = function createAdminsRepository(sequelize) {
     });
   }
 
-  function add(data) {
+  async function add(data) {
+    assertEmailNotTaken(data.email, [Admin, models.Teacher, models.Student]);
+
     return Admin.create(data);
   }
 

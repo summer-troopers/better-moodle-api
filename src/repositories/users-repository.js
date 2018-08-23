@@ -24,14 +24,14 @@ module.exports = function getUserRepository(sequelize) {
     return false;
   }
 
-  async function getUser(form) {
-    const student = await selectUserDB(form, Student);
+  async function getUser(data) {
+    const student = await selectUserDB(data, Student);
     if (student) return [roles.STUDENT, student.dataValues];
 
-    const teacher = await selectUserDB(form, Teacher);
+    const teacher = await selectUserDB(data, Teacher);
     if (teacher) return [roles.TEACHER, teacher.dataValues];
 
-    const admin = await selectUserDB(form, Admin);
+    const admin = await selectUserDB(data, Admin);
     if (admin) return [roles.ADMIN, admin.dataValues];
 
     return null;

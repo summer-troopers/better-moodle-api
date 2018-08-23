@@ -72,6 +72,9 @@ module.exports = function createLabReportsRepository(mongoConnection, sqlConnect
     const filter = {
       limit,
       offset,
+      order: [
+        ['updatedAt', 'DESC'],
+      ],
     };
 
     let reports = await handleId(queryParams, LabReport, filter, queryParamsBindings, projector);

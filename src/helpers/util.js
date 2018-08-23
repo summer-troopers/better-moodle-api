@@ -1,6 +1,7 @@
 'use strict';
 
 const faker = require('faker');
+const errors = require('@feathersjs/errors');
 
 function createMessage(to, from, subject, text) {
   const message = {
@@ -225,6 +226,20 @@ function detectDuplicate(array) {
   return false;
 }
 
+async function assertEmailNotTaken(email, models) {
+  const userRequests = [];
+
+  models.forEach((model) => {
+    userRequests.push(model.findOne({ where: { email } }));
+  });
+
+  const users = await Promise.all(userRequests);
+
+  for (let i = 0; i < users.length; i += 1) {
+    if (users[i]) throw errors.BadRequest('EMAIL_ALREADY_TAKEN');
+  }
+}
+
 module.exports = {
   createMessage,
   permissions: createPermissions,
@@ -238,4 +253,5 @@ module.exports = {
   generateUniqueEmail,
   generateUniqueNumber,
   detectDuplicate,
+  assertEmailNotTaken,
 };

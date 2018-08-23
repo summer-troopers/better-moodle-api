@@ -48,6 +48,9 @@ module.exports = function createCoursesRepository(sequelize) {
           [Op.like]: [`%${contains}%`],
         },
       },
+      order: [
+        ['updatedAt', 'DESC'],
+      ],
     };
 
     let response = await handleId(queryParams, Course, filter, queryParamsBindings);

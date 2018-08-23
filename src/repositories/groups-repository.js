@@ -54,6 +54,9 @@ module.exports = function createGroupsRepository(sequelize) {
           [Op.like]: [`%${contains}%`],
         },
       },
+      order: [
+        ['updatedAt', 'DESC'],
+      ],
     };
 
     let groups = await handleId(queryParams, Group, filter, queryParamsBindings);

@@ -65,6 +65,9 @@ module.exports = function createLabTasksRepository(mongoConnection, sqlConnectio
     const filter = {
       limit,
       offset,
+      order: [
+        ['updatedAt', 'DESC'],
+      ],
     };
 
     let tasks = await handleId(queryParams, LabTask, filter, queryParamsBindings);
