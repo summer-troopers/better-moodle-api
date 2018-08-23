@@ -79,25 +79,25 @@ async function appendParentData(initialResults, parentModel) {
   return initialResults;
 }
 
-async function appendDependentCount(initialResults, parentModel, dependentModel) {
-  if (!initialResults || initialResults.length === 0) return initialResults;
+async function appendDependentCount(rows, parentModel, dependentModel) {
+  if (!rows || rows.length === 0) return rows;
 
   const parentName = getLowerCaseName(parentModel);
   const dependentName = getLowerCaseName(dependentModel);
-  const parentsIds = initialResults.map(model => model.id);
+  const parentsIds = rows.map(model => model.id);
 
   const dependencies = await dependentModel.findAll({
     where: { [`${parentName}Id`]: { $in: parentsIds } },
   });
 
-  initialResults.forEach((model) => {
-    const matchingDependencies = dependencies.filter((iterModel) => {
-      return (iterModel[`${parentName}Id`] === model.id);
+  rows.forEach((parentRow) => {
+    const matchingDependencies = dependencies.filter((dependentRow) => {
+      return (dependentRow[`${parentName}Id`] === parentRow.id);
     });
-    model[`${dependentName}Count`] = matchingDependencies.length;
+    parentRow[`${dependentName}Count`] = matchingDependencies.length;
   });
 
-  return initialResults;
+  return rows;
 }
 
 // This next function is just an experiment for fun :)
@@ -160,10 +160,10 @@ function getLowerCaseName(model) {
   return model.name.charAt(0).toLowerCase() + model.name.slice(1);
 }
 
-function buildIncludes(param, modelsArg) {
-  const models = [...modelsArg];
-  models.reverse();
-  return models.reduce((accumulator, model, index) => {
+function buildIncludes(param, models) {
+  const modelsCopy = [...models];
+  modelsCopy.reverse();
+  return modelsCopy.reduce((accumulator, model, index) => {
     if (index === 0) {
       accumulator.include = [
         {
@@ -197,21 +197,19 @@ function generatePhoneNumber() {
 }
 
 function generateUniqueEmail(emails) {
-  let genEmail;
+  let genEmail = faker.internet.email().toLocaleLowerCase();
   const predicate = object => object.email === genEmail;
-  while (true) {
+  while (emails.find(predicate)) {
     genEmail = faker.internet.email().toLocaleLowerCase();
-    if (!emails.find(predicate)) break;
   }
   return genEmail;
 }
 
 function generateUniqueNumber(phoneNumbers) {
-  let genNumber;
+  let genNumber = generatePhoneNumber();
   const predicate = object => object.phone_number === genNumber;
-  while (true) {
+  while (phoneNumbers.find(predicate)) {
     genNumber = generatePhoneNumber();
-    if (!phoneNumbers.find(predicate)) break;
   }
   return genNumber;
 }
