@@ -1,8 +1,7 @@
 'use strict';
 
 const errors = require('@feathersjs/errors');
-const { Op } = require('sequelize');
-const { handleId, appendParentData, projectDatabaseResponse } = require('../helpers/util');
+const { handleId, appendParentData } = require('../helpers/util');
 
 module.exports = function createCommentRepository(connection) {
   const {
@@ -64,19 +63,17 @@ module.exports = function createCommentRepository(connection) {
 
     await appendParentData(labComments.rows, LabReport);
 
-    return projectDatabaseResponse(labComments, projector);
+    labComments.rows = labComments.rows.map(projector);
+
+    return labComments;
   }
 
-  async function view(labCommentId) {
-    const labComments = await LabComment.findAndCountAll({
-      where: { labCommentId },
-    });
+  async function view(id) {
+    const labComment = await LabComment.findById(id);
 
-    await appendParentData(labComments.rows, LabReport);
+    await appendParentData([labComment], LabReport);
 
-    const projectedLabComments = await projectDatabaseResponse(labComments, projector);
-
-    return projectedLabComments.rows[0];
+    return projector(labComment);
   }
 
   async function add(data) {

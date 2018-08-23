@@ -1,8 +1,7 @@
 'use strict';
 
 const { Op } = require('sequelize');
-const errors = require('@feathersjs/errors');
-const { assertEmailNotTaken } = require('../helpers/util');
+const { assert } = require('../helpers/db');
 
 module.exports = function createAdminsRepository(sequelize) {
   const { models } = sequelize;
@@ -22,33 +21,35 @@ module.exports = function createAdminsRepository(sequelize) {
     });
   }
 
-  async function view(adminId) {
+  async function view(id) {
     return Admin.findOne({
-      where: { id: adminId },
+      where: { id },
       attributes: { exclude: ['password', 'createdAt', 'updatedAt'] },
     });
   }
 
   async function add(data) {
-    assertEmailNotTaken(data.email, [Admin, models.Teacher, models.Student]);
+    assert.notTaken.email(data.email, [Admin, models.Teacher, models.Student]);
 
     return Admin.create(data);
   }
 
-  async function exists(adminId) {
-    const result = await Admin.findById(adminId);
+  async function exists(id) {
+    const result = await Admin.findById(id);
     if (result) return true;
     return false;
   }
 
-  async function update(adminId, data) {
+  async function update(id, data) {
+    assert.notTaken.email(data.email, [Admin, models.Teacher, models.Student]);
+
     return Admin.update(data, {
-      where: { id: adminId },
+      where: { id },
     });
   }
 
-  function remove(adminId) {
-    return Admin.destroy({ where: { id: adminId } });
+  function remove(id) {
+    return Admin.destroy({ where: { id } });
   }
 
   return {

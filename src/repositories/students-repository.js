@@ -2,12 +2,8 @@
 
 const errors = require('@feathersjs/errors');
 const { Op } = require('sequelize');
-const {
-  handleId,
-  appendParentData, appendDependentCount,
-  projectDatabaseResponse,
-  assertEmailNotTaken,
-} = require('../helpers/util');
+const { handleId, appendParentData, appendDependentCount } = require('../helpers/util');
+const { assert } = require('../helpers/db');
 
 module.exports = function createStudentsRepository(connection) {
   const {
@@ -76,25 +72,23 @@ module.exports = function createStudentsRepository(connection) {
     await appendParentData(students.rows, Group);
     await appendDependentCount(students.rows, Student, LabReport);
 
-    return projectDatabaseResponse(students, projector);
+    students.rows = students.rows.map(projector);
+
+    return students;
   }
 
 
   async function view(studentId) {
-    const students = await Student.findAndCountAll({
-      where: { id: studentId },
-    });
+    const student = await Student.findById(studentId);
 
-    await appendParentData(students.rows, Group);
-    await appendDependentCount(students.rows, Student, LabReport);
+    await appendParentData([student], Group);
+    await appendDependentCount([student], Student, LabReport);
 
-    const projectedStudents = await projectDatabaseResponse(students, projector);
-
-    return projectedStudents.rows[0];
+    return projector(student);
   }
 
   async function add(data) {
-    assertEmailNotTaken(data.email, [models.Admin, models.Teacher, Student]);
+    assert.notTaken.email(data.email, [models.Admin, models.Teacher, Student]);
 
     const group = await Group.findById(data.groupId);
     if (!group) throw new errors.NotFound('GROUP_NOT_FOUND');
@@ -109,6 +103,8 @@ module.exports = function createStudentsRepository(connection) {
   }
 
   async function update(studentId, data) {
+    assert.notTaken.email(data.email, [models.Admin, models.Teacher, Student]);
+
     const group = await Group.findById(data.groupId);
     if (!group) throw new errors.NotFound('GROUP_NOT_FOUND');
 

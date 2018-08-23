@@ -2,7 +2,8 @@
 
 const { Op } = require('sequelize');
 const errors = require('@feathersjs/errors');
-const { handleId, appendParentData, projectDatabaseResponse } = require('../helpers/util');
+const { handleId, appendParentData } = require('../helpers/util');
+const { assert } = require('../helpers/util');
 
 module.exports = function createGroupsRepository(sequelize) {
   const {
@@ -65,22 +66,22 @@ module.exports = function createGroupsRepository(sequelize) {
 
     await appendParentData(groups.rows, Specialty);
 
-    return projectDatabaseResponse(groups, projector);
+    groups.rows = groups.rows.map(projector);
+
+    return groups;
   }
 
-  async function view(groupId) {
-    const groups = await Group.findAndCountAll({
-      where: { id: groupId },
-    });
+  async function view(id) {
+    const group = await Group.findById(id);
 
-    await appendParentData(groups.rows, Specialty);
+    group.specialty = await group.getSpecialty();
 
-    const projectedGroups = await projectDatabaseResponse(groups, projector);
-
-    return projectedGroups.rows[0];
+    return projector(group);
   }
 
   async function add(data) {
+    assert.notTaken.name(data.name, Course);
+
     const specialty = await Specialty.findById(data.specialtyId);
     if (!specialty) throw new errors.NotFound('SPECIALTY_NOT_FOUND');
 
@@ -94,6 +95,8 @@ module.exports = function createGroupsRepository(sequelize) {
   }
 
   async function update(groupId, data) {
+    assert.notTaken.name(data.name, Course);
+
     const specialty = await Specialty.findById(data.specialtyId);
     if (!specialty) throw new errors.NotFound('SPECIALTY_NOT_FOUND');
 

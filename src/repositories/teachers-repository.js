@@ -2,7 +2,8 @@
 
 const errors = require('@feathersjs/errors');
 const { Op } = require('sequelize');
-const { handleId, assertEmailNotTaken, projectDatabaseResponse } = require('../helpers/util');
+const { handleId } = require('../helpers/util');
+const { assert } = require('../helpers/db');
 
 module.exports = function createTeacherRepository(connection) {
   const {
@@ -57,18 +58,19 @@ module.exports = function createTeacherRepository(connection) {
       ],
     };
 
-    let response = await handleId(queryParams, Teacher, filter, queryParamsBindings);
+    let teachers = await handleId(queryParams, Teacher, filter, queryParamsBindings);
 
-    if (!response) response = await Teacher.findAndCountAll(filter);
+    if (!teachers) teachers = await Teacher.findAndCountAll(filter);
 
-    return projectDatabaseResponse(response, projector);
+    teachers.rows = teachers.rows.map(projector);
+
+    return teachers;
   }
 
   async function view(teacherId) {
-    return Teacher.findOne({
-      where: { id: teacherId },
-      attributes: { exclude: ['password', 'createdAt', 'updatedAt'] },
-    });
+    const teacher = await Teacher.findById(teacherId);
+
+    return projector(teacher);
   }
 
   async function add(data, queryParams) {
@@ -80,7 +82,7 @@ module.exports = function createTeacherRepository(connection) {
       return teacher.addCourse(course);
     }
 
-    assertEmailNotTaken(data.email, [models.Admin, Teacher, models.Student]);
+    assert.notTaken.email(data.email, [models.Admin, Teacher, models.Student]);
 
     return Teacher.create(data);
   }
@@ -92,6 +94,8 @@ module.exports = function createTeacherRepository(connection) {
   }
 
   async function update(teacherId, data) {
+    assert.notTaken.email(data.email, [models.Admin, Teacher, models.Student]);
+
     return Teacher.update(data, {
       where: { id: teacherId },
     });

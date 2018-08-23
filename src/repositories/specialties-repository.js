@@ -2,7 +2,8 @@
 
 const { Op } = require('sequelize');
 const errors = require('@feathersjs/errors');
-const { handleId, projectDatabaseResponse } = require('../helpers/util');
+const { handleId } = require('../helpers/util');
+const { assert } = require('../helpers/db');
 
 module.exports = function createSpecialtiesRepository(sequelize) {
   const {
@@ -53,21 +54,24 @@ module.exports = function createSpecialtiesRepository(sequelize) {
       ],
     };
 
-    let response = await handleId(queryParams, Specialty, filter, queryParamsBindings);
+    let specialties = await handleId(queryParams, Specialty, filter, queryParamsBindings);
 
-    if (!response) response = await Specialty.findAndCountAll(filter);
+    if (!specialties) specialties = await Specialty.findAndCountAll(filter);
 
-    return projectDatabaseResponse(response, projector);
+    specialties.rows = specialties.rows.map(projector);
+
+    return specialties;
   }
 
   async function view(specialtyId) {
-    return Specialty.findOne({
-      where: { id: specialtyId },
-      attributes: { exclude: ['createdAt', 'updatedAt'] },
-    });
+    const specialty = await Specialty.findById(specialtyId);
+
+    return projector(specialty);
   }
 
   async function add(data, queryParams) {
+    assert.notTaken.name(data.name, Course);
+
     if (queryParams.courseId) {
       const course = await Course.findById(queryParams.courseId);
       if (!course) throw new errors.NotFound('COURSE_NOT_FOUND');
@@ -85,6 +89,8 @@ module.exports = function createSpecialtiesRepository(sequelize) {
   }
 
   async function update(specialtyId, data) {
+    assert.notTaken.name(data.name, Course);
+
     return Specialty.update(data, {
       where: { id: specialtyId },
     });
