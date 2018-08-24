@@ -119,7 +119,7 @@ module.exports = function createLabTasksRepository(mongoConnection, sqlConnectio
       },
     });
     if (task) {
-      await update(task.id, data);
+      return update(task.id, data);
     }
     return LabTask.create({
       courseId: data.courseId,
