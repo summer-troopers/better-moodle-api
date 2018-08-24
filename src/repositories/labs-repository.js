@@ -131,9 +131,19 @@ module.exports = function createLabTasksRepository(mongoConnection, sqlConnectio
     });
   }
 
-  async function update(id, fileId) {
+  // eslint-disable-next-line complexity
+  async function update(id, { fileId, userId }) {
     const lab = await Lab.findById(id);
-    if (lab && lab.mongoFileId) await removeFile(lab.mongoFileId);
+    if (lab) {
+      // Only admins (userId === 0) and the teacher that is responsible for this lab ca go here
+      if (userId !== 0 && userId !== lab.teacherId) throw new errors.Forbidden('UPLOAD_PERMISSIONS_MISSING');
+
+      // If there is already a file
+      if (lab.mongoFileId) await removeFile(lab.mongoFileId);
+
+      // Teachers can only delete the file, not the row in the DB
+      if (userId === lab.teacherId) return null;
+    }
 
     return Lab.update({
       mongoFileId: fileId,

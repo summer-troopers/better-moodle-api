@@ -74,26 +74,9 @@ module.exports = function createLabsRoute(repository, permissions) {
 
   function assertFileField(request, response, next) {
     const { file } = request;
-    if (!file) return next(new errors.BadRequest(msg.error.notReceived.file));
-
-    try {
-      const { fieldname } = file;
-      if (fieldname !== names.requiredField) throw new errors.BadRequest(msg.error.notReceived.file);
-    } catch (error) {
-      repository.removeFile(request.file.id);
-      return next(error);
-    }
+    if (!file) request.file = { id: null };
 
     return next();
-  }
-
-  function buildData(fileId, dependencyId, userId) {
-    const data = {};
-    if (fileId) data.fileId = fileId;
-    if (dependencyId) data[names.dependencyId] = dependencyId;
-    if (userId) data[names.userId] = userId;
-
-    return data;
   }
 
   async function list(request, response, next) {
@@ -144,10 +127,12 @@ module.exports = function createLabsRoute(repository, permissions) {
   }
 
   function update(request, response, next) {
-    let userId = request.token.userRole === roles.ADMIN ? request.body[names.userId] : request.token.user;
-    userId = userId || '1';
+    const userId = request.token.userRole === roles.ADMIN ? 0 : request.token.user;
 
-    repository.update(request.params.id, request.file.id.toString())
+    repository.update(request.params.id, {
+      fileId: request.file.id.toString(),
+      userId,
+    })
       .then((result) => {
         response.json(msg.success.update);
 
