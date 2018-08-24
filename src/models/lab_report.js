@@ -26,20 +26,8 @@ module.exports = function defineLabReport(sequelize, DataTypes) {
       type: DataTypes.INTEGER,
       allowNull: true,
       validate: {
-        min: {
-          args: [1],
-          msg: {
-            code: 'MARK_TOO_LOW',
-            reason: 'Field \'mark\' cannot hold a value lower than 1',
-          },
-        },
-        max: {
-          args: [10],
-          msg: {
-            code: 'MARK_TOO_HIGH',
-            reason: 'Field \'mark\' cannot hold a value higher than 10',
-          },
-        },
+        min: 1,
+        max: 10,
       },
     },
     mongoFileId: {
