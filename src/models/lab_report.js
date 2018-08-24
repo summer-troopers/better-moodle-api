@@ -18,6 +18,30 @@ module.exports = function defineLabReport(sequelize, DataTypes) {
       field: 'lab_task_id',
       allowNull: false,
     },
+    review: {
+      type: DataTypes.TEXT,
+      allowNull: true,
+    },
+    mark: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+      validate: {
+        min: {
+          args: [1],
+          msg: {
+            code: 'MARK_TOO_LOW',
+            reason: 'Field \'mark\' cannot hold a value lower than 1',
+          },
+        },
+        max: {
+          args: [10],
+          msg: {
+            code: 'MARK_TOO_HIGH',
+            reason: 'Field \'mark\' cannot hold a value higher than 10',
+          },
+        },
+      },
+    },
     mongoFileId: {
       type: DataTypes.STRING,
       field: 'mongo_file_id',
@@ -31,7 +55,6 @@ module.exports = function defineLabReport(sequelize, DataTypes) {
   LabReport.associate = function associateLabReport(models) {
     LabReport.belongsTo(models.Student, { foreignKey: 'studentId' });
     LabReport.belongsTo(models.LabTask, { foreignKey: 'labTaskId' });
-    LabReport.hasMany(models.LabComment, { foreignKey: 'labReportId' });
   };
   return LabReport;
 };

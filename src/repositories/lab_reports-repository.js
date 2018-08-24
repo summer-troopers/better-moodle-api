@@ -34,6 +34,8 @@ module.exports = function createLabReportsRepository(mongoConnection, sqlConnect
   const projector = (row) => {
     return {
       id: row.id,
+      review: row.review,
+      mark: row.mark,
       studentId: row.studentId,
       labTaskId: row.labTaskId,
       student: {

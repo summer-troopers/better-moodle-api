@@ -28,6 +28,14 @@ module.exports = {
           key: 'id',
         },
       },
+      review: {
+        type: Sequelize.TEXT,
+        allowNull: true,
+      },
+      mark: {
+        type: Sequelize.INTEGER,
+        allowNull: true,
+      },
       mongoFileId: {
         type: Sequelize.STRING,
         field: 'mongo_file_id',

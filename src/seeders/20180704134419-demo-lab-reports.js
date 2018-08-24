@@ -33,6 +33,8 @@ module.exports = {
     return LabReport.bulkCreate([{
       studentId: 1,
       labTaskId: 1,
+      review: 'Bla bla bla',
+      mark: 5,
       mongoFileId: file.id,
     }], {});
   },
