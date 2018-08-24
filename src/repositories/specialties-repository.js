@@ -13,8 +13,7 @@ module.exports = function createSpecialtiesRepository(sequelize) {
     Teacher,
     Student,
     LabReport,
-    LabTask,
-    LabComment,
+    Lab,
   } = sequelize.models;
 
   const projector = (item) => {
@@ -30,8 +29,7 @@ module.exports = function createSpecialtiesRepository(sequelize) {
     groupId: [Group],
     studentId: [Group, Student],
     labReportId: [Group, Student, LabReport],
-    labTaskId: [Group, Student, LabReport, LabTask],
-    labCommentId: [Group, Student, LabReport, LabComment],
+    labId: [Group, Student, LabReport, Lab],
   };
 
   async function list(queryParams) {
@@ -63,8 +61,8 @@ module.exports = function createSpecialtiesRepository(sequelize) {
     return specialties;
   }
 
-  async function view(specialtyId) {
-    const specialty = await Specialty.findById(specialtyId);
+  async function view(id) {
+    const specialty = await Specialty.findById(id);
 
     return projector(specialty);
   }
@@ -82,25 +80,25 @@ module.exports = function createSpecialtiesRepository(sequelize) {
     return Specialty.create(data);
   }
 
-  async function exists(specialtyId) {
-    const result = await Specialty.findById(specialtyId);
+  async function exists(id) {
+    const result = await Specialty.findById(id);
     if (result) return true;
     return false;
   }
 
-  async function update(specialtyId, data) {
+  async function update(id, data) {
     assert.notTaken.name(data.name, Course);
 
     return Specialty.update(data, {
-      where: { id: specialtyId },
+      where: { id },
     });
   }
 
-  async function remove(specialtyId, queryParams) {
+  async function remove(id, queryParams) {
     if (queryParams.courseId) {
       return CourseSpecialty.destroy({
         where: {
-          specialtyId,
+          specialtyId: id,
           courseId: queryParams.courseId,
         },
       });
@@ -108,7 +106,7 @@ module.exports = function createSpecialtiesRepository(sequelize) {
 
     try {
       return await Specialty.destroy({
-        where: { id: specialtyId },
+        where: { id },
       });
     } catch (error) {
       if (error.name === 'SequelizeForeignKeyConstraintError') {

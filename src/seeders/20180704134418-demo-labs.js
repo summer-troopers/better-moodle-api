@@ -29,13 +29,13 @@ module.exports = {
     });
 
     const { sequelize } = queryInterface;
-    const LabTask = sequelize.import('../models/lab_task.js');
-    return LabTask.bulkCreate([{
+    const Lab = sequelize.import('../models/lab.js');
+    return Lab.bulkCreate([{
       teacherId: 1,
       courseId: 1,
       mongoFileId: file.id,
     }], {});
   },
   // eslint-disable-next-line no-unused-vars
-  down(queryInterface, Sequelize) { return queryInterface.bulkDelete('lab_tasks', null, {}); },
+  down(queryInterface, Sequelize) { return queryInterface.bulkDelete('labs', null, {}); },
 };

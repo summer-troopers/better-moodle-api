@@ -32,7 +32,7 @@ module.exports = {
     const LabReport = sequelize.import('../models/lab_report.js');
     return LabReport.bulkCreate([{
       studentId: 1,
-      labTaskId: 1,
+      labId: 1,
       review: 'Bla bla bla',
       mark: 5,
       mongoFileId: file.id,

@@ -1,7 +1,5 @@
 'use strict';
 
-const labRoutesConfig = require('./lab-routes');
-
 module.exports = {
   mysql: process.env.MYSQL_URI || 'mysql://localhost:3306/moodle',
   mongo: process.env.MONGO_URI || 'mongodb://localhost:27017/uploads',
@@ -27,6 +25,4 @@ module.exports = {
       expiresIn: 864000, // 10 days exist token
     },
   },
-
-  labRoutes: labRoutesConfig,
 };

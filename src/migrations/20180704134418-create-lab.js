@@ -2,7 +2,7 @@
 
 module.exports = {
   up(queryInterface, Sequelize) {
-    return queryInterface.createTable('lab_tasks', {
+    return queryInterface.createTable('labs', {
       id: {
         type: Sequelize.INTEGER,
         primaryKey: true,
@@ -31,7 +31,7 @@ module.exports = {
       mongoFileId: {
         type: Sequelize.STRING,
         field: 'mongo_file_id',
-        allowNull: false,
+        allowNull: true,
       },
       createdAt: {
         type: Sequelize.DATE,
@@ -44,5 +44,5 @@ module.exports = {
     });
   },
   // eslint-disable-next-line no-unused-vars
-  down(queryInterface, Sequelize) { return queryInterface.dropTable('lab_tasks'); },
+  down(queryInterface, Sequelize) { return queryInterface.dropTable('labs'); },
 };

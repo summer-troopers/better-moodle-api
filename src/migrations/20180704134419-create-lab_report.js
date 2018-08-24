@@ -18,13 +18,13 @@ module.exports = {
           key: 'id',
         },
       },
-      labTaskId: {
+      labId: {
         type: Sequelize.INTEGER,
-        field: 'lab_task_id',
+        field: 'lab_id',
         foreignKey: true,
         allowNull: false,
         references: {
-          model: 'lab_tasks',
+          model: 'labs',
           key: 'id',
         },
       },

@@ -1,7 +1,7 @@
 'use strict';
 
-module.exports = function defineLabTask(sequelize, DataTypes) {
-  const LabTask = sequelize.define('LabTask', {
+module.exports = function defineLab(sequelize, DataTypes) {
+  const Lab = sequelize.define('Lab', {
     id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
@@ -21,18 +21,18 @@ module.exports = function defineLabTask(sequelize, DataTypes) {
     mongoFileId: {
       type: DataTypes.STRING,
       field: 'mongo_file_id',
-      allowNull: false,
+      allowNull: true,
     },
   },
   {
-    tableName: 'lab_tasks',
+    tableName: 'labs',
     timestamps: true,
   });
   // eslint-disable-next-line no-unused-vars
-  LabTask.associate = function associateLabTask(models) {
-    LabTask.belongsTo(models.Teacher, { foreignKey: 'teacherId', targetKey: 'id' });
-    LabTask.belongsTo(models.Course, { foreignKey: 'courseId', targetKey: 'id' });
-    LabTask.hasMany(models.LabReport, { foreignKey: 'labTaskId', sourceKey: 'id' });
+  Lab.associate = function associateLab(models) {
+    Lab.belongsTo(models.Teacher, { foreignKey: 'teacherId' });
+    Lab.belongsTo(models.Course, { foreignKey: 'courseId' });
+    Lab.hasMany(models.LabReport, { foreignKey: 'labId' });
   };
-  return LabTask;
+  return Lab;
 };

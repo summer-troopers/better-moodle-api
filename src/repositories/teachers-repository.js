@@ -12,9 +12,8 @@ module.exports = function createTeacherRepository(connection) {
     Group,
     Student,
     LabReport,
-    LabTask,
+    Lab,
     Teacher,
-    LabComment,
   } = connection.models;
 
   const projector = (item) => {
@@ -29,9 +28,8 @@ module.exports = function createTeacherRepository(connection) {
   };
 
   const queryParamsBindings = {
-    labTaskId: [LabTask],
-    labReportId: [LabTask, LabReport],
-    labCommentId: [LabTask, LabReport, LabComment],
+    lab: [Lab],
+    labReportId: [Lab, LabReport],
     courseId: [Course],
     specialtyId: [Course, Specialty],
     groupId: [Course, Specialty, Group],
@@ -87,25 +85,25 @@ module.exports = function createTeacherRepository(connection) {
     return Teacher.create(data);
   }
 
-  async function exists(teacherId) {
-    const result = await Teacher.findById(teacherId);
+  async function exists(id) {
+    const result = await Teacher.findById(id);
     if (result) return true;
     return false;
   }
 
-  async function update(teacherId, data) {
+  async function update(id, data) {
     assert.notTaken.email(data.email, [models.Admin, Teacher, models.Student]);
 
     return Teacher.update(data, {
-      where: { id: teacherId },
+      where: { id },
     });
   }
 
-  async function remove(teacherId, queryParams) {
+  async function remove(id, queryParams) {
     if (queryParams.courseId) {
-      return CourseTeacher.destroy({
+      return Lab.destroy({
         where: {
-          teacherId,
+          id,
           courseId: queryParams.courseId,
         },
       });
@@ -113,7 +111,7 @@ module.exports = function createTeacherRepository(connection) {
 
     try {
       return await Teacher.destroy({
-        where: { id: teacherId },
+        where: { id },
       });
     } catch (error) {
       if (error.name === 'SequelizeForeignKeyConstraintError') {

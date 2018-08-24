@@ -13,8 +13,7 @@ module.exports = function createGroupsRepository(sequelize) {
     Teacher,
     Student,
     LabReport,
-    LabTask,
-    LabComment,
+    Lab,
   } = sequelize.models;
 
   const projector = (item) => {
@@ -35,8 +34,7 @@ module.exports = function createGroupsRepository(sequelize) {
     teacherId: [Specialty, Course, Teacher],
     studentId: [Student],
     labReportId: [Student, LabReport],
-    labTaskId: [Student, LabReport, LabTask],
-    labCommentId: [Student, LabReport, LabComment],
+    labId: [Student, LabReport, Lab],
   };
 
   // eslint-disable-next-line complexity

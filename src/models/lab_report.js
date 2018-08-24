@@ -13,9 +13,9 @@ module.exports = function defineLabReport(sequelize, DataTypes) {
       field: 'student_id',
       allowNull: false,
     },
-    labTaskId: {
+    labId: {
       type: DataTypes.INTEGER,
-      field: 'lab_task_id',
+      field: 'lab_id',
       allowNull: false,
     },
     review: {
@@ -42,7 +42,7 @@ module.exports = function defineLabReport(sequelize, DataTypes) {
   // eslint-disable-next-line no-unused-vars
   LabReport.associate = function associateLabReport(models) {
     LabReport.belongsTo(models.Student, { foreignKey: 'studentId' });
-    LabReport.belongsTo(models.LabTask, { foreignKey: 'labTaskId' });
+    LabReport.belongsTo(models.Lab, { foreignKey: 'labId' });
   };
   return LabReport;
 };

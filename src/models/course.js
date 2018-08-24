@@ -22,14 +22,14 @@ module.exports = function defineCourse(sequelize, DataTypes) {
   // eslint-disable-next-line no-unused-vars
   Course.associate = function associateCourse(models) {
     Course.belongsToMany(models.Teacher, {
-      through: 'CourseTeacher',
+      through: 'Lab',
       foreignKey: 'courseId',
     });
     Course.belongsToMany(models.Specialty, {
       through: 'CourseSpecialty',
       foreignKey: 'courseId',
     });
-    Course.hasMany(models.LabTask, { foreignKey: 'courseId' });
+    Course.hasMany(models.Lab, { foreignKey: 'courseId' });
   };
   return Course;
 };

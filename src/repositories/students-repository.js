@@ -13,8 +13,7 @@ module.exports = function createStudentsRepository(connection) {
     Course,
     Teacher,
     LabReport,
-    LabTask,
-    LabComment,
+    Lab,
   } = connection.models;
 
   const projector = (item) => {
@@ -35,13 +34,12 @@ module.exports = function createStudentsRepository(connection) {
   };
 
   const queryParamsBindings = {
-    labCommentId: [LabReport, LabComment],
     labReportId: [LabReport],
     groupId: [Group],
     courseId: [Group, Specialty, Course],
     specialtyId: [Group, Specialty],
-    labTaskId: [LabReport, LabTask],
-    teacherId: [LabReport, LabTask, Teacher],
+    labId: [LabReport, Lab],
+    teacherId: [LabReport, Lab, Teacher],
   };
 
   // eslint-disable-next-line complexity
@@ -78,8 +76,8 @@ module.exports = function createStudentsRepository(connection) {
   }
 
 
-  async function view(studentId) {
-    const student = await Student.findById(studentId);
+  async function view(id) {
+    const student = await Student.findById(id);
 
     await appendParentData([student], Group);
     await appendDependentCount([student], Student, LabReport);
@@ -96,27 +94,27 @@ module.exports = function createStudentsRepository(connection) {
     return Student.create(data);
   }
 
-  async function exists(studentId) {
-    const result = await Student.findById(studentId);
+  async function exists(id) {
+    const result = await Student.findById(id);
     if (result) return true;
     return false;
   }
 
-  async function update(studentId, data) {
+  async function update(id, data) {
     assert.notTaken.email(data.email, [models.Admin, models.Teacher, Student]);
 
     const group = await Group.findById(data.groupId);
     if (!group) throw new errors.NotFound('GROUP_NOT_FOUND');
 
     return Student.update(data, {
-      where: { id: studentId },
+      where: { id },
     });
   }
 
-  async function remove(studentId) {
+  async function remove(id) {
     try {
       return await Student.destroy({
-        where: { id: studentId },
+        where: { id },
       });
     } catch (error) {
       if (error.name === 'SequelizeForeignKeyConstraintError') {

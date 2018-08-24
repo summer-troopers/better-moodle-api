@@ -3,6 +3,7 @@
 const errors = require('@feathersjs/errors');
 const { Op } = require('sequelize');
 const { assert } = require('../helpers/db');
+const { handleId } = require('../helpers/util');
 
 module.exports = function createCoursesRepository(sequelize) {
   const {
@@ -12,8 +13,7 @@ module.exports = function createCoursesRepository(sequelize) {
     Group,
     Student,
     LabReport,
-    LabTask,
-    LabComment,
+    Lab,
   } = sequelize.models;
 
   const projector = (item) => {
@@ -28,9 +28,8 @@ module.exports = function createCoursesRepository(sequelize) {
     groupId: [Specialty, Group],
     studentId: [Specialty, Group, Student],
     teacherId: [Teacher],
-    labTaskId: [Teacher, LabTask],
-    labReportId: [Teacher, LabTask, LabReport],
-    labCommentId: [Teacher, LabTask, LabReport, LabComment],
+    labId: [Teacher, Lab],
+    labReportId: [Teacher, Lab, LabReport],
   };
 
   async function list(queryParams) {
@@ -114,7 +113,7 @@ module.exports = function createCoursesRepository(sequelize) {
   /* eslint-disable complexity */
   async function remove(id, queryParams) {
     if (queryParams.teacherId) {
-      return CourseTeacher.destroy({
+      return Lab.destroy({
         where: {
           courseId: id,
           teacherId: queryParams.teacherId,
