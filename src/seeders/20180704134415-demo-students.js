@@ -1,6 +1,6 @@
 const faker = require('faker');
 const hashFactory = require('../helpers/hash/hash-factory')();
-const { generateUniqueEmail, generateUniqueNumber } = require('../helpers/util');
+const { generateUniqueEmail, generateUniquePhoneNumber } = require('../helpers/util');
 
 module.exports = {
   // eslint-disable-next-line no-unused-vars
@@ -11,7 +11,9 @@ module.exports = {
     return Student.bulkCreate(await generate250Students(Group), {});
   },
   // eslint-disable-next-line no-unused-vars
-  down(queryInterface, Sequelize) { return queryInterface.bulkDelete('students', null, {}); },
+  down(queryInterface, Sequelize) {
+    return queryInterface.bulkDelete('students', null, {});
+  },
 };
 
 async function generate250Students(Group) {
@@ -32,7 +34,7 @@ async function generate250Students(Group) {
       lastName: faker.name.lastName(),
       email: generateUniqueEmail(students),
       password: faker.random.alphaNumeric(60),
-      phoneNumber: generateUniqueNumber(students),
+      phoneNumber: generateUniquePhoneNumber(students),
       groupId: groups[groupIndex].id,
     });
   }

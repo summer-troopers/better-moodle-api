@@ -1,7 +1,5 @@
 {
-  "plugins": [
-    "spellcheck"
-  ],
+  "plugins": ["spellcheck"],
   "extends": "airbnb-base",
   "rules": {
     "spellcheck/spell-checker": [
@@ -48,7 +46,7 @@
           "msg",
           "maxsize",
           "param",
-          "middlewares",
+          "middleware",
           "verifier",
           "mongo",
           "hasher",
@@ -58,14 +56,13 @@
           "normalizer",
           "validator",
           "md5",
-          "unlink"
+          "unlink",
+          "lorem",
+          "Dockerfile"
         ]
       }
     ],
-    "linebreak-style": [
-      "off",
-      "windows"
-    ],
+    "linebreak-style": ["off", "windows"],
     "no-unused-vars": "warn",
     "global-require": "warn",
     "no-use-before-define": "off",
@@ -75,10 +72,6 @@
     "strict": "off",
     "max-len": "off",
     "no-param-reassign": "off",
-    "complexity": [
-      "error",
-      4
-    ],
-    "no-param-reassign": "off"
+    "complexity": ["error", 4]
   }
 }

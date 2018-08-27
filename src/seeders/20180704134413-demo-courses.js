@@ -1,6 +1,7 @@
 'use strict';
 
 const faker = require('faker');
+const { generateUniqueJobName } = require('../helpers/util');
 
 module.exports = {
   // eslint-disable-next-line no-unused-vars
@@ -10,24 +11,22 @@ module.exports = {
     return Course.bulkCreate(generate20Courses(), {});
   },
   // eslint-disable-next-line no-unused-vars
-  down(queryInterface, Sequelize) { return queryInterface.bulkDelete('courses', null, {}); },
+  down(queryInterface, Sequelize) {
+    return queryInterface.bulkDelete('courses', null, {});
+  },
 };
 
 function generate20Courses() {
   const courses = [];
-  courses.push({ name: 'Artificial Intelligence' });
+  courses.push({
+    name: 'Artificial Intelligence',
+    description: 'Learn about AI.',
+  });
   for (let i = 1; i <= 20; i += 1) {
-    courses.push({ name: generateUniqueName(i, courses) });
+    courses.push({
+      name: generateUniqueJobName(courses),
+      description: faker.lorem.sentence(),
+    });
   }
   return courses;
-}
-
-function generateUniqueName(i, courses) {
-  let genName;
-  const predicate = object => object.name === genName;
-  while (true) {
-    genName = faker.name.jobDescriptor();
-    if (!courses.find(predicate)) break;
-  }
-  return genName;
 }

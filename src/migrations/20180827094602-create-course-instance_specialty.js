@@ -2,7 +2,7 @@
 
 module.exports = {
   up(queryInterface, Sequelize) {
-    return queryInterface.createTable('course-instances_specialties', {
+    return queryInterface.createTable('course_instances-specialties', {
       courseInstanceId: {
         type: Sequelize.INTEGER,
         field: 'course_instance_id',
@@ -38,6 +38,6 @@ module.exports = {
 
   // eslint-disable-next-line no-unused-vars
   down(queryInterface, Sequelize) {
-    return queryInterface.dropTable('course_instances');
+    return queryInterface.dropTable('course_instances-specialties');
   },
 };

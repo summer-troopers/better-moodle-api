@@ -13,7 +13,8 @@ module.exports = {
   appendDependentCount,
   generatePhoneNumber,
   generateUniqueEmail,
-  generateUniqueNumber,
+  generateUniquePhoneNumber,
+  generateUniqueJobName,
   detectDuplicate,
 };
 
@@ -106,7 +107,7 @@ async function appendDependentCount(rows, parentModel, dependentModel) {
 
   rows.forEach((parentRow) => {
     const matchingDependencies = dependencies.filter((dependentRow) => {
-      return (dependentRow[`${parentName}Id`] === parentRow.id);
+      return dependentRow[`${parentName}Id`] === parentRow.id;
     });
     parentRow[`${dependentName}Count`] = matchingDependencies.length;
   });
@@ -217,13 +218,22 @@ function generateUniqueEmail(emails) {
   return genEmail;
 }
 
-function generateUniqueNumber(phoneNumbers) {
+function generateUniquePhoneNumber(phoneNumbers) {
   let genNumber = generatePhoneNumber();
   const predicate = object => object.phone_number === genNumber;
   while (phoneNumbers.find(predicate)) {
     genNumber = generatePhoneNumber();
   }
   return genNumber;
+}
+
+function generateUniqueJobName(names) {
+  let genName = faker.name.jobDescriptor();
+  const predicate = object => object.name === genName;
+  while (names.find(predicate)) {
+    genName = faker.name.jobDescriptor();
+  }
+  return genName;
 }
 
 function detectDuplicate(array) {
