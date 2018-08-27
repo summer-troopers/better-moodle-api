@@ -3,7 +3,7 @@
 const errors = require('@feathersjs/errors');
 const { Op } = require('sequelize');
 const { assert } = require('../helpers/db');
-const { handleId, appendDependentData } = require('../helpers/util');
+const { handleId, appendDependentDataThrough } = require('../helpers/util');
 
 module.exports = function createCoursesRepository(sequelize) {
   const {
@@ -21,7 +21,15 @@ module.exports = function createCoursesRepository(sequelize) {
       id: row.id,
       name: row.name,
       description: row.description,
-      teachers: row.teachers,
+      teachers: row.teachers.map((teacherRow) => {
+        return {
+          id: teacherRow.id,
+          firstName: teacherRow.firstName,
+          lastName: teacherRow.lastName,
+          email: teacherRow.email,
+          phoneNumber: teacherRow.phoneNumber,
+        };
+      }),
     };
   };
 
@@ -58,7 +66,11 @@ module.exports = function createCoursesRepository(sequelize) {
 
     if (!courses) courses = await Course.findAndCountAll(filter);
 
-    await appendDependentData(courses.rows, Course, Teacher);
+    await appendDependentDataThrough(courses.rows, {
+      parent: Course,
+      dependent: Teacher,
+      through: CourseInstance,
+    });
 
     courses.rows = courses.rows.map(projector);
 
@@ -66,7 +78,13 @@ module.exports = function createCoursesRepository(sequelize) {
   }
 
   async function view(id) {
-    const course = await Course.findOne(id);
+    const course = await Course.findById(id);
+
+    await appendDependentDataThrough([course], {
+      parent: Course,
+      dependent: Teacher,
+      through: CourseInstance,
+    });
 
     return projector(course);
   }

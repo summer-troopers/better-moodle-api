@@ -2,38 +2,50 @@
 
 const errors = require('@feathersjs/errors');
 
-const { handleId, appendParentData } = require('../helpers/util');
+const { handleId, appendParentData, appendParentDataDeep } = require('../helpers/util');
 
 module.exports = function createCourseInstancesRepository(sqlConnection) {
   const { models } = sqlConnection;
 
-  const { CourseInstanceSpecialty } = models;
+  const { CourseInstanceSpecialty, CourseInstance, Specialty } = models;
 
   const queryParamsBindings = {
-    specialtyId: [models.Specialty],
-    courseInstanceId: [models.CourseInstance],
-    groupId: [models.Specialty, models.Group],
-    courseId: [models.CourseInstance, models.Course],
-    teacherId: [models.CourseInstance, models.Teacher],
-    labReportId: [models.CourseInstance, models.LabReport],
-    studentId: [models.Specialty, models.Group, models.Student],
+    specialtyId: [Specialty],
+    courseInstanceId: [CourseInstance],
+    groupId: [Specialty, models.Group],
+    courseId: [CourseInstance, models.Course],
+    teacherId: [CourseInstance, models.Teacher],
+    labReportId: [CourseInstance, models.LabReport],
+    studentId: [Specialty, models.Group, models.Student],
   };
 
   const projector = (row) => {
     return {
       id: row.id,
-      courseInstanceId: row.courseInstanceId,
       specialtyId: row.specialtyId,
-      courseInstance: {
-        id: row.courseInstance.id,
-        teacherId: row.courseInstance.teacherId,
-        courseId: row.courseInstance.courseId,
-        fileExists: row.courseInstance.labTasksFileId !== null,
-      },
       specialty: {
         id: row.specialty.id,
         name: row.specialty.name,
         description: row.specialty.description,
+      },
+      courseInstanceId: row.courseInstanceId,
+      courseInstance: {
+        id: row.courseInstance.id,
+        teacherId: row.courseInstance.teacherId,
+        teacher: {
+          id: row.courseInstance.teacher.id,
+          firstName: row.courseInstance.teacher.firstName,
+          lastName: row.courseInstance.teacher.lastName,
+          email: row.courseInstance.teacher.email,
+          phoneNumber: row.courseInstance.teacher.phoneNumber,
+        },
+        courseId: row.courseInstance.courseId,
+        course: {
+          id: row.courseInstance.course.id,
+          name: row.courseInstance.course.name,
+          description: row.courseInstance.course.description,
+        },
+        fileExists: row.courseInstance.labTasksFileId !== null,
       },
     };
   };
@@ -47,12 +59,13 @@ module.exports = function createCourseInstancesRepository(sqlConnection) {
       order: [['updatedAt', 'DESC']],
     };
 
-    let results = await handleId(queryParams, CourseInstance, filter, queryParamsBindings);
+    let results = await handleId(queryParams, CourseInstanceSpecialty, filter, queryParamsBindings);
 
     if (!results) results = await CourseInstanceSpecialty.findAndCountAll(filter);
 
-    await appendParentData(results.rows, models.CourseInstance);
-    await appendParentData(results.rows, models.Specialty);
+    await appendParentData(results.rows, Specialty);
+    await appendParentDataDeep(results.rows, [CourseInstance, models.Course]);
+    await appendParentDataDeep(results.rows, [CourseInstance, models.Teacher]);
 
     results.rows = results.rows.map(projector);
 
@@ -62,10 +75,11 @@ module.exports = function createCourseInstancesRepository(sqlConnection) {
   async function view(id) {
     const row = await CourseInstanceSpecialty.findById(id);
 
-    await appendParentData([row], models.CourseInstance);
-    await appendParentData([row], models.Specialty);
+    await appendParentData([row], Specialty);
+    await appendParentDataDeep([row], [CourseInstance, models.Course]);
+    await appendParentDataDeep([row], [CourseInstance, models.Teacher]);
 
-    return row;
+    return projector(row);
   }
 
   async function exists(id) {

@@ -2,10 +2,12 @@
 
 const errors = require('@feathersjs/errors');
 const { Op } = require('sequelize');
-const { handleId, appendParentData, appendDependentCount } = require('../helpers/util');
+const { handleId, appendParentDataDeep, appendDependentData } = require('../helpers/util');
 const { assert } = require('../helpers/db');
 
 module.exports = function createStudentsRepository(connection) {
+  const { models } = connection;
+
   const {
     Student,
     Group,
@@ -14,22 +16,52 @@ module.exports = function createStudentsRepository(connection) {
     Teacher,
     LabReport,
     CourseInstance,
-  } = connection.models;
+  } = models;
 
-  const projector = (item) => {
+  const projector = (row) => {
     return {
-      id: item.id,
-      firstName: item.firstName,
-      lastName: item.lastName,
-      phoneNumber: item.phoneNumber,
-      email: item.email,
-      groupId: item.groupId,
+      id: row.id,
+      firstName: row.firstName,
+      lastName: row.lastName,
+      phoneNumber: row.phoneNumber,
+      email: row.email,
+      groupId: row.groupId,
       group: {
-        id: item.group.id,
-        name: item.group.name,
-        specialtyId: item.group.specialtyId,
+        id: row.group.id,
+        name: row.group.name,
+        specialtyId: row.group.specialtyId,
+        specialty: {
+          id: row.group.specialty.id,
+          name: row.group.specialty.name,
+          description: row.group.specialty.description,
+        },
       },
-      labReportCount: item.labReportCount,
+      labReports: row.labReports.map((labReport) => {
+        return {
+          id: labReport.id,
+          review: labReport.review,
+          mark: labReport.mark,
+          studentId: labReport.studentId,
+          courseInstanceId: labReport.courseInstanceId,
+          courseInstance: {
+            id: labReport.courseInstance.id,
+            teacherId: labReport.courseInstance.teacherId,
+            teacher: {
+              id: labReport.courseInstance.teacher.id,
+              firstName: labReport.courseInstance.teacher.firstName,
+              lastName: labReport.courseInstance.teacher.lastName,
+              phoneNumber: labReport.courseInstance.teacher.phoneNumber,
+              email: labReport.courseInstance.teacher.email,
+            },
+            courseId: labReport.courseInstance.courseId,
+            course: {
+              id: labReport.courseInstance.course.id,
+              name: labReport.courseInstance.course.name,
+              description: labReport.courseInstance.course.description,
+            },
+          },
+        };
+      }),
     };
   };
 
@@ -67,8 +99,10 @@ module.exports = function createStudentsRepository(connection) {
 
     if (!students) students = await Student.findAndCountAll(filter);
 
-    await appendParentData(students.rows, Group);
-    await appendDependentCount(students.rows, Student, LabReport);
+    await appendParentDataDeep(students.rows, [Group, Specialty]);
+    await appendDependentData(students.rows, { parent: Student, dependent: LabReport });
+    await Promise.all(students.rows.map(student => appendParentDataDeep(student.labReports, [CourseInstance, Course])));
+    await Promise.all(students.rows.map(student => appendParentDataDeep(student.labReports, [CourseInstance, Teacher])));
 
     students.rows = students.rows.map(projector);
 
@@ -79,8 +113,10 @@ module.exports = function createStudentsRepository(connection) {
   async function view(id) {
     const student = await Student.findById(id);
 
-    await appendParentData([student], Group);
-    await appendDependentCount([student], Student, LabReport);
+    await appendParentDataDeep([student], [Group, Specialty]);
+    await appendDependentData([student], { parent: Student, dependent: LabReport });
+    await appendParentDataDeep(student.labReports, [CourseInstance, Course]);
+    await appendParentDataDeep(student.labReports, [CourseInstance, Teacher]);
 
     return projector(student);
   }

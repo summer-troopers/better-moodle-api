@@ -6,7 +6,7 @@ const errors = require('@feathersjs/errors');
 
 const logger = require('../services/winston/logger');
 // eslint-disable-next-line object-curly-newline
-const { handleId, appendParentData, appendParentDataDeep } = require('../helpers/util');
+const { handleId, appendParentDataDeep } = require('../helpers/util');
 
 module.exports = function createLabReportsRepository(mongoConnection, sqlConnection) {
   const gridFS = createGridFS({
@@ -27,6 +27,7 @@ module.exports = function createLabReportsRepository(mongoConnection, sqlConnect
     teacherId: [CourseInstance, models.Teacher],
     courseId: [CourseInstance, models.Course],
     groupId: [Student, models.Group],
+    // TODO: Is this the right route, there is a shorter one, but does that mean this is not the right one?
     specialtyId: [Student, models.Group, models.Specialty],
   };
 
@@ -36,7 +37,6 @@ module.exports = function createLabReportsRepository(mongoConnection, sqlConnect
       review: row.review,
       mark: row.mark,
       studentId: row.studentId,
-      courseInstanceId: row.courseInstanceId,
       student: {
         id: row.student.id,
         firstName: row.student.firstName,
@@ -44,12 +44,34 @@ module.exports = function createLabReportsRepository(mongoConnection, sqlConnect
         email: row.student.email,
         phoneNumber: row.student.phoneNumber,
         groupId: row.student.groupId,
+        group: {
+          id: row.student.group.id,
+          name: row.student.group.name,
+          specialtyId: row.student.group.specialtyId,
+          specialty: {
+            id: row.student.group.specialty.id,
+            name: row.student.group.specialty.name,
+            description: row.student.group.specialty.description,
+          },
+        },
       },
+      courseInstanceId: row.courseInstanceId,
       courseInstance: {
         id: row.courseInstance.id,
         teacherId: row.courseInstance.teacherId,
-        name: row.courseInstance.course.name,
-        description: row.courseInstance.course.description,
+        teacher: {
+          id: row.courseInstance.teacher.id,
+          firstName: row.courseInstance.teacher.firstName,
+          lastName: row.courseInstance.teacher.lastName,
+          email: row.courseInstance.teacher.email,
+          phoneNumber: row.courseInstance.teacher.phoneNumber,
+        },
+        courseId: row.courseInstance.courseId,
+        course: {
+          id: row.courseInstance.course.id,
+          name: row.courseInstance.course.name,
+          description: row.courseInstance.course.description,
+        },
       },
     };
   };
@@ -70,17 +92,16 @@ module.exports = function createLabReportsRepository(mongoConnection, sqlConnect
     const filter = {
       limit,
       offset,
-      order: [
-        ['updatedAt', 'DESC'],
-      ],
+      order: [['updatedAt', 'DESC']],
     };
 
     let reports = await handleId(queryParams, LabReport, filter, queryParamsBindings, projector);
 
     if (!reports) reports = await LabReport.findAndCountAll(filter);
 
-    await appendParentData(reports.rows, Student);
+    await appendParentDataDeep(reports.rows, [Student, models.Group, models.Specialty]);
     await appendParentDataDeep(reports.rows, [CourseInstance, models.Course]);
+    await appendParentDataDeep(reports.rows, [CourseInstance, models.Teacher]);
 
     reports.rows = reports.rows.map(projector);
 
@@ -139,12 +160,15 @@ module.exports = function createLabReportsRepository(mongoConnection, sqlConnect
   }
 
   async function update(id, data) {
-    return LabReport.update({
-      review: data.review,
-      mark: data.mark,
-    }, {
-      where: { id },
-    });
+    return LabReport.update(
+      {
+        review: data.review,
+        mark: data.mark,
+      },
+      {
+        where: { id },
+      },
+    );
   }
 
   async function remove(id) {

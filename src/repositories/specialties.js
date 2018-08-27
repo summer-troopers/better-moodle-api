@@ -2,10 +2,12 @@
 
 const { Op } = require('sequelize');
 const errors = require('@feathersjs/errors');
-const { handleId, appendDependentData, appendParentData } = require('../helpers/util');
+const { handleId, appendDependentDataThrough, appendParentData } = require('../helpers/util');
 const { assert } = require('../helpers/db');
 
 module.exports = function createSpecialtiesRepository(sequelize) {
+  const { models } = sequelize;
+
   const {
     Group,
     Specialty,
@@ -14,7 +16,7 @@ module.exports = function createSpecialtiesRepository(sequelize) {
     Student,
     LabReport,
     CourseInstance,
-  } = sequelize.models;
+  } = models;
 
   const projector = (row) => {
     return {
@@ -24,10 +26,20 @@ module.exports = function createSpecialtiesRepository(sequelize) {
       courseInstances: row.courseInstances.map((courseInstanceRow) => {
         return {
           id: courseInstanceRow.id,
-          name: courseInstanceRow.course.name,
-          description: courseInstanceRow.course.description,
           teacherId: courseInstanceRow.teacherId,
+          teacher: {
+            id: courseInstanceRow.teacher.id,
+            firstName: courseInstanceRow.teacher.firstName,
+            lastName: courseInstanceRow.teacher.lastName,
+            email: courseInstanceRow.teacher.email,
+            phoneNumber: courseInstanceRow.teacher.phoneNumber,
+          },
           courseId: courseInstanceRow.courseId,
+          course: {
+            id: courseInstanceRow.course.id,
+            name: courseInstanceRow.course.name,
+            description: courseInstanceRow.course.description,
+          },
           fileExists: courseInstanceRow.labTasksFile !== null,
         };
       }),
@@ -40,7 +52,7 @@ module.exports = function createSpecialtiesRepository(sequelize) {
     studentId: [Group, Student],
     teacherId: [CourseInstance, Teacher],
     courseId: [CourseInstance, Course],
-    labReportId: [Group, Student, LabReport],
+    labReportId: [Group, Student, LabReport], // TODO: Not sure about this one, needs more thinking
   };
 
   async function list(queryParams) {
@@ -67,26 +79,14 @@ module.exports = function createSpecialtiesRepository(sequelize) {
 
     if (!specialties) specialties = await Specialty.findAndCountAll(filter);
 
-    // await appendDependentData(specialties.rows, Specialty, CourseInstance);
-
-    const specCourseInstancesPromises = [];
-
-    specialties.rows.forEach((row) => {
-      specCourseInstancesPromises.push(
-        new Promise((resolve) => {
-          row.getCourseInstances()
-            .then((courseInstances) => {
-              resolve(appendParentData(courseInstances, Course));
-            });
-        }),
-      );
+    await appendDependentDataThrough(specialties.rows, {
+      parent: Specialty,
+      dependent: CourseInstance,
+      through: models.CourseInstanceSpecialty,
     });
 
-    const specCourseInstances = await Promise.all(specCourseInstancesPromises);
-
-    specialties.rows.forEach((row, index) => {
-      row.courseInstances = specCourseInstances[index];
-    });
+    await Promise.all(specialties.rows.map(row => appendParentData(row.courseInstances, Course)));
+    await Promise.all(specialties.rows.map(row => appendParentData(row.courseInstances, Teacher)));
 
     specialties.rows = specialties.rows.map(projector);
 
@@ -95,6 +95,15 @@ module.exports = function createSpecialtiesRepository(sequelize) {
 
   async function view(id) {
     const specialty = await Specialty.findById(id);
+
+    await appendDependentDataThrough([specialty], {
+      parent: Specialty,
+      dependent: CourseInstance,
+      through: models.CourseInstanceSpecialty,
+    });
+
+    await appendParentData(specialty.courseInstances, Course);
+    await appendParentData(specialty.courseInstances, Teacher);
 
     return projector(specialty);
   }

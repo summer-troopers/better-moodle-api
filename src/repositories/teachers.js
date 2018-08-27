@@ -16,14 +16,13 @@ module.exports = function createTeacherRepository(connection) {
     Teacher,
   } = connection.models;
 
-  const projector = (item) => {
+  const projector = (row) => {
     return {
-      id: item.id,
-      firstName: item.firstName,
-      lastName: item.lastName,
-      phoneNumber: item.phoneNumber,
-      email: item.email,
-      groupId: item.groupId,
+      id: row.id,
+      firstName: row.firstName,
+      lastName: row.lastName,
+      phoneNumber: row.phoneNumber,
+      email: row.email,
     };
   };
 

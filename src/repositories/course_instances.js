@@ -33,16 +33,19 @@ module.exports = function createCourseInstancesRepository(mongoConnection, sqlCo
   const projector = (row) => {
     return {
       id: row.id,
-      name: row.course.name,
-      description: row.course.description,
       teacherId: row.teacherId,
-      courseId: row.courseId,
       teacher: {
         id: row.teacher.id,
         firstName: row.teacher.firstName,
         lastName: row.teacher.lastName,
         email: row.teacher.email,
         phoneNumber: row.teacher.phoneNumber,
+      },
+      courseId: row.courseId,
+      course: {
+        id: row.course.id,
+        name: row.course.name,
+        description: row.course.description,
       },
       fileExists: row.labTasksFileId !== null,
     };

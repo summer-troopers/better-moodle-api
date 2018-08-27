@@ -16,14 +16,15 @@ module.exports = function createGroupsRepository(sequelize) {
     CourseInstance,
   } = sequelize.models;
 
-  const projector = (item) => {
+  const projector = (row) => {
     return {
-      id: item.id,
-      name: item.name,
-      specialtyId: item.specialtyId,
+      id: row.id,
+      name: row.name,
+      specialtyId: row.specialtyId,
       specialty: {
-        id: item.specialty.id,
-        name: item.specialty.name,
+        id: row.specialty.id,
+        name: row.specialty.name,
+        description: row.specialty.description,
       },
     };
   };
@@ -72,7 +73,7 @@ module.exports = function createGroupsRepository(sequelize) {
   async function view(id) {
     const group = await Group.findById(id);
 
-    group.specialty = await group.getSpecialty();
+    await appendParentData([group], Specialty);
 
     return projector(group);
   }
