@@ -8,13 +8,13 @@ module.exports = {
     const { sequelize } = queryInterface;
     const Group = sequelize.import('../models/group.js');
     const Student = sequelize.import('../models/student.js');
-    return Student.bulkCreate(await generate50Students(Group), {});
+    return Student.bulkCreate(await generate250Students(Group), {});
   },
   // eslint-disable-next-line no-unused-vars
   down(queryInterface, Sequelize) { return queryInterface.bulkDelete('students', null, {}); },
 };
 
-async function generate50Students(Group) {
+async function generate250Students(Group) {
   const groups = await Group.findAll({ attributes: ['id'] });
   const students = [];
   students.push({
@@ -25,7 +25,7 @@ async function generate50Students(Group) {
     phoneNumber: '068689688',
     groupId: '1',
   });
-  for (let i = 1; i <= 50; i += 1) {
+  for (let i = 1; i <= 250; i += 1) {
     const groupIndex = faker.random.number(groups.length - 1);
     students.push({
       firstName: faker.name.firstName(),

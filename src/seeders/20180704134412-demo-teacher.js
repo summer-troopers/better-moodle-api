@@ -10,13 +10,13 @@ module.exports = {
   async up(queryInterface, Sequelize) {
     const { sequelize } = queryInterface;
     const Teacher = sequelize.import('../models/teacher.js');
-    return Teacher.bulkCreate(await generate50Teachers(), {});
+    return Teacher.bulkCreate(await generate250Teachers(), {});
   },
   // eslint-disable-next-line no-unused-vars
   down(queryInterface, Sequelize) { return queryInterface.bulkDelete('teachers', null, {}); },
 };
 
-async function generate50Teachers() {
+async function generate250Teachers() {
   const teachers = [];
   teachers.push({
     firstName: 'teacher',
@@ -25,7 +25,7 @@ async function generate50Teachers() {
     password: await hashFactory.encrypt('teacher'),
     phoneNumber: '068115681',
   });
-  for (let i = 1; i <= 50; i += 1) {
+  for (let i = 1; i <= 250; i += 1) {
     teachers.push({
       firstName: faker.name.firstName(),
       lastName: faker.name.lastName(),
