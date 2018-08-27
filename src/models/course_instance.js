@@ -45,3 +45,6 @@ module.exports = function defineLab(sequelize, DataTypes) {
 
   return CourseInstance;
 };
+
+// FIXME: There is still something that adds 'TeacherId' to this when making calls to the db
+// Doesn't seem to break anything so far so it shall be taken care of later :)

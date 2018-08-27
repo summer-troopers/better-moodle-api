@@ -7,7 +7,7 @@ module.exports = {
     const CourseInstanceSpecialty = sequelize.import('../models/course_instance-specialty.js');
     const CourseInstance = sequelize.import('../models/course_instance.js');
     const Specialty = sequelize.import('../models/specialty.js');
-    return CourseInstanceSpecialty.bulkCreate(await generate10Connections(CourseInstance, Specialty), {});
+    return CourseInstanceSpecialty.bulkCreate(await generate50Connections(CourseInstance, Specialty), {});
   },
 
   // eslint-disable-next-line no-unused-vars
@@ -16,7 +16,7 @@ module.exports = {
   },
 };
 
-async function generate10Connections(CourseInstance, Specialty) {
+async function generate50Connections(CourseInstance, Specialty) {
   const courseInstances = await CourseInstance.findAll({ attributes: ['id'] });
   const specialties = await Specialty.findAll({ attributes: ['id'] });
   const connections = [];

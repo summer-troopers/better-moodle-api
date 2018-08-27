@@ -36,7 +36,7 @@ module.exports = {
     const Student = sequelize.import('../models/student.js');
     const CourseInstance = sequelize.import('../models/course_instance.js');
     const LabReport = sequelize.import('../models/lab_report.js');
-    return LabReport.bulkCreate(await generate10LabReports(Student, CourseInstance, file.id), {});
+    return LabReport.bulkCreate(await generate50LabReports(Student, CourseInstance, file.id), {});
   },
 
   // eslint-disable-next-line no-unused-vars
@@ -45,7 +45,7 @@ module.exports = {
   },
 };
 
-async function generate10LabReports(Student, CourseInstance, fileId) {
+async function generate50LabReports(Student, CourseInstance, fileId) {
   const students = await Student.findAll({ attributes: ['id'] });
   const courseInstances = await CourseInstance.findAll({ attributes: ['id'] });
   const labReports = [
