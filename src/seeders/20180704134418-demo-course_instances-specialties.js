@@ -24,7 +24,7 @@ async function generate50Connections(CourseInstance, Specialty) {
     specialtyId: '1',
     courseInstanceId: '1',
   });
-  for (let i = 0; i < 10; i += 1) {
+  for (let i = 0; i < 50; i += 1) {
     const specIndex = faker.random.number(specialties.length - 1);
     const courseInstanceIndex = faker.random.number(courseInstances.length - 1);
     connections.push({

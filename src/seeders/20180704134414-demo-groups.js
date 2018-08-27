@@ -21,7 +21,7 @@ async function generate25Groups(Specialty) {
     name: 'AI-151',
     specialtyId: '1',
   });
-  for (let i = 1; i <= 30; i += 1) {
+  for (let i = 1; i <= 25; i += 1) {
     const specIndex = faker.random.number(specialties.length - 1);
     group.push({
       name: generateRandomGroupName(), // eslint-disable-line no-unused-vars, no-use-before-define

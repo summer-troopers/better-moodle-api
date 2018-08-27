@@ -56,7 +56,7 @@ async function generate50CourseInstances(Teacher, Course, fileId) {
     },
   ];
 
-  for (let i = 0; i < 10; i += 1) {
+  for (let i = 0; i < 50; i += 1) {
     const courseIndex = faker.random.number(courses.length - 1);
     const teacherIndex = faker.random.number(teachers.length - 1);
     courseInstances.push({

@@ -58,7 +58,7 @@ async function generate50LabReports(Student, CourseInstance, fileId) {
     },
   ];
 
-  for (let i = 0; i < 10; i += 1) {
+  for (let i = 0; i < 50; i += 1) {
     const studentIndex = faker.random.number(students.length - 1);
     const courseInstanceIndex = faker.random.number(courseInstances.length - 1);
 
