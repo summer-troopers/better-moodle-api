@@ -2,15 +2,15 @@
 
 module.exports = {
   up(queryInterface, Sequelize) {
-    return queryInterface.createTable('courses_specialties', {
-      courseId: {
+    return queryInterface.createTable('course-instances_specialties', {
+      courseInstanceId: {
         type: Sequelize.INTEGER,
-        field: 'course_id',
+        field: 'course_instance_id',
         primaryKey: true,
-        foreignKey: true,
         allowNull: false,
+        foreignKey: true,
         references: {
-          model: 'courses',
+          model: 'course_instances',
           key: 'id',
         },
       },
@@ -18,17 +18,26 @@ module.exports = {
         type: Sequelize.INTEGER,
         field: 'specialty_id',
         primaryKey: true,
-        foreignKey: true,
         allowNull: false,
+        foreignKey: true,
         references: {
           model: 'specialties',
           key: 'id',
         },
       },
+      createdAt: {
+        type: Sequelize.DATE,
+        allowNull: false,
+      },
+      updatedAt: {
+        type: Sequelize.DATE,
+        allowNull: false,
+      },
     });
   },
+
   // eslint-disable-next-line no-unused-vars
   down(queryInterface, Sequelize) {
-    return queryInterface.dropTable('courses_specialties');
+    return queryInterface.dropTable('course_instances');
   },
 };

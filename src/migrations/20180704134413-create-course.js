@@ -13,6 +13,10 @@ module.exports = {
         allowNull: false,
         unique: true,
       },
+      description: {
+        type: Sequelize.TEXT,
+        allowNull: false,
+      },
       createdAt: {
         type: Sequelize.DATE,
         allowNull: false,
@@ -23,6 +27,9 @@ module.exports = {
       },
     });
   },
+
   // eslint-disable-next-line no-unused-vars
-  down(queryInterface, Sequelize) { return queryInterface.dropTable('courses'); },
+  down(queryInterface, Sequelize) {
+    return queryInterface.dropTable('courses');
+  },
 };

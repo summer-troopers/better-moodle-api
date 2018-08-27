@@ -11,22 +11,27 @@ module.exports = {
       studentId: {
         type: Sequelize.INTEGER,
         field: 'student_id',
-        foreignKey: true,
         allowNull: false,
+        foreignKey: true,
         references: {
           model: 'students',
           key: 'id',
         },
       },
-      labId: {
+      courseInstanceId: {
         type: Sequelize.INTEGER,
-        field: 'lab_id',
-        foreignKey: true,
+        field: 'course_instance_id',
         allowNull: false,
+        foreignKey: true,
         references: {
-          model: 'labs',
+          model: 'course_instances',
           key: 'id',
         },
+      },
+      labReportFileId: {
+        type: Sequelize.STRING,
+        field: 'lab_report_file_id',
+        allowNull: false,
       },
       review: {
         type: Sequelize.TEXT,
@@ -35,11 +40,6 @@ module.exports = {
       mark: {
         type: Sequelize.INTEGER,
         allowNull: true,
-      },
-      mongoFileId: {
-        type: Sequelize.STRING,
-        field: 'mongo_file_id',
-        allowNull: false,
       },
       createdAt: {
         type: Sequelize.DATE,
@@ -51,6 +51,9 @@ module.exports = {
       },
     });
   },
+
   // eslint-disable-next-line no-unused-vars
-  down(queryInterface, Sequelize) { return queryInterface.dropTable('lab_reports'); },
+  down(queryInterface, Sequelize) {
+    return queryInterface.dropTable('lab_reports');
+  },
 };
