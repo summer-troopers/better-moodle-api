@@ -10,13 +10,12 @@ const createPermissionVerifier = require('../middlewares/permission-verifier');
 const parseQueryParams = require('../middlewares/parse-query');
 const createIdParamValidator = require('../middlewares/id-param-validator');
 
-
-module.exports = function createLabsRoute(repository, permissions, routeConfig) {
+module.exports = function createLabReportsRoute(repository, permissions) {
   const router = express.Router();
 
   const names = {
     userId: 'studentId',
-    dependencyId: 'labId',
+    dependencyId: 'courseInstanceId',
     requiredField: 'labReport',
   };
 
@@ -28,14 +27,14 @@ module.exports = function createLabsRoute(repository, permissions, routeConfig) 
         file: 'LAB_REPORT_FILE_NOT_RECEIVED',
         id: 'LAB_REPORT_ID_NOT_RECEIVED',
         mark: 'MARK_NOT_RECEIVED',
-        review: 'REVIEW_NOT_RECIEVED',
+        review: 'REVIEW_NOT_RECEIVED',
       },
       notFound: 'LAB_REPORT_NOT_FOUND',
     },
     success: {
       add: 'LAB_REPORT_ADDED',
       delete: 'LAB_REPORT_DELETED',
-      update: 'LAB_REPORT_REVIEW_ADDED',
+      update: 'LAB_REPORT_REVIEW_UPDATED',
     },
   };
 
@@ -47,13 +46,15 @@ module.exports = function createLabsRoute(repository, permissions, routeConfig) 
     storage: repository.storage,
   });
 
-  router.route('/')
+  router
+    .route('/')
     .get(permissionVerifier.read, parseQueryParams, list)
     .post(permissionVerifier.create, upload.single(names.requiredField), assertStudentInputFields, add);
 
   router.param('id', validateId);
 
-  router.route('/:id')
+  router
+    .route('/:id')
     .get(permissionVerifier.read, view)
     .put(permissionVerifier.update, assertTeacherInputFields, update)
     .delete(permissionVerifier.delete, remove);
@@ -62,7 +63,7 @@ module.exports = function createLabsRoute(repository, permissions, routeConfig) 
 
   function assertDependencyReceived(request) {
     let dependencyId = request.body[names.dependencyId];
-    dependencyId = (dependencyId) ? dependencyId.trim() : dependencyId;
+    dependencyId = dependencyId ? dependencyId.trim() : dependencyId;
     if (!dependencyId) throw new errors.BadRequest(msg.error.notReceived.dependencyId);
   }
 
@@ -72,7 +73,7 @@ module.exports = function createLabsRoute(repository, permissions, routeConfig) 
   }
 
   function assertRequiredFieldName(request) {
-    const { fieldname } = file; // Assuming multer will trim this for me
+    const { fieldname } = request.file; // Assuming 'multer' will trim this for me
     if (fieldname !== names.requiredField) throw new errors.BadRequest(msg.error.notReceived.file);
   }
 
@@ -96,13 +97,13 @@ module.exports = function createLabsRoute(repository, permissions, routeConfig) 
 
   function assertMarkReceived(request) {
     let { mark } = request.body;
-    mark = (mark) ? mark.trim() : mark;
+    mark = mark ? mark.trim() : mark;
     if (!mark) throw new errors.BadRequest(msg.error.notReceived.mark);
   }
 
   function assertReviewReceived(request) {
     let { review } = request.body;
-    review = (review) ? review.trim() : review;
+    review = review ? review.trim() : review;
     if (!review) throw new errors.BadRequest(msg.error.notReceived.review);
   }
 
@@ -118,7 +119,8 @@ module.exports = function createLabsRoute(repository, permissions, routeConfig) 
   }
 
   async function list(request, response, next) {
-    repository.list(request.query)
+    repository
+      .list(request.query)
       .then((result) => {
         response.json({
           total: result.count,
@@ -133,7 +135,8 @@ module.exports = function createLabsRoute(repository, permissions, routeConfig) 
   }
 
   function view(request, response, next) {
-    repository.view(request.params.id)
+    repository
+      .view(request.params.id)
       .then((file) => {
         response.attachment(file.metadata.filename);
         response.set('Content-Length', file.metadata.length);
@@ -144,14 +147,15 @@ module.exports = function createLabsRoute(repository, permissions, routeConfig) 
   }
 
   function add(request, response, next) {
-    let userId = (request.token.userRole === roles.ADMIN) ? request.body[names.userId] : request.token.user;
+    let userId = request.token.userRole === roles.ADMIN ? request.body[names.userId] : request.token.user;
     userId = userId || '1';
 
-    repository.add({
-      fileId: request.file.id.toString(),
-      [names.dependencyId]: request.body[names.dependencyId],
-      [names.userId]: userId,
-    })
+    repository
+      .add({
+        fileId: request.file.id.toString(),
+        [names.dependencyId]: request.body[names.dependencyId],
+        [names.userId]: userId,
+      })
       .then((result) => {
         response.json({
           success: msg.success.add,
@@ -164,10 +168,11 @@ module.exports = function createLabsRoute(repository, permissions, routeConfig) 
   }
 
   function update(request, response, next) {
-    repository.update(request.params.id, {
-      review: request.review,
-      mark: request.mark,
-    })
+    repository
+      .update(request.params.id, {
+        review: request.review,
+        mark: request.mark,
+      })
       .then(() => {
         response.json(msg.success.update);
         return next();
@@ -176,7 +181,8 @@ module.exports = function createLabsRoute(repository, permissions, routeConfig) 
   }
 
   function remove(request, response, next) {
-    repository.remove(request.params.id)
+    repository
+      .remove(request.params.id)
       .then(() => {
         response.json(msg.success.delete);
         return next();

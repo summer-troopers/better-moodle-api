@@ -10,6 +10,7 @@ module.exports = {
   handleId,
   appendParentData,
   appendParentDataDeep,
+  appendDependentData,
   appendDependentCount,
   generatePhoneNumber,
   generateUniqueEmail,
@@ -84,13 +85,11 @@ async function appendParentData(rows, parentModel) {
     where: { id: { $in: parentsIds } },
   });
 
-  for (let i = 0; i < rows.length; i += 1) {
-    for (let j = 0; j < parents.length; j += 1) {
-      if (rows[i][`${parentColumnName}Id`] === parents[j].id) {
-        rows[i][parentColumnName] = parents[j];
-      }
-    }
-  }
+  rows.forEach((row) => {
+    const matchingParentRow = parents.find(parentRow => parentRow.id === row[`${parentColumnName}Id`]);
+    row[parentColumnName] = Object.assign({}, row[parentColumnName], matchingParentRow, matchingParentRow.dataValues);
+  });
+
   return rows;
 }
 
@@ -111,6 +110,70 @@ async function appendDependentCount(rows, parentModel, dependentModel) {
     });
     parentRow[`${dependentName}Count`] = matchingDependencies.length;
   });
+
+  return rows;
+}
+
+async function appendDependentData(rows, /* models */{ parent, dependent }) {
+  if (!rows || rows.length === 0) return rows;
+
+  const parentName = getLowerCaseName(parent);
+  const dependentName = getLowerCaseName(dependent);
+  const parentsIds = rows.map(model => model.id);
+
+  const dependencies = await dependent.findAll({
+    where: { [`${parentName}Id`]: { $in: parentsIds } },
+  });
+
+  rows.forEach((parentRow) => {
+    const matchingDependencies = dependencies.filter((dependentRow) => {
+      return dependentRow[`${parentName}Id`] === parentRow.id;
+    });
+    parentRow[`${dependentName}s`] = Object.assign(
+      {},
+      parentRow[`${dependentName}s`],
+      matchingDependencies,
+    );
+  });
+
+  return rows;
+}
+
+async function appendDependentDataThrough(rows, /* models */{ parent, dependent, through }) {
+  if (!rows || rows.length === 0) return rows;
+
+  const parentName = getLowerCaseName(parent);
+  const dependentName = getLowerCaseName(dependent);
+  const parentsIds = rows.map(model => model.id);
+
+  const throughRows = await through.findAll({
+    where: { [`${parentName}Id`]: { $in: parentsIds } },
+  });
+
+  const dependentIds = throughRows.map(row => row[`${dependentName}Id`]);
+
+  const dependencies = await dependent.findAll({
+    where: { id: { $in: dependentIds } },
+  });
+
+  rows.forEach((row) => { // TODO: Maybe 'map'?
+    return throughRows
+      .filter(throughRow => throughRow[`${parentName}Id`] === row.id)
+      .map((throughRow) => {
+        return dependencies.find(dependency => dependency.id === throughRow[`${dependentName}Id`]);
+      });
+  });
+
+  // parentRows.forEach((parentRow) => {
+  //   const matchingDependencies = dependencies.filter((dependentRow) => {
+  //     return dependentRow[`${parentName}Id`] === parentRow.id;
+  //   });
+  //   parentRow[`${dependentName}s`] = Object.assign(
+  //     {},
+  //     parentRow[`${dependentName}s`],
+  //     matchingDependencies,
+  //   );
+  // });
 
   return rows;
 }
@@ -158,7 +221,11 @@ async function appendParentDataDeep(rows, parentModelChain) {
     }
     await doWork(index + 1);
     for (let i = 0; i < currentRows.length; i += 1) {
-      currentRows[i][parentName] = nextRows[i];
+      currentRows[i][parentName] = Object.assign(
+        {},
+        currentRows[i][parentName],
+        nextRows[i],
+      );
     }
 
     return null;

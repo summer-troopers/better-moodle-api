@@ -19,13 +19,13 @@ module.exports = function createLabReportsRepository(mongoConnection, sqlConnect
 
   const { models } = sqlConnection;
 
-  const { LabReport, Lab, Student } = models;
+  const { LabReport, CourseInstance, Student } = models;
 
   const queryParamsBindings = {
-    labId: [Lab],
+    courseInstanceId: [CourseInstance],
     studentId: [Student],
-    teacherId: [Lab, models.Teacher],
-    courseId: [Lab, models.Course],
+    teacherId: [CourseInstance, models.Teacher],
+    courseId: [CourseInstance, models.Course],
     groupId: [Student, models.Group],
     specialtyId: [Student, models.Group, models.Specialty],
   };
@@ -36,7 +36,7 @@ module.exports = function createLabReportsRepository(mongoConnection, sqlConnect
       review: row.review,
       mark: row.mark,
       studentId: row.studentId,
-      labId: row.labId,
+      courseInstanceId: row.courseInstanceId,
       student: {
         id: row.student.id,
         firstName: row.student.firstName,
@@ -45,14 +45,11 @@ module.exports = function createLabReportsRepository(mongoConnection, sqlConnect
         phoneNumber: row.student.phoneNumber,
         groupId: row.student.groupId,
       },
-      lab: {
-        id: row.lab.id,
-        teacherId: row.lab.teacherId,
-        courseId: row.lab.courseId,
-        course: {
-          id: row.lab.course.id,
-          name: row.lab.course.name,
-        },
+      courseInstance: {
+        id: row.courseInstance.id,
+        teacherId: row.courseInstance.teacherId,
+        name: row.courseInstance.course.name,
+        description: row.courseInstance.course.description,
       },
     };
   };
@@ -83,8 +80,7 @@ module.exports = function createLabReportsRepository(mongoConnection, sqlConnect
     if (!reports) reports = await LabReport.findAndCountAll(filter);
 
     await appendParentData(reports.rows, Student);
-
-    await appendParentDataDeep(reports.rows, [Lab, models.Course]);
+    await appendParentDataDeep(reports.rows, [CourseInstance, models.Course]);
 
     reports.rows = reports.rows.map(projector);
 
@@ -93,9 +89,9 @@ module.exports = function createLabReportsRepository(mongoConnection, sqlConnect
 
   async function view(id) {
     const report = await LabReport.findById(id);
-    const metadata = await getFile(report.mongoFileId);
+    const metadata = await getFile(report.labReportFileId);
     if (!metadata) throw new errors.NotFound('LAB_REPORT_FILE_NOT_FOUND');
-    const stream = LabReportFile.readById(report.mongoFileId);
+    const stream = LabReportFile.readById(report.labReportFileId);
     return {
       metadata,
       stream,
@@ -124,21 +120,21 @@ module.exports = function createLabReportsRepository(mongoConnection, sqlConnect
   async function add(data) {
     const report = await LabReport.findOne({
       where: {
-        labId: data.labId,
+        courseInstanceId: data.courseInstanceId,
         studentId: data.studentId,
       },
     });
     if (report) throw new errors.Conflict('LAB_REPORT_ALREADY_EXISTS');
 
-    const task = await Lab.findById(data.labId);
+    const task = await CourseInstance.findById(data.courseInstanceId);
     if (!task) throw new errors.NotFound('LAB_TASK_NOT_FOUND');
     const student = await Student.findById(data.studentId);
     if (!student) throw new errors.NotFound('STUDENT_NOT_FOUND');
 
     return LabReport.create({
-      labId: data.labId,
+      courseInstanceId: data.courseInstanceId,
       studentId: data.studentId,
-      mongoFileId: data.fileId,
+      labReportFileId: data.fileId,
     });
   }
 
@@ -153,7 +149,7 @@ module.exports = function createLabReportsRepository(mongoConnection, sqlConnect
 
   async function remove(id) {
     const report = await LabReport.findById(id);
-    await removeFile(report.mongoFileId);
+    await removeFile(report.labReportFileId);
     try {
       return await LabReport.destroy({
         where: { id },

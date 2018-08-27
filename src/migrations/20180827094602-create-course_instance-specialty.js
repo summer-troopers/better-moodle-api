@@ -3,6 +3,12 @@
 module.exports = {
   up(queryInterface, Sequelize) {
     return queryInterface.createTable('course_instances-specialties', {
+      id: {
+        type: Sequelize.INTEGER,
+        primaryKey: true,
+        autoIncrement: true,
+        allowNull: false,
+      },
       courseInstanceId: {
         type: Sequelize.INTEGER,
         field: 'course_instance_id',

@@ -47,6 +47,7 @@
           "maxsize",
           "param",
           "middleware",
+          "middlewares",
           "verifier",
           "mongo",
           "hasher",
