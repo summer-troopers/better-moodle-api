@@ -23,13 +23,13 @@ module.exports = function createCourseInstancesRoute(repository, permissions) {
         userId: 'TEACHER_ID_NOT_RECEIVED',
         dependencyId: 'COURSE_ID_NOT_RECEIVED',
         file: 'LAB_TASKS_FILE_NOT_RECEIVED',
-        id: 'LAB_ID_NOT_RECEIVED',
+        id: 'COURSE_INSTANCE_ID_NOT_RECEIVED',
       },
-      notFound: 'LAB_NOT_FOUND',
+      notFound: 'COURSE_INSTANCE_NOT_FOUND',
     },
     success: {
-      add: 'LAB_ADDED',
-      delete: 'LAB_DELETED',
+      add: 'COURSE_INSTANCE_ADDED',
+      delete: 'COURSE_INSTANCE_DELETED',
       update: 'LAB_TASKS_FILE_UPLOADED',
     },
   };
@@ -127,10 +127,7 @@ module.exports = function createCourseInstancesRoute(repository, permissions) {
 
   function update(request, response, next) {
     repository
-      .update(request.params.id, {
-        fileId: request.file.id.toString(),
-        userId,
-      })
+      .update(request.params.id, request.file.id.toString(), request.token)
       .then(() => {
         response.json(msg.success.update);
 
@@ -141,7 +138,7 @@ module.exports = function createCourseInstancesRoute(repository, permissions) {
 
   function remove(request, response, next) {
     repository
-      .remove(request.params.id)
+      .remove(request.params.id, request.token)
       .then(() => {
         response.json(msg.success.delete);
         return next();

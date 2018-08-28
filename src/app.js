@@ -43,7 +43,7 @@ module.exports = function getApp(sqlConnection, mongoConnection) {
   // eslint-disable-next-line global-require
   const courseInstancesRoute = require('./routes/course_instances')(
     courseInstancesRepository,
-    permissions('crud|ru|r'),
+    permissions('crud|rud|r'),
   );
 
   // eslint-disable-next-line global-require

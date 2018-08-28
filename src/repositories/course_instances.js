@@ -141,9 +141,9 @@ module.exports = function createCourseInstancesRepository(mongoConnection, sqlCo
     });
   }
 
-  async function update(id, data, user) {
+  async function update(id, fileId, user) {
     const instance = await CourseInstance.findById(id);
-    if (user.id !== instance.teacherId) {
+    if (user.userRole === roles.TEACHER && user.user !== instance.teacherId) {
       throw new errors.Forbidden('UPLOAD_PERMISSIONS_MISSING');
     }
 
@@ -178,7 +178,7 @@ module.exports = function createCourseInstancesRepository(mongoConnection, sqlCo
         }
         throw error;
       }
-    } else if (user.id === instance.teacherId) {
+    } else if (user.user === instance.teacherId) {
       result = await CourseInstance.update(
         {
           labTasksFileId: null,
