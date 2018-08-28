@@ -79,7 +79,7 @@ module.exports = function createGroupsRepository(sequelize) {
   }
 
   async function add(data) {
-    assert.notTaken.name(data.name, Group);
+    await assert.notTaken.name(data.name, Group);
 
     const specialty = await Specialty.findById(data.specialtyId);
     if (!specialty) throw new errors.NotFound('SPECIALTY_NOT_FOUND');
@@ -94,7 +94,7 @@ module.exports = function createGroupsRepository(sequelize) {
   }
 
   async function update(id, data) {
-    assert.notTaken.name(data.name, Group);
+    await assert.notTaken.name(data.name, Group);
 
     const specialty = await Specialty.findById(data.specialtyId);
     if (!specialty) throw new errors.NotFound('SPECIALTY_NOT_FOUND');

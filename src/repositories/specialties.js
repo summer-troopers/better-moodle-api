@@ -109,7 +109,7 @@ module.exports = function createSpecialtiesRepository(sequelize) {
   }
 
   async function add(data) {
-    assert.notTaken.name(data.name, Specialty);
+    await assert.notTaken.name(data.name, Specialty);
 
     return Specialty.create(data);
   }
@@ -121,7 +121,7 @@ module.exports = function createSpecialtiesRepository(sequelize) {
   }
 
   async function update(id, data) {
-    assert.notTaken.name(data.name, Course);
+    await assert.notTaken.name(data.name, Course);
 
     return Specialty.update(data, {
       where: { id },

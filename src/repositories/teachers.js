@@ -73,7 +73,8 @@ module.exports = function createTeacherRepository(connection) {
   }
 
   async function add(data) {
-    assert.notTaken.email(data.email, [models.Admin, Teacher, models.Student]);
+    await assert.notTaken.email(data.email, [models.Admin, Teacher, models.Student]);
+    await assert.notTaken.phoneNumber(data.phoneNumber, [models.Admin, Teacher, models.Student]);
 
     return Teacher.create(data);
   }
@@ -85,7 +86,8 @@ module.exports = function createTeacherRepository(connection) {
   }
 
   async function update(id, data) {
-    assert.notTaken.email(data.email, [models.Admin, Teacher, models.Student]);
+    await assert.notTaken.email(data.email, [models.Admin, Teacher, models.Student]);
+    await assert.notTaken.phoneNumber(data.phoneNumber, [models.Admin, Teacher, models.Student]);
 
     return Teacher.update(data, {
       where: { id },
