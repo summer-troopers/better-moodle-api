@@ -90,7 +90,7 @@ module.exports = function createCoursesRepository(sequelize) {
   }
 
   async function add(data) {
-    assert.notTaken.name(data.name, Course);
+    await assert.notTaken.name(data.name, Course);
 
     return Course.create(data);
   }
@@ -102,7 +102,7 @@ module.exports = function createCoursesRepository(sequelize) {
   }
 
   async function update(id, data) {
-    assert.notTaken.name(data.name, Course);
+    await assert.notTaken.name(data.name, Course);
 
     return Course.update(data, {
       where: { id },

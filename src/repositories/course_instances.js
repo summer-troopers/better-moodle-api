@@ -133,7 +133,7 @@ module.exports = function createCourseInstancesRepository(mongoConnection, sqlCo
     const teacher = Teacher.findById(teacherId);
     if (!teacher) throw new error.NotFound('TEACHER_NOT_FOUND');
 
-    assertNotExists({ courseId, teacherId });
+    await assertNotExists({ courseId, teacherId });
 
     return CourseInstance.create({
       courseId,

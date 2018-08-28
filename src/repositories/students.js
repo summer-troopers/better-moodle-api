@@ -122,7 +122,8 @@ module.exports = function createStudentsRepository(connection) {
   }
 
   async function add(data) {
-    assert.notTaken.email(data.email, [models.Admin, models.Teacher, Student]);
+    await assert.notTaken.email(data.email, [models.Admin, models.Teacher, Student]);
+    await assert.notTaken.phoneNumber(data.phoneNumber, [models.Admin, models.Teacher, Student]);
 
     const group = await Group.findById(data.groupId);
     if (!group) throw new errors.NotFound('GROUP_NOT_FOUND');
@@ -137,7 +138,8 @@ module.exports = function createStudentsRepository(connection) {
   }
 
   async function update(id, data) {
-    assert.notTaken.email(data.email, [models.Admin, models.Teacher, Student]);
+    await assert.notTaken.email(data.email, [models.Admin, models.Teacher, Student]);
+    await assert.notTaken.phoneNumber(data.phoneNumber, [models.Admin, models.Teacher, Student]);
 
     const group = await Group.findById(data.groupId);
     if (!group) throw new errors.NotFound('GROUP_NOT_FOUND');

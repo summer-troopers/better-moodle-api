@@ -29,7 +29,8 @@ module.exports = function createAdminsRepository(sequelize) {
   }
 
   async function add(data) {
-    assert.notTaken.email(data.email, [Admin, models.Teacher, models.Student]);
+    await assert.notTaken.email(data.email, [Admin, models.Teacher, models.Student]);
+    await assert.notTaken.phoneNumber(data.phoneNumber, [Admin, models.Teacher, models.Student]);
 
     return Admin.create(data);
   }
@@ -41,7 +42,8 @@ module.exports = function createAdminsRepository(sequelize) {
   }
 
   async function update(id, data) {
-    assert.notTaken.email(data.email, [Admin, models.Teacher, models.Student]);
+    await assert.notTaken.email(data.email, [Admin, models.Teacher, models.Student]);
+    await assert.notTaken.phoneNumber(data.phoneNumber, [Admin, models.Teacher, models.Student]);
 
     return Admin.update(data, {
       where: { id },

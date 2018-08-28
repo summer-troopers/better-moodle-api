@@ -4,24 +4,20 @@ const errors = require('@feathersjs/errors');
 
 module.exports = {
   notTaken: {
-    email: assertEmailNotTaken,
+    email: createUserDataNotTakenAssert('email'),
+    phoneNumber: createUserDataNotTakenAssert('phoneNumber'),
     name: assertNameNotTaken,
   },
 };
 
+function createUserDataNotTakenAssert(userDataName) {
+  return async function assertUserDataNotTaken(userData, models) {
+    const users = await Promise.all(models.map(model => model.findOne({ where: { [userDataName]: userData } })));
 
-async function assertEmailNotTaken(email, models) {
-  const userRequests = [];
-
-  models.forEach((model) => {
-    userRequests.push(model.findOne({ where: { email } }));
-  });
-
-  const users = await Promise.all(userRequests);
-
-  for (let i = 0; i < users.length; i += 1) {
-    if (users[i]) throw new errors.BadRequest('EMAIL_ALREADY_TAKEN');
-  }
+    users.forEach((user) => {
+      if (user) throw new errors.BadRequest(`${userDataName.toUpperCase()}_ALREADY_TAKEN`);
+    });
+  };
 }
 
 async function assertNameNotTaken(name, model) {
