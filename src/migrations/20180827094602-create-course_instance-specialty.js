@@ -2,31 +2,34 @@
 
 module.exports = {
   up(queryInterface, Sequelize) {
-    return queryInterface.createTable('lab_comments', {
+    return queryInterface.createTable('course_instances-specialties', {
       id: {
         type: Sequelize.INTEGER,
         primaryKey: true,
         autoIncrement: true,
-      },
-      labReportId: {
-        type: Sequelize.INTEGER,
-        field: 'lab_report_id',
-        foreignKey: true,
         allowNull: false,
+      },
+      courseInstanceId: {
+        type: Sequelize.INTEGER,
+        field: 'course_instance_id',
+        primaryKey: true,
+        allowNull: false,
+        foreignKey: true,
         references: {
-          model: 'lab_reports',
+          model: 'course_instances',
           key: 'id',
         },
       },
-      content: {
-        type: Sequelize.STRING,
-        field: 'content',
-        allowNull: false,
-      },
-      mark: {
+      specialtyId: {
         type: Sequelize.INTEGER,
-        field: 'mark',
+        field: 'specialty_id',
+        primaryKey: true,
         allowNull: false,
+        foreignKey: true,
+        references: {
+          model: 'specialties',
+          key: 'id',
+        },
       },
       createdAt: {
         type: Sequelize.DATE,
@@ -38,6 +41,9 @@ module.exports = {
       },
     });
   },
+
   // eslint-disable-next-line no-unused-vars
-  down(queryInterface, Sequelize) { return queryInterface.dropTable('lab_comments'); },
+  down(queryInterface, Sequelize) {
+    return queryInterface.dropTable('course_instances-specialties');
+  },
 };

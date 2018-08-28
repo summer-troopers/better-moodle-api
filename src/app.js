@@ -6,17 +6,16 @@ const bodyParser = require('body-parser');
 const morgan = require('morgan');
 const swaggerUi = require('swagger-ui-express');
 const { FeathersError } = require('@feathersjs/errors');
-const config = require('config');
 
 const swaggerDocument = require('../swagger.json');
 const logger = require('../src/services/winston/logger');
 
 const importModels = require('./models');
-const createRoute = require('./routes/route-factory');
-const createAuthenticationRoute = require('./routes/authentication-route');
-const createLabsRoute = require('./routes/labs-route');
+const createRoute = require('./routes/resources');
+const createAuthenticationRoute = require('./routes/authentication');
+const createLabReportsRoute = require('./routes/lab_reports');
 
-const createUserRepository = require('./repositories/users-repository');
+const createUserRepository = require('./repositories/users');
 const createAuthorizationVerifier = require('./middlewares/authorization-verifier');
 
 const { permissions } = require('./helpers/util');
@@ -26,25 +25,38 @@ module.exports = function getApp(sqlConnection, mongoConnection) {
 
   importModels(sqlConnection);
 
-  const adminsRepository = require('./repositories/admins-repository')(sqlConnection); // eslint-disable-line global-require
-  const teachersRepository = require('./repositories/teachers-repository')(sqlConnection); // eslint-disable-line global-require
-  const studentsRepository = require('./repositories/students-repository')(sqlConnection); // eslint-disable-line global-require
-  const coursesRepository = require('./repositories/courses-repository')(sqlConnection); // eslint-disable-line global-require
-  const groupsRepository = require('./repositories/groups-repository')(sqlConnection); // eslint-disable-line global-require
-  const specialtiesRepository = require('./repositories/specialties-repository')(sqlConnection); // eslint-disable-line global-require
+  const adminsRepository = require('./repositories/admins')(sqlConnection); // eslint-disable-line global-require
+  const teachersRepository = require('./repositories/teachers')(sqlConnection); // eslint-disable-line global-require
+  const studentsRepository = require('./repositories/students')(sqlConnection); // eslint-disable-line global-require
+  const coursesRepository = require('./repositories/courses')(sqlConnection); // eslint-disable-line global-require
+  const groupsRepository = require('./repositories/groups')(sqlConnection); // eslint-disable-line global-require
+  const specialtiesRepository = require('./repositories/specialties')(sqlConnection); // eslint-disable-line global-require
+
+  // eslint-disable-next-line global-require
+  const courseInstancesSpecialtiesRepository = require('./repositories/course-instances_specialties')(sqlConnection);
 
   const userRepository = createUserRepository(sqlConnection);
 
-  const labCommentsRepository = require('./repositories/lab-comments-repository')(sqlConnection); // eslint-disable-line global-require
-  const labReportsRepository = require('./repositories/lab_reports-repository')(mongoConnection, sqlConnection); // eslint-disable-line global-require
-  const labTasksRepository = require('./repositories/lab_tasks-repository')(mongoConnection, sqlConnection); // eslint-disable-line global-require
+  const labReportsRepository = require('./repositories/lab_reports')(mongoConnection, sqlConnection); // eslint-disable-line global-require
+  const courseInstancesRepository = require('./repositories/course_instances')(mongoConnection, sqlConnection); // eslint-disable-line global-require
 
-  const labReportsRoute = createLabsRoute(labReportsRepository, permissions('crud|r|crud|'), config.labRoutes.labReports);
-  const labTasksRoute = createLabsRoute(labTasksRepository, permissions('crud|crud|r|'), config.labRoutes.labTasks);
+  // eslint-disable-next-line global-require
+  const courseInstancesRoute = require('./routes/course_instances')(
+    courseInstancesRepository,
+    permissions('crud|rud|r'),
+  );
 
-  app.use(cors({
-    exposedHeaders: 'Content-Disposition',
-  }));
+  // eslint-disable-next-line global-require
+  const courseInstancesSpecialtiesRoute = require('./routes/course_instances-specialties')(
+    courseInstancesSpecialtiesRepository,
+    permissions('crud|r|r'),
+  );
+
+  app.use(
+    cors({
+      exposedHeaders: ['Content-Disposition', 'Content-Length', 'Content-MD5'],
+    }),
+  );
   app.use(bodyParser.json());
   app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -62,9 +74,9 @@ module.exports = function getApp(sqlConnection, mongoConnection) {
   app.use('/api/v1/courses', createRoute(coursesRepository, permissions('crud|r|r')));
   app.use('/api/v1/groups', createRoute(groupsRepository, permissions('crud|r|r')));
   app.use('/api/v1/specialties', createRoute(specialtiesRepository, permissions('crud|r|r')));
-  app.use('/api/v1/lab_comments', createRoute(labCommentsRepository, permissions('crud|crud|r')));
-  app.use('/api/v1/lab_reports', labReportsRoute);
-  app.use('/api/v1/lab_tasks', labTasksRoute);
+  app.use('/api/v1/lab_reports', createLabReportsRoute(labReportsRepository, permissions('crud|ru|cr|')));
+  app.use('/api/v1/course_instances', courseInstancesRoute);
+  app.use('/api/v1/course_instances-specialties', courseInstancesSpecialtiesRoute);
 
   app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 

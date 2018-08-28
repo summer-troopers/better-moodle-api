@@ -9,7 +9,9 @@ module.exports = {
     return Group.bulkCreate(await generate25Groups(Specialty), {});
   },
   // eslint-disable-next-line no-unused-vars
-  down(queryInterface, Sequelize) { return queryInterface.bulkDelete('groups', null, {}); },
+  down(queryInterface, Sequelize) {
+    return queryInterface.bulkDelete('groups', null, {});
+  },
 };
 
 async function generate25Groups(Specialty) {
@@ -19,22 +21,26 @@ async function generate25Groups(Specialty) {
     name: 'AI-151',
     specialtyId: '1',
   });
-  for (let i = 1; i <= 30; i += 1) {
+  for (let i = 1; i <= 25; i += 1) {
     const specIndex = faker.random.number(specialties.length - 1);
     group.push({
-      name: `${getRandomLetters()}${faker.random.number(60)}`, // eslint-disable-line no-unused-vars, no-use-before-define
+      name: generateRandomGroupName(), // eslint-disable-line no-unused-vars, no-use-before-define
       specialtyId: specialties[specIndex].id,
     });
   }
   return group;
 }
 
-function getRandomLetters() {
-  const list = 'ABCDEFGHIJKLMNPQRSTUVWXYZ';
+function generateRandomGroupName() {
+  return `${generateRandomCharSequence(3)}${faker.random.number({ min: 100, max: 200 })}`;
+}
+
+function generateRandomCharSequence(length) {
+  const dictionary = 'ABCDEFGHIJKLMNPQRSTUVWXYZ';
   let result = '';
-  for (let i = 0; i < 3; i += 1) {
-    const random = Math.floor(Math.random() * list.length);
-    result += list.charAt(random);
+  for (let i = 0; i < length; i += 1) {
+    const random = faker.random.number(dictionary.length - 1);
+    result += dictionary.charAt(random);
   }
   return result;
 }

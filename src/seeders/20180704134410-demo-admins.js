@@ -2,7 +2,7 @@
 
 const faker = require('faker');
 const hashFactory = require('../helpers/hash/hash-factory')();
-const { generateUniqueEmail, generateUniqueNumber } = require('../helpers/util');
+const { generateUniqueEmail, generateUniquePhoneNumber } = require('../helpers/util');
 
 module.exports = {
   // eslint-disable-next-line no-unused-vars
@@ -12,7 +12,9 @@ module.exports = {
     return Admin.bulkCreate(await generate50Admins(), {});
   },
   // eslint-disable-next-line no-unused-vars
-  down(queryInterface, Sequelize) { return queryInterface.bulkDelete('admins', null, {}); },
+  down(queryInterface, Sequelize) {
+    return queryInterface.bulkDelete('admins', null, {});
+  },
 };
 
 async function generate50Admins() {
@@ -30,7 +32,7 @@ async function generate50Admins() {
       lastName: faker.name.lastName(),
       email: generateUniqueEmail(admins),
       password: faker.random.alphaNumeric(60),
-      phoneNumber: generateUniqueNumber(admins),
+      phoneNumber: generateUniquePhoneNumber(admins),
     });
   }
   return admins;

@@ -1,6 +1,24 @@
 'use strict';
 
 const faker = require('faker');
+const errors = require('@feathersjs/errors');
+
+module.exports = {
+  createMessage,
+  permissions: createPermissions,
+  buildIncludes,
+  handleId,
+  appendParentData,
+  appendParentDataDeep,
+  appendDependentData,
+  appendDependentDataThrough,
+  appendDependentCount,
+  generatePhoneNumber,
+  generateUniqueEmail,
+  generateUniquePhoneNumber,
+  generateUniqueJobName,
+  detectDuplicate,
+};
 
 function createMessage(to, from, subject, text) {
   const message = {
@@ -59,110 +77,170 @@ function handleId(queryParams, Model, filter, queryParamsBindings) {
 }
 
 // eslint-disable-next-line complexity
-async function appendParentData(initialResults, parentModel) {
-  if (!initialResults || initialResults.length === 0) return initialResults;
+async function appendParentData(rows, parentModel) {
+  if (!rows || rows.length === 0) return rows;
   const parentColumnName = getLowerCaseName(parentModel);
-  const parentsIds = initialResults.map(model => model[`${parentColumnName}Id`]);
+  const parentsIds = rows.map(model => model[`${parentColumnName}Id`]);
 
   const parents = await parentModel.findAll({
     where: { id: { $in: parentsIds } },
   });
 
-  for (let i = 0; i < initialResults.length; i += 1) {
-    for (let j = 0; j < parents.length; j += 1) {
-      if (initialResults[i][`${parentColumnName}Id`] === parents[j].id) {
-        initialResults[i][parentColumnName] = parents[j];
-      }
-    }
-  }
-  return initialResults;
+  rows.forEach((row) => {
+    const matchingParentRow = parents.find(parentRow => parentRow.id === row[`${parentColumnName}Id`]);
+    row[parentColumnName] = Object.assign({}, row[parentColumnName], matchingParentRow, matchingParentRow.dataValues);
+  });
+
+  return rows;
 }
 
-async function appendDependentCount(initialResults, parentModel, dependentModel) {
-  if (!initialResults || initialResults.length === 0) return initialResults;
+async function appendDependentCount(rows, parentModel, dependentModel) {
+  if (!rows || rows.length === 0) return rows;
 
   const parentName = getLowerCaseName(parentModel);
   const dependentName = getLowerCaseName(dependentModel);
-  const parentsIds = initialResults.map(model => model.id);
+  const parentsIds = rows.map(model => model.id);
 
   const dependencies = await dependentModel.findAll({
     where: { [`${parentName}Id`]: { $in: parentsIds } },
   });
 
-  initialResults.forEach((model) => {
-    const matchingDependencies = dependencies.filter((iterModel) => {
-      return (iterModel[`${parentName}Id`] === model.id);
+  rows.forEach((parentRow) => {
+    const matchingDependencies = dependencies.filter((dependentRow) => {
+      return dependentRow[`${parentName}Id`] === parentRow.id;
     });
-    model[`${dependentName}Count`] = matchingDependencies.length;
+    parentRow[`${dependentName}Count`] = matchingDependencies.length;
   });
 
-  return initialResults;
+  return rows;
+}
+
+async function appendDependentData(rows, /* models */{ parent, dependent }) {
+  if (!rows || rows.length === 0) return rows;
+
+  const parentName = getLowerCaseName(parent);
+  const dependentName = getLowerCaseName(dependent);
+  const parentsIds = rows.map(model => model.id);
+
+  const dependencies = await dependent.findAll({
+    where: { [`${parentName}Id`]: { $in: parentsIds } },
+  });
+
+  rows.forEach((parentRow) => {
+    const matchingDependencies = dependencies.filter((dependentRow) => {
+      return dependentRow[`${parentName}Id`] === parentRow.id;
+    });
+    parentRow[`${dependentName}s`] = Object.assign(
+      [],
+      parentRow[`${dependentName}s`],
+      matchingDependencies,
+    );
+  });
+
+  return rows;
+}
+
+async function appendDependentDataThrough(rows, /* models */{ parent, dependent, through }) {
+  if (!rows || rows.length === 0) return rows;
+
+  const parentName = getLowerCaseName(parent);
+  const dependentName = getLowerCaseName(dependent);
+  const parentsIds = rows.map(model => model.id);
+
+  const throughRows = await through.findAll({
+    where: { [`${parentName}Id`]: { $in: parentsIds } },
+  });
+
+  const dependentIds = throughRows.map(row => row[`${dependentName}Id`]);
+
+  const dependencies = await dependent.findAll({
+    where: { id: { $in: dependentIds } },
+  });
+
+  rows.forEach((row) => {
+    const rowDependencies = throughRows
+      .filter(throughRow => throughRow[`${parentName}Id`] === row.id)
+      .map((throughRow) => {
+        return dependencies.find(dependency => dependency.id === throughRow[`${dependentName}Id`]);
+      });
+
+    row[`${dependentName}s`] = Object.assign(
+      [],
+      row[`${dependentName}s`],
+      rowDependencies,
+    );
+  });
+
+  return rows;
 }
 
 // This next function is just an experiment for fun :)
 // eslint-disable-next-line complexity
-async function appendParentDataDeep(initialResults, parentModelChain) {
+async function appendParentDataDeep(rows, parentModelChain) {
   const parentsNames = [];
-  parentModelChain.forEach((Model) => {
-    const name = getLowerCaseName(Model);
-    parentsNames.push(name);
+  parentModelChain.forEach((parentModel) => {
+    const parentName = getLowerCaseName(parentModel);
+    parentsNames.push(parentName);
   });
-  const resultsAggregate = [initialResults];
+  const temp2DStorage = [rows];
 
   // eslint-disable-next-line complexity
-  async function doWork(parentModelChainParam, index = 0, resultsAggregateParam) {
-    if (index === parentModelChainParam.length) return null;
+  async function doWork(index = 0) {
+    if (index === parentModelChain.length) return null;
 
-    const currentResults = resultsAggregateParam[index];
-    const parentColumnName = parentsNames[index];
+    const currentRows = temp2DStorage[index];
+    const parentName = parentsNames[index];
 
-    const parentsIds = currentResults.map(model => model[`${parentColumnName}Id`]);
+    const parentsIds = currentRows.map(model => model[`${parentName}Id`]);
 
-    const dependencies = await parentModelChainParam[index].findAll({
+    const parents = await parentModelChain[index].findAll({
       where: { id: { $in: parentsIds } },
     });
 
-    resultsAggregateParam.push([]);
+    temp2DStorage.push([]);
 
-    const nextResults = resultsAggregateParam[index + 1];
+    const nextRows = temp2DStorage[index + 1];
 
-    for (let i = 0; i < currentResults.length; i += 1) {
-      for (let j = 0; j < dependencies.length; j += 1) {
-        const currentId = currentResults[i][`${parentColumnName}Id`];
-        if (currentId === dependencies[j].id) {
-          nextResults.push(dependencies[j]);
-          break;
-        }
+    for (let i = 0; i < currentRows.length; i += 1) {
+      const requiredParentId = currentRows[i][`${parentName}Id`];
+      const matchingParent = parents.find(parent => parent.id === requiredParentId);
+      if (!matchingParent) {
+        throw new errors.GeneralError('PARENT_NOT_FOUND', {
+          function: 'appendParentDataDeep',
+          file: './src/helpers/util.js',
+          cause: 'unknown',
+          severity: 'HUMAN_LOGIC_ERROR',
+          solution: 'tell Roman to fix it',
+        });
       }
+      nextRows.push(matchingParent);
     }
-    await doWork(parentModelChainParam, index + 1, resultsAggregateParam);
-    for (let i = 0; i < currentResults.length; i += 1) {
-      currentResults[i][parentColumnName] = nextResults[i];
+    await doWork(index + 1);
+    for (let i = 0; i < currentRows.length; i += 1) {
+      currentRows[i][parentName] = Object.assign(
+        {},
+        currentRows[i][parentName],
+        nextRows[i],
+        nextRows[i].dataValues,
+      );
     }
 
     return null;
   }
 
-  await doWork(parentModelChain, 0, resultsAggregate);
+  await doWork();
 
-  return initialResults;
-}
-
-function projectDatabaseResponse(response, projector) {
-  return {
-    count: response.count,
-    rows: response.rows.map(projector),
-  };
+  return rows;
 }
 
 function getLowerCaseName(model) {
   return model.name.charAt(0).toLowerCase() + model.name.slice(1);
 }
 
-function buildIncludes(param, modelsArg) {
-  const models = [...modelsArg];
-  models.reverse();
-  return models.reduce((accumulator, model, index) => {
+function buildIncludes(param, models) {
+  const modelsCopy = [...models];
+  modelsCopy.reverse();
+  return modelsCopy.reduce((accumulator, model, index) => {
     if (index === 0) {
       accumulator.include = [
         {
@@ -196,23 +274,30 @@ function generatePhoneNumber() {
 }
 
 function generateUniqueEmail(emails) {
-  let genEmail;
+  let genEmail = faker.internet.email().toLocaleLowerCase();
   const predicate = object => object.email === genEmail;
-  while (true) {
+  while (emails.find(predicate)) {
     genEmail = faker.internet.email().toLocaleLowerCase();
-    if (!emails.find(predicate)) break;
   }
   return genEmail;
 }
 
-function generateUniqueNumber(phoneNumbers) {
-  let genNumber;
+function generateUniquePhoneNumber(phoneNumbers) {
+  let genNumber = generatePhoneNumber();
   const predicate = object => object.phone_number === genNumber;
-  while (true) {
+  while (phoneNumbers.find(predicate)) {
     genNumber = generatePhoneNumber();
-    if (!phoneNumbers.find(predicate)) break;
   }
   return genNumber;
+}
+
+function generateUniqueJobName(names) {
+  let genName = faker.name.jobDescriptor();
+  const predicate = object => object.name === genName;
+  while (names.find(predicate)) {
+    genName = faker.name.jobDescriptor();
+  }
+  return genName;
 }
 
 function detectDuplicate(array) {
@@ -224,18 +309,3 @@ function detectDuplicate(array) {
 
   return false;
 }
-
-module.exports = {
-  createMessage,
-  permissions: createPermissions,
-  buildIncludes,
-  handleId,
-  appendParentData,
-  appendParentDataDeep,
-  appendDependentCount,
-  projectDatabaseResponse,
-  generatePhoneNumber,
-  generateUniqueEmail,
-  generateUniqueNumber,
-  detectDuplicate,
-};
