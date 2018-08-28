@@ -6,7 +6,7 @@ const errors = require('@feathersjs/errors');
 
 const logger = require('../services/winston/logger');
 const roles = require('../helpers/constants/roles');
-const { handleId, appendParentData } = require('../helpers/util');
+const { handleId, appendParentData, appendDependentData } = require('../helpers/util');
 
 module.exports = function createCourseInstancesRepository(mongoConnection, sqlConnection) {
   const gridFS = createGridFS({
@@ -48,6 +48,13 @@ module.exports = function createCourseInstancesRepository(mongoConnection, sqlCo
         description: row.course.description,
       },
       fileExists: row.labTasksFileId !== null,
+      labReports: row.labReports.map((labReportRow) => {
+        return {
+          id: labReportRow.id,
+          studentId: labReportRow.studentId,
+          courseInstanceId: labReportRow.courseInstanceId,
+        };
+      }),
     };
   };
 
@@ -76,6 +83,10 @@ module.exports = function createCourseInstancesRepository(mongoConnection, sqlCo
 
     await appendParentData(courseInstances.rows, Course);
     await appendParentData(courseInstances.rows, Teacher);
+    await appendDependentData(courseInstances.rows, {
+      parent: CourseInstance,
+      dependent: models.LabReport,
+    });
 
     courseInstances.rows = courseInstances.rows.map(projector);
 
