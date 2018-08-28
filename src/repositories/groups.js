@@ -3,7 +3,7 @@
 const { Op } = require('sequelize');
 const errors = require('@feathersjs/errors');
 const { handleId, appendParentData } = require('../helpers/util');
-const { assert } = require('../helpers/util');
+const { assert } = require('../helpers/db');
 
 module.exports = function createGroupsRepository(sequelize) {
   const {
