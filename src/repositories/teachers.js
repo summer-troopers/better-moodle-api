@@ -6,6 +6,7 @@ const { handleId } = require('../helpers/util');
 const { assert } = require('../helpers/db');
 
 module.exports = function createTeacherRepository(connection) {
+  const { models } = connection;
   const {
     Course,
     Specialty,
