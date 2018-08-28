@@ -97,14 +97,16 @@ module.exports = function createLabReportsRoute(repository, permissions) {
 
   function assertMarkReceived(request) {
     let { mark } = request.body;
-    mark = mark ? mark.trim() : mark;
+    mark = parseInt(mark, 10) || 0;
     if (!mark) throw new errors.BadRequest(msg.error.notReceived.mark);
+    request.body.mark = mark;
   }
 
   function assertReviewReceived(request) {
     let { review } = request.body;
     review = review ? review.trim() : review;
     if (!review) throw new errors.BadRequest(msg.error.notReceived.review);
+    request.body.review = review;
   }
 
   function assertTeacherInputFields(request, response, next) {
@@ -170,8 +172,8 @@ module.exports = function createLabReportsRoute(repository, permissions) {
   function update(request, response, next) {
     repository
       .update(request.params.id, {
-        review: request.review,
-        mark: request.mark,
+        review: request.body.review,
+        mark: request.body.mark,
       })
       .then(() => {
         response.json(msg.success.update);
