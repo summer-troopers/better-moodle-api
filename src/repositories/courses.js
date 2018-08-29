@@ -102,7 +102,7 @@ module.exports = function createCoursesRepository(sequelize) {
   }
 
   async function update(id, data) {
-    await assert.notTaken.name(data.name, Course);
+    await assert.notTaken.name(data.name, Course, id);
 
     return Course.update(data, {
       where: { id },

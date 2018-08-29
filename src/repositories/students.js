@@ -138,8 +138,8 @@ module.exports = function createStudentsRepository(connection) {
   }
 
   async function update(id, data) {
-    await assert.notTaken.email(data.email, [models.Admin, models.Teacher, Student]);
-    await assert.notTaken.phoneNumber(data.phoneNumber, [models.Admin, models.Teacher, Student]);
+    await assert.notTaken.email(data.email, [models.Admin, models.Teacher, Student], id);
+    await assert.notTaken.phoneNumber(data.phoneNumber, [models.Admin, models.Teacher, Student], id);
 
     const group = await Group.findById(data.groupId);
     if (!group) throw new errors.NotFound('GROUP_NOT_FOUND');
