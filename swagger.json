@@ -1,10 +1,20 @@
 {
-  "swagger": "2.0",
+  "openapi": "3.0.0",
   "info": {
-    "version": "1.0.0",
-    "title": "Moodle App"
+    "title": "Moodle App",
+    "description": "Backend API for our Angular App",
+    "version": "0.9.9"
   },
-  "host": "10.177.106.10",
+  "servers": [
+    {
+      "url": "http://10.177.106.10/api/v1",
+      "description": "Remote production server"
+    },
+    {
+      "url": "http://localhost/api/v1",
+      "description": "Local dev server"
+    }
+  ],
   "tags": [
     {
       "name": "login"
@@ -15,7 +25,7 @@
     },
     {
       "name": "teacher",
-      "description": "Everything about Tachers"
+      "description": "Everything about Teachers"
     },
     {
       "name": "student",
@@ -34,12 +44,17 @@
       "description": "Everything about Specialties"
     },
     {
-      "name": "laboratory",
+      "name": "lab report",
       "description": "Everything about Laboratories"
+    },
+    {
+      "name": "course_instance",
+      "description": "Everything about course instances"
+    },
+    {
+      "name": "course_instance_specialty",
+      "description": "Everything about bindings between course instances and specialties"
     }
-  ],
-  "schemes": [
-    "http"
   ],
   "security": [
     {
@@ -47,144 +62,138 @@
     }
   ],
   "paths": {
-    "/api/v1/login": {
+    "/login": {
       "post": {
         "tags": [
           "login"
         ],
-        "summary": "Get authorization token.",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "in": "body",
-            "name": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/User"
+        "summary": "Authenticate to receive an authorization token.",
+        "requestBody": {
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginInput"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginInput"
+              }
             }
           }
-        ],
+        },
         "responses": {
           "200": {
-            "description": "success"
+            "description": "A JSON object containing the token for the logged user and info about the user himself",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "token": {
+                      "type": "string",
+                      "description": "A JWT token to be used for authentication",
+                      "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyUm9sZSI6ImFkbWluIiwidXNlciI6MSwiaWF0IjoxNTM1NTI5NDI4LCJleHAiOjE1MzYzOTM0Mjh9.ugtTsi1JxxdGyyZbHVT39eSFnPBcPrxvZ_5YBuVyPPa"
+                    },
+                    "userData": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "oneOf": [
+                            {
+                              "type": "integer",
+                              "minimum": 1
+                            },
+                            {
+                              "type": "string",
+                              "example": "1"
+                            }
+                          ]
+                        },
+                        "firstName": {
+                          "type": "string",
+                          "example": "Admin"
+                        },
+                        "lastName": {
+                          "type": "string",
+                          "example": "Administator"
+                        },
+                        "phoneNumber": {
+                          "type": "string",
+                          "pattern": "^0[67]\\d{7}$",
+                          "example": "060000000"
+                        },
+                        "email": {
+                          "type": "string",
+                          "format": "email"
+                        },
+                        "userRole": {
+                          "type": "string",
+                          "enum": [
+                            "admin",
+                            "teacher",
+                            "student"
+                          ]
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
           },
-          "400": {
-            "description": "error"
+          "401": {
+            "description": "Email and password combination is wrong"
           }
         }
       }
     },
-    "/api/v1/lab_comments": {
-      "get": {
-        "tags": [
-          "laboratory"
-        ],
-        "summary": "Get all lab comments",
-        "produces": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "in": "query",
-            "name": "offset",
-            "schema": {
-              "type": "integer"
-            },
-            "description": "Nr. of items to skip before starting to collect results"
-          },
-          {
-            "in": "query",
-            "name": "limit",
-            "schema": {
-              "type": "integer"
-            },
-            "description": "Nr. of items to return"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "success",
-            "schema": {
-              "type": "string"
-            }
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "laboratory"
-        ],
-        "summary": "Add a comment in the DB.",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "in": "body",
-            "name": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/Laboratories"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "success"
-          },
-          "400": {
-            "description": "error"
-          },
-          "404": {
-            "description": "error"
-          }
-        }
-      }
-    },
-    "/api/v1/admins": {
+    "/admins": {
       "get": {
         "tags": [
           "admin"
         ],
         "summary": "Get all admins",
-        "produces": [
-          "application/json"
-        ],
         "parameters": [
           {
             "in": "query",
             "name": "offset",
             "schema": {
-              "type": "integer"
+              "type": "integer",
+              "default": 0
             },
-            "description": "Nr. of items to skip before starting to collect results"
+            "description": "Nr. of admins to skip before starting to collect results"
           },
           {
             "in": "query",
             "name": "limit",
             "schema": {
-              "type": "integer"
+              "type": "integer",
+              "default": 10
             },
-            "description": "Nr. of items to return"
+            "description": "Nr. of admins to return"
           }
         ],
         "responses": {
           "200": {
-            "description": "success",
-            "schema": {
-              "type": "string"
+            "description": "A JSON object containing the requested array of admins, with the total available, plus the requested limit and offset",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
             }
           },
-          "400": {
-            "description": "error"
+          "403": {
+            "description": "Authorization error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
           }
         }
       },
@@ -192,69 +201,134 @@
         "tags": [
           "admin"
         ],
-        "summary": "Add an admin in the DB.",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "in": "body",
-            "name": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/Admin"
+        "summary": "Add an admin.",
+        "requestBody": {
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminPOSTInput"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminPOSTInput"
+              }
             }
           }
-        ],
+        },
         "responses": {
           "200": {
-            "description": "success"
+            "description": "Success"
           },
           "400": {
-            "description": "error"
+            "description": "Some field is missing or invalid",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string",
+                  "description": "Error code"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Either an email or a phone number is already taken",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string",
+                  "description": "Error code"
+                }
+              }
+            }
           }
         }
       }
     },
-    "/api/v1/teachers": {
+    "/teachers": {
       "get": {
         "tags": [
           "teacher"
         ],
         "summary": "Get all teachers",
-        "produces": [
-          "application/json"
-        ],
         "parameters": [
           {
             "in": "query",
             "name": "offset",
             "schema": {
-              "type": "integer"
+              "type": "integer",
+              "default": 0
             },
-            "description": "Nr. of items to skip before starting to collect results"
+            "description": "Nr. of teachers to skip before starting to collect results"
           },
           {
             "in": "query",
             "name": "limit",
             "schema": {
+              "type": "integer",
+              "default": 10
+            },
+            "description": "Nr. of teachers to return"
+          },
+          {
+            "in": "query",
+            "name": "courseId",
+            "schema": {
               "type": "integer"
             },
-            "description": "Nr. of items to return"
+            "description": "The id of the course for which to return the teachers"
+          },
+          {
+            "in": "query",
+            "name": "courseInstanceId",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The id of the course instance for which to return the teacher (only 1, but still in an array)"
+          },
+          {
+            "in": "query",
+            "name": "labReportId",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The id of the lab report for which to return the teacher (only 1, but still in an array)"
+          },
+          {
+            "in": "query",
+            "name": "specialtyId",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The id of the specialty for which to return the teachers"
+          },
+          {
+            "in": "query",
+            "name": "groupId",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The id of the group for which to return the teachers"
+          },
+          {
+            "in": "query",
+            "name": "studentId",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The id of the student for which to return the teachers"
           }
         ],
         "responses": {
           "200": {
-            "description": "success",
-            "schema": {
-              "type": "string"
+            "description": "A JSON object containing the requested array of teachers, with the total available, plus the requested limit and offset",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TeacherAllResponse"
+                }
+              }
             }
-          },
-          "400": {
-            "description": "error"
           }
         }
       },
@@ -262,48 +336,63 @@
         "tags": [
           "teacher"
         ],
-        "summary": "Add a teacher in the DB.",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "in": "body",
-            "name": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/Teacher"
+        "summary": "Add a teacher.",
+        "requestBody": {
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/TeacherPOSTInput"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TeacherPOSTInput"
+              }
             }
           }
-        ],
+        },
         "responses": {
           "200": {
             "description": "success"
           },
           "400": {
-            "description": "error"
+            "description": "some field is missing or invalid",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string",
+                  "description": "error code"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "either an email or a phone number is already taken",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string",
+                  "description": "error code"
+                }
+              }
+            }
           }
         }
       }
     },
-    "/api/v1/students": {
+    "/students": {
       "get": {
         "tags": [
           "student"
         ],
         "summary": "Get all students",
-        "produces": [
-          "application/json"
-        ],
         "parameters": [
           {
             "in": "query",
             "name": "offset",
             "schema": {
-              "type": "integer"
+              "type": "integer",
+              "default": 0
             },
             "description": "Nr. of items to skip before starting to collect results"
           },
@@ -311,20 +400,70 @@
             "in": "query",
             "name": "limit",
             "schema": {
-              "type": "integer"
+              "type": "integer",
+              "default": 10
             },
             "description": "Nr. of items to return"
+          },
+          {
+            "in": "query",
+            "name": "courseId",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The id of the course for which to return the students"
+          },
+          {
+            "in": "query",
+            "name": "courseInstanceId",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The id of the course instance for which to return the students"
+          },
+          {
+            "in": "query",
+            "name": "labReportId",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The id of the lab report for which to return the student (only 1, but still in an array)"
+          },
+          {
+            "in": "query",
+            "name": "specialtyId",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The id of the specialty for which to return the students"
+          },
+          {
+            "in": "query",
+            "name": "groupId",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The id of the group for which to return the students"
+          },
+          {
+            "in": "query",
+            "name": "teacherId",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The id of the teacher for which to return the students"
           }
         ],
         "responses": {
           "200": {
-            "description": "success",
-            "schema": {
-              "type": "string"
+            "description": "A JSON object containing the requested array of students, with the total available, plus the requested limit and offset",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StudentAllResponse"
+                }
+              }
             }
-          },
-          "400": {
-            "description": "error"
           }
         }
       },
@@ -332,58 +471,77 @@
         "tags": [
           "student"
         ],
-        "summary": "Add a student in the DB.",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "in": "body",
-            "name": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/Student"
+        "summary": "Add a student.",
+        "requestBody": {
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/StudentPOSTInput"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StudentPOSTInput"
+              }
             }
           }
-        ],
+        },
         "responses": {
           "200": {
-            "description": "success"
+            "description": "Success"
           },
           "400": {
-            "description": "error"
+            "description": "Some field is missing or invalid",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string",
+                  "description": "Error code"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The group with the requested id was not found"
+          },
+          "409": {
+            "description": "Either an email or a phone number is already taken",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string",
+                  "description": "Error code"
+                }
+              }
+            }
           }
         }
       }
     },
-    "/api/v1/courses": {
+    "/courses": {
       "get": {
         "tags": [
           "course"
         ],
         "summary": "Get all courses",
-        "produces": [
-          "application/json"
-        ],
         "parameters": [
           {
             "in": "query",
             "name": "offset",
             "schema": {
-              "type": "integer"
+              "type": "integer",
+              "default": 0
             },
-            "description": "Nr. of items to skip before starting to collect results"
+            "description": "Nr. of courses to skip before starting to collect results"
           },
           {
             "in": "query",
             "name": "limit",
             "schema": {
-              "type": "integer"
+              "type": "integer",
+              "default": 10
             },
-            "description": "Nr. of items to return"
+            "description": "Nr. of courses to return"
           },
           {
             "in": "query",
@@ -392,17 +550,66 @@
               "type": "string"
             },
             "description": "Part of the name to be searched for"
+          },
+          {
+            "in": "query",
+            "name": "teacherId",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The id of the teacher for which to return the courses"
+          },
+          {
+            "in": "query",
+            "name": "courseInstanceId",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The id of the course instance for which to return the courses"
+          },
+          {
+            "in": "query",
+            "name": "labReportId",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The id of the lab report for which to return the courses"
+          },
+          {
+            "in": "query",
+            "name": "specialtyId",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The id of the speacialty for which to return the courses"
+          },
+          {
+            "in": "query",
+            "name": "groupId",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The id of the group for which to return the courses"
+          },
+          {
+            "in": "query",
+            "name": "studentId",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The id of the student for which to return the courses"
           }
         ],
         "responses": {
           "200": {
-            "description": "success",
-            "schema": {
-              "type": "string"
+            "description": "A JSON object containing the requested array of courses, with the total available, plus the requested limit and offset",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CourseAllResponse"
+                }
+              }
             }
-          },
-          "400": {
-            "description": "error"
           }
         }
       },
@@ -410,77 +617,141 @@
         "tags": [
           "course"
         ],
-        "summary": "Add a course in the DB.",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "in": "body",
-            "name": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/Course"
+        "summary": "Add a course.",
+        "requestBody": {
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/CoursePOSTInput"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CoursePOSTInput"
+              }
             }
           }
-        ],
+        },
         "responses": {
           "200": {
-            "description": "success"
+            "description": "Success"
           },
           "400": {
-            "description": "error"
+            "description": "Some field is missing or invalid",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string",
+                  "description": "Error code"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "The course name is already taken",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string",
+                  "description": "Error code"
+                }
+              }
+            }
           }
         }
       }
     },
-    "/api/v1/groups": {
+    "/groups": {
       "get": {
         "tags": [
           "group"
         ],
         "summary": "Get all groups",
-        "produces": [
-          "application/json"
-        ],
         "parameters": [
           {
             "in": "query",
             "name": "offset",
             "schema": {
-              "type": "integer"
+              "type": "integer",
+              "default": 0
             },
-            "description": "Nr. of items to skip before starting to collect results"
+            "description": "Nr. of groups to skip before starting to collect results"
           },
           {
             "in": "query",
             "name": "limit",
             "schema": {
-              "type": "integer"
+              "type": "integer",
+              "default": 10
             },
-            "description": "Nr. of items to return"
+            "description": "Nr. of groups to return"
           },
           {
             "in": "query",
             "name": "contains",
             "schema": {
               "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "teacherId",
+            "schema": {
+              "type": "integer"
             },
-            "description": "Part of the name to be searched for"
+            "description": "The id of the teacher for which to return the groups"
+          },
+          {
+            "in": "query",
+            "name": "courseInstanceId",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The id of the course instance for which to return the groups"
+          },
+          {
+            "in": "query",
+            "name": "labReportId",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The id of the lab report for which to return the groups"
+          },
+          {
+            "in": "query",
+            "name": "specialtyId",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The id of the speacialty for which to return the groups"
+          },
+          {
+            "in": "query",
+            "name": "groupId",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The id of the course for which to return the groups"
+          },
+          {
+            "in": "query",
+            "name": "studentId",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The id of the student for which to return the groups"
           }
         ],
         "responses": {
           "200": {
-            "description": "success",
-            "schema": {
-              "type": "string"
+            "description": "A JSON object containing the requested array of groups, with the total available, plus the requested limit and offset",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GroupAllResponse"
+                }
+              }
             }
-          },
-          "404": {
-            "description": "error"
           }
         }
       },
@@ -488,58 +759,77 @@
         "tags": [
           "group"
         ],
-        "summary": "Add a group in the DB.",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "in": "body",
-            "name": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/Group"
+        "summary": "Add a group",
+        "requestBody": {
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/GroupPOSTInput"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GroupPOSTInput"
+              }
             }
           }
-        ],
+        },
         "responses": {
           "200": {
-            "description": "success"
+            "description": "Success"
           },
           "400": {
-            "description": "error"
+            "description": "Some field is missing or invalid",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string",
+                  "description": "Error code"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The specialty with the requested id was not found"
+          },
+          "409": {
+            "description": "The course name is already taken",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string",
+                  "description": "Error code"
+                }
+              }
+            }
           }
         }
       }
     },
-    "/api/v1/specialties": {
+    "/specialties": {
       "get": {
         "tags": [
           "specialty"
         ],
         "summary": "Get all specialties",
-        "produces": [
-          "application/json"
-        ],
         "parameters": [
           {
             "in": "query",
             "name": "offset",
             "schema": {
-              "type": "integer"
+              "type": "integer",
+              "default": 0
             },
-            "description": "Nr. of items to skip before starting to collect results"
+            "description": "Nr. of specialties to skip before starting to collect results"
           },
           {
             "in": "query",
             "name": "limit",
             "schema": {
-              "type": "integer"
+              "type": "integer",
+              "default": 10
             },
-            "description": "Nr. of items to return"
+            "description": "Nr. of specialties to return"
           },
           {
             "in": "query",
@@ -548,17 +838,66 @@
               "type": "string"
             },
             "description": "Part of the name to be searched for"
+          },
+          {
+            "in": "query",
+            "name": "teacherId",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The id of the teacher for which to return the specialties"
+          },
+          {
+            "in": "query",
+            "name": "courseInstanceId",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The id of the course instance for which to return the specialties"
+          },
+          {
+            "in": "query",
+            "name": "labReportId",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The id of the lab report for which to return the specialties"
+          },
+          {
+            "in": "query",
+            "name": "groupId",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The id of the group  for which to return the specialty (only 1, but still in an array)"
+          },
+          {
+            "in": "query",
+            "name": "courseId",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The id of the course for which to return the specialties"
+          },
+          {
+            "in": "query",
+            "name": "studentId",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The id of the student for which to return the specialties"
           }
         ],
         "responses": {
           "200": {
-            "description": "success",
-            "schema": {
-              "type": "string"
+            "description": "A JSON object containing the requested array of specialties, with the total available, plus the requested limit and offset",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SpecialtyAllResponse"
+                }
+              }
             }
-          },
-          "400": {
-            "description": "error"
           }
         }
       },
@@ -566,86 +905,434 @@
         "tags": [
           "specialty"
         ],
-        "summary": "Add a speciality in the DB.",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "in": "body",
-            "name": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/Specialty"
+        "summary": "Add a speciality",
+        "requestBody": {
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/SpecialtyPOSTInput"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SpecialtyPOSTInput"
+              }
             }
           }
-        ],
+        },
         "responses": {
           "200": {
-            "description": "success"
+            "description": "Success"
           },
           "400": {
-            "description": "error"
+            "description": "Some field is missing or invalid",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string",
+                  "description": "Error code"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "The name is already taken",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string",
+                  "description": "Error code"
+                }
+              }
+            }
           }
         }
       }
     },
-    "/api/v1/admins/{id}": {
+    "/lab_reports": {
+      "get": {
+        "tags": [
+          "lab_report"
+        ],
+        "summary": "Get all lab reports",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "offset",
+            "schema": {
+              "type": "integer",
+              "default": 0
+            },
+            "description": "Nr. of lab reports to skip before starting to collect results"
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer",
+              "default": 10
+            },
+            "description": "Nr. of lab reports to return"
+          },
+          {
+            "in": "query",
+            "name": "teacherId",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The id of the teacher for which to return the lab reports"
+          },
+          {
+            "in": "query",
+            "name": "specialtyId",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The id of the specialty for which to return the lab reports"
+          },
+          {
+            "in": "query",
+            "name": "courseInstanceId",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The id of the course instance for which to return the lab reports"
+          },
+          {
+            "in": "query",
+            "name": "groupId",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The id of the group  for which to return the lab reports"
+          },
+          {
+            "in": "query",
+            "name": "courseId",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The id of the course for which to return the lab reports"
+          },
+          {
+            "in": "query",
+            "name": "studentId",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The id of the student for which to return the lab reports"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A JSON object containing the requested array of lab reports, with the total available, plus the requested limit and offset",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LabReportAllResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "lab_report"
+        ],
+        "summary": "Add a lab report",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/LabReportPOSTInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Either the student or the course instance were not found"
+          }
+        }
+      }
+    },
+    "/course_instances": {
+      "get": {
+        "tags": [
+          "course_instance"
+        ],
+        "summary": "Get all course instances",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "offset",
+            "schema": {
+              "type": "integer",
+              "default": 0
+            },
+            "description": "Nr. of course instances to skip before starting to collect results"
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer",
+              "default": 10
+            },
+            "description": "Nr. of course instances to return"
+          },
+          {
+            "in": "query",
+            "name": "teacherId",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The id of the teacher for which to return the course instances"
+          },
+          {
+            "in": "query",
+            "name": "specialtyId",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The id of the specialty for which to return the course instances"
+          },
+          {
+            "in": "query",
+            "name": "labReportId",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The id of the lab report for which to return the course instances"
+          },
+          {
+            "in": "query",
+            "name": "groupId",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The id of the group  for which to return the course instances"
+          },
+          {
+            "in": "query",
+            "name": "courseId",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The id of the course for which to return the course instances"
+          },
+          {
+            "in": "query",
+            "name": "studentId",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The id of the student for which to return the course instances"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A JSON object containing the requested array of course instances, with the total available, plus the requested limit and offset",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CourseInstanceAllResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "course_instance"
+        ],
+        "summary": "Add a course instance",
+        "requestBody": {
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/CourseInstancePOSTInput"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CourseInstancePOSTInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Either the teacher or the course were not found"
+          }
+        }
+      }
+    },
+    "/course_instances-specialties": {
+      "get": {
+        "tags": [
+          "course_instance_specialty"
+        ],
+        "summary": "Get all bindings between course instances and specialties",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "offset",
+            "schema": {
+              "type": "integer",
+              "default": 0
+            },
+            "description": "Nr. of items to skip before starting to collect results"
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer",
+              "default": 10
+            },
+            "description": "Nr. of items to return"
+          },
+          {
+            "in": "query",
+            "name": "teacherId",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The id of the teacher for which to return the items"
+          },
+          {
+            "in": "query",
+            "name": "specialtyId",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The id of the specialty for which to return the items"
+          },
+          {
+            "in": "query",
+            "name": "labReportId",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The id of the lab report for which to return the items"
+          },
+          {
+            "in": "query",
+            "name": "groupId",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The id of the group  for which to return the items"
+          },
+          {
+            "in": "query",
+            "name": "courseId",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The id of the course for which to return the items"
+          },
+          {
+            "in": "query",
+            "name": "studentId",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The id of the student for which to return the items"
+          },
+          {
+            "in": "query",
+            "name": "courseInstanceId",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "The id of the course instance for which to return the items"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A JSON object containing the requested array of pairs of ids representing bindings between course instances and specialties, with the total available, plus the requested limit and offset",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CourseInstanceSpecialtyAllResponse"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "course_instance_specialty"
+        ],
+        "summary": "Add a binding between a course instance and a specialty",
+        "requestBody": {
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/CourseInstanceSpecialtyInput"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CourseInstanceSpecialtyInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "Either the course instance or the specialty were not found"
+          },
+          "409": {
+            "description": "The given combination of ids already exists"
+          }
+        }
+      }
+    },
+    "/admins/{id}": {
       "get": {
         "tags": [
           "admin"
         ],
-        "summary": "Get an admin by id.",
-        "produces": [
-          "application/json"
-        ],
+        "summary": "Get an admin by id",
         "parameters": [
           {
             "name": "id",
             "in": "path",
-            "description": "Get the admin by ID.",
+            "description": "The id of admin",
             "required": true,
-            "type": "integer"
+            "schema": {
+              "type": "integer"
+            }
           }
         ],
         "responses": {
           "200": {
-            "description": "success",
-            "schema": {
-              "type": "string"
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminResponse"
+                }
+              }
             }
           },
           "404": {
-            "description": "error"
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "admin"
-        ],
-        "summary": "Delete an admin by ID.",
-        "produces": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "ID of the Admin to be deleted.",
-            "required": true,
-            "type": "integer"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "success"
-          },
-          "404": {
-            "description": "error"
+            "description": "The admin with the requested id was not found"
           }
         }
       },
@@ -653,162 +1340,105 @@
         "tags": [
           "admin"
         ],
-        "summary": "Update the data of an admin.",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "integer"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/Admin"
+        "summary": "Update the data of an admin by id",
+        "requestBody": {
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminPUTInput"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminPUTInput"
+              }
             }
           }
-        ],
-        "responses": {
-          "400": {
-            "description": "Invalid ID supplied"
-          },
-          "404": {
-            "description": "Admin not found"
-          },
-          "405": {
-            "description": "Validation exception"
-          }
-        }
-      }
-    },
-    "/api/v1/lab_comments/{id}": {
-      "delete": {
-        "tags": [
-          "laboratory"
-        ],
-        "summary": "Delete a laboratory comment by ID.",
-        "produces": [
-          "application/json"
-        ],
+        },
         "parameters": [
           {
             "name": "id",
             "in": "path",
-            "description": "ID of the laboratory comment to be deleted.",
             "required": true,
-            "type": "integer"
+            "schema": {
+              "type": "integer",
+              "minimum": 1
+            }
           }
         ],
         "responses": {
           "200": {
-            "description": "success"
+            "description": "Success"
+          },
+          "400": {
+            "description": "One or more of fields are invalid"
           },
           "404": {
-            "description": "error"
+            "description": "The admin with the requested id not found"
           },
-          "403": {
-            "description": "error"
+          "409": {
+            "description": "Either the email or the phone number is already taken"
           }
         }
       },
-      "put": {
+      "delete": {
         "tags": [
-          "laboratory"
+          "admin"
         ],
-        "summary": "Update the comment laboratory.",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
+        "summary": "Delete an admin by id",
         "parameters": [
           {
             "name": "id",
             "in": "path",
-            "required": true,
-            "type": "integer"
-          },
-          {
-            "name": "body",
-            "in": "body",
+            "description": "The id of the admin to be deleted",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/Laboratories"
+              "type": "integer"
             }
           }
         ],
         "responses": {
-          "400": {
-            "description": "Invalid ID supplied"
+          "200": {
+            "description": "Success"
           },
           "404": {
-            "description": "Laboratory comment not found"
+            "description": "The admin with requested id was not not found"
           }
         }
       }
     },
-    "/api/v1/teachers/{id}": {
+    "/teachers/{id}": {
       "get": {
         "tags": [
           "teacher"
         ],
-        "summary": "Get a teacher",
-        "produces": [
-          "application/json"
-        ],
+        "summary": "Get a teacher by id",
         "parameters": [
           {
             "name": "id",
             "in": "path",
-            "description": "Get the teacher by ID.",
+            "description": "The id of the teacher",
             "required": true,
-            "type": "integer"
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "example": 1
+            }
           }
         ],
         "responses": {
           "200": {
-            "description": "success",
-            "schema": {
-              "type": "string"
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TeacherResponse"
+                }
+              }
             }
           },
           "404": {
-            "description": "error"
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "teacher"
-        ],
-        "summary": "Delete a teacher by ID.",
-        "produces": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "ID of the teacher to be deleted.",
-            "required": true,
-            "type": "integer"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "success"
-          },
-          "404": {
-            "description": "error"
+            "description": "The teacher with the requested id was not found"
           }
         }
       },
@@ -816,95 +1446,111 @@
         "tags": [
           "teacher"
         ],
-        "summary": "Update the data of an teacher.",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
+        "summary": "Update the data of a teacher",
+        "requestBody": {
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/TeacherPUTInput"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TeacherPUTInput"
+              }
+            }
+          }
+        },
         "parameters": [
           {
             "name": "id",
             "in": "path",
             "required": true,
-            "type": "integer"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
             "schema": {
-              "$ref": "#/definitions/Teacher"
+              "type": "integer",
+              "minimum": 1,
+              "example": 1
             }
           }
         ],
         "responses": {
+          "200": {
+            "description": "Success"
+          },
           "400": {
-            "description": "Invalid ID supplied"
+            "description": "One or more fields are invalid"
           },
           "404": {
-            "description": "Teacher not found"
+            "description": "The teacher with the requested id was not found"
           },
-          "405": {
-            "description": "Validation exception"
+          "409": {
+            "description": "Either the email or the phone number is already taken"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "teacher"
+        ],
+        "summary": "Delete a teacher by id",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "The id of the teacher to be deleted",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "example": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "The teacher with the requested id was not found"
+          },
+          "409": {
+            "description": "The teacher could not be delete because other resources depend on it"
           }
         }
       }
     },
-    "/api/v1/students/{id}": {
+    "/students/{id}": {
       "get": {
         "tags": [
           "student"
         ],
-        "summary": "Get a student by ID.",
-        "produces": [
-          "application/json"
-        ],
+        "summary": "Get a student by id",
         "parameters": [
           {
             "name": "id",
             "in": "path",
-            "description": "Get the student by ID.",
+            "description": "The id of the student",
             "required": true,
-            "type": "integer"
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "example": 1
+            }
           }
         ],
         "responses": {
           "200": {
-            "description": "success",
-            "schema": {
-              "type": "string"
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StudentResponse"
+                }
+              }
             }
           },
           "404": {
-            "description": "error"
-          }
-        }
-      },
-      "delete": {
-        "tags": [
-          "student"
-        ],
-        "summary": "Delete a student by ID.",
-        "produces": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "ID of the student to be deleted.",
-            "required": true,
-            "type": "integer"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "success"
-          },
-          "404": {
-            "description": "error"
+            "description": "The student with the requested id was not found"
           }
         }
       },
@@ -912,95 +1558,111 @@
         "tags": [
           "student"
         ],
-        "summary": "Update the data of an student.",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "integer"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/Student"
+        "summary": "Update the data of a student",
+        "requestBody": {
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/StudentPUTInput"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StudentPUTInput"
+              }
             }
           }
-        ],
-        "responses": {
-          "400": {
-            "description": "Invalid ID supplied"
-          },
-          "404": {
-            "description": "Student not found"
-          },
-          "405": {
-            "description": "Validation exception"
-          }
-        }
-      }
-    },
-    "/api/v1/courses/{id}": {
-      "get": {
-        "tags": [
-          "course"
-        ],
-        "summary": "Get a course by ID.",
-        "produces": [
-          "application/json"
-        ],
+        },
         "parameters": [
           {
             "name": "id",
             "in": "path",
-            "description": "Get the course by ID.",
             "required": true,
-            "type": "integer"
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "example": 1
+            }
           }
         ],
         "responses": {
           "200": {
-            "description": "success",
-            "schema": {
-              "type": "string"
-            }
+            "description": "Success"
+          },
+          "400": {
+            "description": "One or more fields are invalid"
           },
           "404": {
-            "description": "error"
+            "description": "The student with the requested id was not found"
+          },
+          "409": {
+            "description": "Either the email or the phone number is already taken"
           }
         }
       },
       "delete": {
         "tags": [
-          "course"
+          "student"
         ],
-        "summary": "Delete a course by ID.",
-        "produces": [
-          "application/json"
-        ],
+        "summary": "Delete a student by id",
         "parameters": [
           {
             "name": "id",
             "in": "path",
-            "description": "ID of the course to be deleted.",
+            "description": "The id of the student to be deleted",
             "required": true,
-            "type": "integer"
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "example": 1
+            }
           }
         ],
         "responses": {
           "200": {
-            "description": "success"
+            "description": "Success"
           },
-          "400": {
-            "description": "error"
+          "404": {
+            "description": "The student with the requested id was not found"
+          },
+          "409": {
+            "description": "The student could not be delete because other resources depend on it"
+          }
+        }
+      }
+    },
+    "/courses/{id}": {
+      "get": {
+        "tags": [
+          "course"
+        ],
+        "summary": "Get a course by id",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "The id of the course",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "example": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CourseResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The course with the requested id was not found"
           }
         }
       },
@@ -1008,95 +1670,111 @@
         "tags": [
           "course"
         ],
-        "summary": "Update the data of an course.",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "integer"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/Course"
+        "summary": "Update the data of a course",
+        "requestBody": {
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/CoursePUTInput"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CoursePUTInput"
+              }
             }
           }
-        ],
-        "responses": {
-          "400": {
-            "description": "Invalid ID supplied"
-          },
-          "404": {
-            "description": "Course not found"
-          },
-          "405": {
-            "description": "Validation exception"
-          }
-        }
-      }
-    },
-    "/api/v1/groups/{id}": {
-      "get": {
-        "tags": [
-          "group"
-        ],
-        "summary": "Get a group by ID.",
-        "produces": [
-          "application/json"
-        ],
+        },
         "parameters": [
           {
             "name": "id",
             "in": "path",
-            "description": "Get the group by ID..",
             "required": true,
-            "type": "integer"
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "example": 1
+            }
           }
         ],
         "responses": {
           "200": {
-            "description": "success",
-            "schema": {
-              "type": "string"
-            }
+            "description": "Success"
+          },
+          "400": {
+            "description": "One or more fields are invalid"
           },
           "404": {
-            "description": "error"
+            "description": "The course with the requested id was not found"
+          },
+          "409": {
+            "description": "The name is already taken"
           }
         }
       },
       "delete": {
         "tags": [
-          "group"
+          "course"
         ],
-        "summary": "Delete a group by ID.",
-        "produces": [
-          "application/json"
-        ],
+        "summary": "Delete a course by id",
         "parameters": [
           {
             "name": "id",
             "in": "path",
-            "description": "ID of the group to be deleted.",
+            "description": "The id of the course to be deleted",
             "required": true,
-            "type": "integer"
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "example": 1
+            }
           }
         ],
         "responses": {
           "200": {
-            "description": "success"
+            "description": "Success"
           },
           "404": {
-            "description": "error"
+            "description": "The course with the requested id was not found"
+          },
+          "409": {
+            "description": "The course could not be delete because other resources depend on it"
+          }
+        }
+      }
+    },
+    "/groups/{id}": {
+      "get": {
+        "tags": [
+          "group"
+        ],
+        "summary": "Get a group by id",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "The id of the group",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "example": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GroupResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The group with the requested id was not found"
           }
         }
       },
@@ -1104,95 +1782,111 @@
         "tags": [
           "group"
         ],
-        "summary": "Update the data of a group by ID.",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "integer"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/Group"
+        "summary": "Update the data of a group",
+        "requestBody": {
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/GroupPUTInput"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GroupPUTInput"
+              }
             }
           }
-        ],
-        "responses": {
-          "400": {
-            "description": "Invalid ID supplied"
-          },
-          "404": {
-            "description": "Group not found"
-          },
-          "405": {
-            "description": "Validation exception"
-          }
-        }
-      }
-    },
-    "/api/v1/specialties/{id}": {
-      "get": {
-        "tags": [
-          "specialty"
-        ],
-        "summary": "Get a specialty by ID.",
-        "produces": [
-          "application/json"
-        ],
+        },
         "parameters": [
           {
             "name": "id",
             "in": "path",
-            "description": "ID of the specialty to be shown",
             "required": true,
-            "type": "integer"
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "example": 1
+            }
           }
         ],
         "responses": {
           "200": {
-            "description": "success",
-            "schema": {
-              "type": "string"
-            }
+            "description": "Success"
+          },
+          "400": {
+            "description": "One or more fields are invalid"
           },
           "404": {
-            "description": "error"
+            "description": "The group with the requested id was not found"
+          },
+          "409": {
+            "description": "The name is already taken"
           }
         }
       },
       "delete": {
         "tags": [
-          "specialty"
+          "group"
         ],
-        "summary": "Delete a speciality by ID.",
-        "produces": [
-          "application/json"
-        ],
+        "summary": "Delete a group by id",
         "parameters": [
           {
             "name": "id",
             "in": "path",
-            "description": "ID of the specialty to be deleted.",
+            "description": "The id of the group to be deleted",
             "required": true,
-            "type": "integer"
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "example": 1
+            }
           }
         ],
         "responses": {
           "200": {
-            "description": "success"
+            "description": "Success"
           },
           "404": {
-            "description": "error"
+            "description": "The group with the requested id was not found"
+          },
+          "409": {
+            "description": "The group could not be delete because other resources depend on it"
+          }
+        }
+      }
+    },
+    "/specialties/{id}": {
+      "get": {
+        "tags": [
+          "specialty"
+        ],
+        "summary": "Get a specialty by id",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "The id of the specialty",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "example": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SpecialtyResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The specialty with the requested id was not found"
           }
         }
       },
@@ -1200,209 +1894,1188 @@
         "tags": [
           "specialty"
         ],
-        "summary": "Update the data of a speciality by ID.",
-        "consumes": [
-          "application/json"
-        ],
-        "produces": [
-          "application/json"
-        ],
+        "summary": "Update the data of a specialty",
+        "requestBody": {
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/SpecialtyPUTInput"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SpecialtyPUTInput"
+              }
+            }
+          }
+        },
         "parameters": [
           {
             "name": "id",
             "in": "path",
             "required": true,
-            "type": "integer"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
             "schema": {
-              "$ref": "#/definitions/Specialty"
+              "type": "integer",
+              "minimum": 1,
+              "example": 1
             }
           }
         ],
         "responses": {
+          "200": {
+            "description": "Success"
+          },
           "400": {
-            "description": "Invalid ID supplied"
+            "description": "One or more fields are invalid"
           },
           "404": {
-            "description": "Specialty not found"
+            "description": "The specialty with the requested id was not found"
           },
-          "405": {
-            "description": "Validation exception"
+          "409": {
+            "description": "The name is already taken"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "specialty"
+        ],
+        "summary": "Delete a specialty by id",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "The id of the specialty to be deleted",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "example": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "The specialty with the requested id was not found"
+          },
+          "409": {
+            "description": "The specialty could not be deleted because other resources depend on it"
+          }
+        }
+      }
+    },
+    "/lab_reports/{id}": {
+      "get": {
+        "tags": [
+          "lab_report"
+        ],
+        "summary": "Get a lab report by id",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "The id of the lab report",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "example": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/*": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The lab report with the requested id was not found"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "lab_report"
+        ],
+        "summary": "Add a review and a mark to the lab report",
+        "requestBody": {
+          "content": {
+            "application/x-www-form-urlencoded": {
+              "schema": {
+                "$ref": "#/components/schemas/LabReportPUTInput"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LabReportPUTInput"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "example": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "One or more fields are missing or invalid"
+          },
+          "404": {
+            "description": "The course instance with the requested id was not found"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "lab_report"
+        ],
+        "summary": "Delete a lab report by id",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "The id of the lab report to be deleted",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "example": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "The lab report with the requested id was not found"
+          },
+          "409": {
+            "description": "The lab report could not be deleted because other resources depend on it"
+          }
+        }
+      }
+    },
+    "/course_instances/{id}": {
+      "get": {
+        "tags": [
+          "course_instance"
+        ],
+        "summary": "Get a course instance by id",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "The id of the course instance",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "example": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "text/*": {
+                "schema": {
+                  "$ref": "#/components/schemas/CourseInstanceResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The course instance with the requested id was not found"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "course_instance"
+        ],
+        "summary": "Update the file with the tasks",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "properties": {
+                  "labTasksFile": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "example": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "400": {
+            "description": "One or more fields are missing or invalid"
+          },
+          "404": {
+            "description": "The course instance with the requested id was not found"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "course_instance"
+        ],
+        "summary": "Delete a course instance if admin or its file if teacher, by id",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "The id of the course instance to be deleted",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "example": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "The course instance with the requested id was not found"
+          },
+          "409": {
+            "description": "The course instance could not be deleted because other resources depend on it"
+          }
+        }
+      }
+    },
+    "/course_instance-specialties/{id}": {
+      "get": {
+        "tags": [
+          "course_instance_specialty"
+        ],
+        "summary": "Get a binding between a course instance and a specialty by id",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "The id of the binding",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "example": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CourseInstanceSpecialtyResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The binding with the requested id was not found"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "course_instance_specialty"
+        ],
+        "summary": "Delete a a binding between a course instance and a specialty by id",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "The id of the binding to be deleted",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "example": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "The binding with the requested id was not found"
           }
         }
       }
     }
   },
-  "securityDefinitions": {
-    "api_key": {
-      "type": "apiKey",
-      "name": "token",
-      "in": "header"
-    }
-  },
-  "definitions": {
-    "User": {
-      "type": "object",
-      "required": [
-        "email",
-        "password"
-      ],
-      "properties": {
-        "email": {
-          "type": "string",
-          "format": "email"
-        },
-        "password": {
-          "type": "string"
-        }
+  "components": {
+    "securitySchemes": {
+      "ApiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "token"
       }
     },
-    "Admin": {
-      "type": "object",
-      "required": [
-        "firstName",
-        "lastName",
-        "email",
-        "password",
-        "phoneNumber"
-      ],
-      "properties": {
-        "firstName": {
-          "type": "string"
-        },
-        "lastName": {
-          "type": "string"
-        },
-        "email": {
-          "type": "string",
-          "format": "email"
-        },
-        "password": {
-          "type": "string"
-        },
-        "phoneNumber": {
-          "type": "string"
+    "schemas": {
+      "LoginInput": {
+        "type": "object",
+        "required": [
+          "email",
+          "password"
+        ],
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "default": "administrator@moodle.com"
+          },
+          "password": {
+            "type": "string",
+            "format": "password",
+            "example": "administrator"
+          }
         }
-      }
-    },
-    "Teacher": {
-      "type": "object",
-      "required": [
-        "firstName",
-        "lastName",
-        "email",
-        "password",
-        "phoneNumber"
-      ],
-      "properties": {
-        "firstName": {
-          "type": "string"
-        },
-        "lastName": {
-          "type": "string"
-        },
-        "email": {
-          "type": "string",
-          "format": "email"
-        },
-        "password": {
-          "type": "string"
-        },
-        "phoneNumber": {
-          "type": "string"
+      },
+      "UserInput": {
+        "type": "object",
+        "properties": {
+          "firstName": {
+            "type": "string",
+            "example": "FirstName"
+          },
+          "lastName": {
+            "type": "string",
+            "example": "LastName"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "user@example.com"
+          },
+          "phoneNumber": {
+            "type": "string",
+            "example": "060000000",
+            "pattern": "^0[67]\\d{7}$"
+          },
+          "password": {
+            "type": "string",
+            "format": "password",
+            "example": "parola"
+          }
         }
-      }
-    },
-    "Student": {
-      "type": "object",
-      "required": [
-        "firstName",
-        "lastName",
-        "email",
-        "password",
-        "phoneNumber",
-        "idGroup"
-      ],
-      "properties": {
-        "firstName": {
-          "type": "string"
-        },
-        "lastName": {
-          "type": "string"
-        },
-        "email": {
-          "type": "string",
-          "format": "email"
-        },
-        "password": {
-          "type": "string"
-        },
-        "phoneNumber": {
-          "type": "string"
-        },
-        "idGroup": {
-          "type": "integer"
+      },
+      "AdminPUTInput": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/UserInput"
+          }
+        ]
+      },
+      "AdminPOSTInput": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/AdminPUTInput"
+          },
+          {
+            "type": "object",
+            "required": [
+              "firstName",
+              "lastName",
+              "email",
+              "phoneNumber",
+              "password"
+            ]
+          }
+        ]
+      },
+      "TeacherPUTInput": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/UserInput"
+          }
+        ]
+      },
+      "TeacherPOSTInput": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/TeacherPUTInput"
+          },
+          {
+            "type": "object",
+            "required": [
+              "firstName",
+              "lastName",
+              "email",
+              "phoneNumber",
+              "password"
+            ]
+          }
+        ]
+      },
+      "StudentPUTInput": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/UserInput"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "groupId": {
+                "type": "integer",
+                "minimum": 1,
+                "example": 1
+              }
+            }
+          }
+        ]
+      },
+      "StudentPOSTInput": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/StudentPUTInput"
+          },
+          {
+            "type": "object",
+            "required": [
+              "firstName",
+              "lastName",
+              "email",
+              "phoneNumber",
+              "password",
+              "groupId"
+            ]
+          }
+        ]
+      },
+      "GroupPUTInput": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Name"
+          },
+          "specialtyId": {
+            "type": "integer",
+            "minimum": 1,
+            "example": 1
+          }
         }
-      }
-    },
-    "Course": {
-      "type": "object",
-      "required": [
-        "name"
-      ],
-      "properties": {
-        "name": {
-          "type": "string"
+      },
+      "GroupPOSTInput": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/GroupPUTInput"
+          },
+          {
+            "type": "object",
+            "required": [
+              "name",
+              "specialtyId"
+            ]
+          }
+        ]
+      },
+      "CoursePUTInput": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Name"
+          },
+          "description": {
+            "type": "string",
+            "example": "Description"
+          }
         }
-      }
-    },
-    "Group": {
-      "type": "object",
-      "required": [
-        "name",
-        "idSpecialty"
-      ],
-      "properties": {
-        "name": {
-          "type": "string"
-        },
-        "idSpecialty": {
-          "type": "integer"
+      },
+      "CoursePOSTInput": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/CoursePUTInput"
+          },
+          {
+            "type": "object",
+            "required": [
+              "name",
+              "description"
+            ]
+          }
+        ]
+      },
+      "SpecialtyPUTInput": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "example": "Name"
+          },
+          "description": {
+            "type": "string",
+            "example": "Description"
+          }
         }
-      }
-    },
-    "Specialty": {
-      "type": "object",
-      "required": [
-        "name"
-      ],
-      "properties": {
-        "name": {
-          "type": "string"
+      },
+      "SpecialtyPOSTInput": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/SpecialtyPUTInput"
+          },
+          {
+            "type": "object",
+            "required": [
+              "name",
+              "description"
+            ]
+          }
+        ]
+      },
+      "LabReportPUTInput": {
+        "type": "object",
+        "required": [
+          "review",
+          "mark"
+        ],
+        "properties": {
+          "review": {
+            "type": "string",
+            "example": "This is a review"
+          },
+          "mark": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 10,
+            "example": 10
+          }
         }
-      }
-    },
-    "Laboratories": {
-      "type": "object",
-      "required": [
-        "labReportId",
-        "teacherComment",
-        "mark"
-      ],
-      "properties": {
-        "labReportId": {
-          "type": "number"
-        },
-        "teacherComment": {
-          "type": "string"
-        },
-        "mark": {
-          "type": "number"
+      },
+      "LabReportPOSTInput": {
+        "type": "object",
+        "required": [
+          "courseInstanceId",
+          "labReport"
+        ],
+        "properties": {
+          "courseInstanceId": {
+            "type": "integer",
+            "minimum": 1,
+            "example": 1
+          },
+          "labReport": {
+            "type": "string",
+            "format": "binary"
+          },
+          "studentId": {
+            "type": "integer",
+            "minimum": 1,
+            "example": 1,
+            "default": 1,
+            "description": "Only for admins"
+          }
         }
+      },
+      "CourseInstancePUTInput": {
+        "type": "object",
+        "required": [
+          "labTasksFile"
+        ],
+        "properties": {
+          "labTasksFile": {
+            "type": "string",
+            "format": "binary"
+          }
+        }
+      },
+      "CourseInstancePOSTInput": {
+        "type": "object",
+        "description": "Only for admins",
+        "required": [
+          "teacherId",
+          "courseId"
+        ],
+        "properties": {
+          "teacherId": {
+            "type": "integer",
+            "minimum": 1,
+            "example": 1
+          },
+          "courseId": {
+            "type": "integer",
+            "minimum": 1,
+            "example": 1
+          }
+        }
+      },
+      "CourseInstanceSpecialtyInput": {
+        "type": "object",
+        "required": [
+          "courseInstanceId",
+          "speacialtyId"
+        ],
+        "properties": {
+          "courseInstanceId": {
+            "type": "integer",
+            "minimum": 1,
+            "example": 1
+          },
+          "specialtyId": {
+            "type": "integer",
+            "minimum": 1,
+            "example": 1
+          }
+        }
+      },
+      "BasicAllResponse": {
+        "type": "object",
+        "properties": {
+          "total": {
+            "type": "integer"
+          },
+          "limit": {
+            "type": "integer"
+          },
+          "offset": {
+            "type": "integer"
+          }
+        }
+      },
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "minimum": 1,
+            "example": 1
+          },
+          "firstName": {
+            "type": "string",
+            "example": "FirstName"
+          },
+          "lastName": {
+            "type": "string",
+            "example": "LastName"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "phoneNumber": {
+            "type": "string"
+          }
+        }
+      },
+      "Admin": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/User"
+          }
+        ]
+      },
+      "AdminResponse": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Admin"
+          }
+        ]
+      },
+      "AdminAllResponse": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BasicAllResponse"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/AdminResponse"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "Teacher": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/User"
+          }
+        ]
+      },
+      "TeacherResponse": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Teacher"
+          }
+        ]
+      },
+      "TeacherAllResponse": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BasicAllResponse"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/TeacherResponse"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "Student": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/User"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "groupId": {
+                "type": "integer",
+                "minimum": 1,
+                "example": 1
+              },
+              "group": {
+                "$ref": "#/components/schemas/Group"
+              }
+            }
+          }
+        ]
+      },
+      "StudentResponse": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Student"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "labReports": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/LabReport"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "StudentAllResponse": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BasicAllResponse"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/StudentResponse"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "Course": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "minimum": 1,
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "example": "Name"
+          },
+          "description": {
+            "type": "string",
+            "example": "This is a description"
+          }
+        }
+      },
+      "CourseResponse": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Course"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "teachers": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/Teacher"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "CourseAllResponse": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BasicAllResponse"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/CourseResponse"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "Group": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "minimum": 1,
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "example": "Name"
+          },
+          "specialtyId": {
+            "type": "integer",
+            "minimum": 1,
+            "example": 1
+          },
+          "specialty": {
+            "$ref": "#/components/schemas/Specialty"
+          }
+        }
+      },
+      "GroupResponse": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Group"
+          }
+        ]
+      },
+      "GroupAllResponse": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BasicAllResponse"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/GroupResponse"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "Specialty": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "minimum": 1,
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "example": "Name"
+          },
+          "descripiton": {
+            "type": "string",
+            "example": "This is a description"
+          }
+        }
+      },
+      "SpecialtyResponse": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Specialty"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "courseInstances": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/CourseInstance"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "SpecialtyAllResponse": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BasicAllResponse"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/SpecialtyResponse"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "CourseInstance": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "minimum": 1,
+            "example": 1
+          },
+          "teacherId": {
+            "type": "integer",
+            "minimum": 1,
+            "example": 1
+          },
+          "courseId": {
+            "type": "integer",
+            "minimum": 1,
+            "example": 1
+          },
+          "teacher": {
+            "$ref": "#/components/schemas/Teacher"
+          },
+          "course": {
+            "$ref": "#/components/schemas/Course"
+          },
+          "fileExists": {
+            "type": "boolean"
+          }
+        }
+      },
+      "CourseInstanceResponse": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/CourseInstance"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "labReports": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/LabReport"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "CourseInstanceAllResponse": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BasicAllResponse"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/CourseInstanceResponse"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "CourseInstanceSpecialty": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "minimum": 1,
+            "example": 1
+          },
+          "courseInstanceId": {
+            "type": "integer",
+            "minimum": 1,
+            "example": 1
+          },
+          "specialtyId": {
+            "type": "integer",
+            "minimum": 1,
+            "example": 1
+          },
+          "courseInstance": {
+            "$ref": "#/components/schemas/CourseInstance"
+          },
+          "specialty": {
+            "$ref": "#/components/schemas/Specialty"
+          }
+        }
+      },
+      "CourseInstanceSpecialtyResponse": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/CourseInstanceSpecialty"
+          }
+        ]
+      },
+      "CourseInstanceSpecialtyAllResponse": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BasicAllResponse"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/CourseInstanceSpecialtyResponse"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "LabReport": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer",
+            "minimum": 1,
+            "example": 1
+          },
+          "studentId": {
+            "type": "integer",
+            "minimum": 1,
+            "example": 1
+          },
+          "courseInstanceId": {
+            "type": "integer",
+            "minimum": 1,
+            "example": 1
+          },
+          "student": {
+            "$ref": "#/components/schemas/Student"
+          },
+          "courseInstance": {
+            "$ref": "#/components/schemas/CourseInstance"
+          }
+        }
+      },
+      "LabReportResponse": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/LabReport"
+          }
+        ]
+      },
+      "LabReportAllResponse": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BasicAllResponse"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/LabReportResponse"
+                }
+              }
+            }
+          }
+        ]
       }
     }
   }
