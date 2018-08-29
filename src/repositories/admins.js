@@ -42,8 +42,8 @@ module.exports = function createAdminsRepository(sequelize) {
   }
 
   async function update(id, data) {
-    await assert.notTaken.email(data.email, [Admin, models.Teacher, models.Student]);
-    await assert.notTaken.phoneNumber(data.phoneNumber, [Admin, models.Teacher, models.Student]);
+    await assert.notTaken.email(data.email, [Admin, models.Teacher, models.Student], id);
+    await assert.notTaken.phoneNumber(data.phoneNumber, [Admin, models.Teacher, models.Student], id);
 
     return Admin.update(data, {
       where: { id },

@@ -121,7 +121,7 @@ module.exports = function createSpecialtiesRepository(sequelize) {
   }
 
   async function update(id, data) {
-    await assert.notTaken.name(data.name, Course);
+    await assert.notTaken.name(data.name, Specialty, id);
 
     return Specialty.update(data, {
       where: { id },
