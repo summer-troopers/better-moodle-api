@@ -58,7 +58,7 @@
   ],
   "security": [
     {
-      "api_key": []
+      "ApiKeyAuth": []
     }
   ],
   "paths": {
