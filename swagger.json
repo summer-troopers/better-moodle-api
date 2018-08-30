@@ -2591,7 +2591,7 @@
         }
       }
     },
-    "/course_instance-specialties/{id}": {
+    "/course_instances-specialties/{id}": {
       "get": {
         "tags": [
           "course_instance_specialty"
