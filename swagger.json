@@ -2268,13 +2268,11 @@
         "properties": {
           "email": {
             "type": "string",
-            "format": "email",
-            "default": "administrator@moodle.com"
+            "format": "email"
           },
           "password": {
             "type": "string",
-            "format": "password",
-            "example": "administrator"
+            "format": "password"
           }
         }
       },
