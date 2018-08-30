@@ -2511,12 +2511,7 @@
           "content": {
             "multipart/form-data": {
               "schema": {
-                "properties": {
-                  "labTasksFile": {
-                    "type": "string",
-                    "format": "binary"
-                  }
-                }
+                "$ref": "#/components/schemas/CourseInstancePUTInput"
               }
             }
           }
