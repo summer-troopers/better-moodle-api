@@ -44,7 +44,7 @@
       "description": "Everything about Specialties"
     },
     {
-      "name": "lab report",
+      "name": "lab_report",
       "description": "Everything about Laboratories"
     },
     {
@@ -231,6 +231,16 @@
               }
             }
           },
+          "403": {
+            "description": "Authorization error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
           "409": {
             "description": "Either an email or a phone number is already taken",
             "content": {
@@ -329,6 +339,16 @@
                 }
               }
             }
+          },
+          "403": {
+            "description": "Authorization error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
           }
         }
       },
@@ -362,6 +382,16 @@
                 "schema": {
                   "type": "string",
                   "description": "error code"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authorization error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
                 }
               }
             }
@@ -464,6 +494,16 @@
                 }
               }
             }
+          },
+          "403": {
+            "description": "Authorization error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
           }
         }
       },
@@ -497,6 +537,16 @@
                 "schema": {
                   "type": "string",
                   "description": "Error code"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authorization error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
                 }
               }
             }
@@ -610,6 +660,16 @@
                 }
               }
             }
+          },
+          "403": {
+            "description": "Authorization error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
           }
         }
       },
@@ -643,6 +703,16 @@
                 "schema": {
                   "type": "string",
                   "description": "Error code"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authorization error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
                 }
               }
             }
@@ -752,6 +822,16 @@
                 }
               }
             }
+          },
+          "403": {
+            "description": "Authorization error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
           }
         }
       },
@@ -785,6 +865,16 @@
                 "schema": {
                   "type": "string",
                   "description": "Error code"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authorization error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
                 }
               }
             }
@@ -898,6 +988,16 @@
                 }
               }
             }
+          },
+          "403": {
+            "description": "Authorization error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
           }
         }
       },
@@ -931,6 +1031,16 @@
                 "schema": {
                   "type": "string",
                   "description": "Error code"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authorization error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
                 }
               }
             }
@@ -1033,6 +1143,16 @@
                 }
               }
             }
+          },
+          "403": {
+            "description": "Authorization error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
           }
         }
       },
@@ -1053,6 +1173,16 @@
         "responses": {
           "200": {
             "description": "Success"
+          },
+          "403": {
+            "description": "Authorization error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
           },
           "404": {
             "description": "Either the student or the course instance were not found"
@@ -1144,6 +1274,16 @@
                 }
               }
             }
+          },
+          "403": {
+            "description": "Authorization error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
           }
         }
       },
@@ -1169,6 +1309,16 @@
         "responses": {
           "200": {
             "description": "Success"
+          },
+          "403": {
+            "description": "Authorization error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
           },
           "404": {
             "description": "Either the teacher or the course were not found"
@@ -1268,6 +1418,16 @@
                 }
               }
             }
+          },
+          "403": {
+            "description": "Authorization error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
           }
         }
       },
@@ -1293,6 +1453,16 @@
         "responses": {
           "200": {
             "description": "Success"
+          },
+          "403": {
+            "description": "Authorization error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
           },
           "404": {
             "description": "Either the course instance or the specialty were not found"
@@ -1327,6 +1497,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/AdminResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authorization error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
                 }
               }
             }
@@ -1373,6 +1553,16 @@
           "400": {
             "description": "One or more of fields are invalid"
           },
+          "403": {
+            "description": "Authorization error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
           "404": {
             "description": "The admin with the requested id not found"
           },
@@ -1400,6 +1590,16 @@
         "responses": {
           "200": {
             "description": "Success"
+          },
+          "403": {
+            "description": "Authorization error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
           },
           "404": {
             "description": "The admin with requested id was not not found"
@@ -1433,6 +1633,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/TeacherResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authorization error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
                 }
               }
             }
@@ -1480,6 +1690,16 @@
           "400": {
             "description": "One or more fields are invalid"
           },
+          "403": {
+            "description": "Authorization error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
           "404": {
             "description": "The teacher with the requested id was not found"
           },
@@ -1509,6 +1729,16 @@
         "responses": {
           "200": {
             "description": "Success"
+          },
+          "403": {
+            "description": "Authorization error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
           },
           "404": {
             "description": "The teacher with the requested id was not found"
@@ -1545,6 +1775,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/StudentResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authorization error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
                 }
               }
             }
@@ -1592,6 +1832,16 @@
           "400": {
             "description": "One or more fields are invalid"
           },
+          "403": {
+            "description": "Authorization error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
           "404": {
             "description": "The student with the requested id was not found"
           },
@@ -1621,6 +1871,16 @@
         "responses": {
           "200": {
             "description": "Success"
+          },
+          "403": {
+            "description": "Authorization error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
           },
           "404": {
             "description": "The student with the requested id was not found"
@@ -1657,6 +1917,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/CourseResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authorization error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
                 }
               }
             }
@@ -1704,6 +1974,16 @@
           "400": {
             "description": "One or more fields are invalid"
           },
+          "403": {
+            "description": "Authorization error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
           "404": {
             "description": "The course with the requested id was not found"
           },
@@ -1733,6 +2013,16 @@
         "responses": {
           "200": {
             "description": "Success"
+          },
+          "403": {
+            "description": "Authorization error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
           },
           "404": {
             "description": "The course with the requested id was not found"
@@ -1769,6 +2059,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/GroupResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authorization error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
                 }
               }
             }
@@ -1816,6 +2116,16 @@
           "400": {
             "description": "One or more fields are invalid"
           },
+          "403": {
+            "description": "Authorization error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
           "404": {
             "description": "The group with the requested id was not found"
           },
@@ -1845,6 +2155,16 @@
         "responses": {
           "200": {
             "description": "Success"
+          },
+          "403": {
+            "description": "Authorization error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
           },
           "404": {
             "description": "The group with the requested id was not found"
@@ -1881,6 +2201,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/SpecialtyResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authorization error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
                 }
               }
             }
@@ -1928,6 +2258,16 @@
           "400": {
             "description": "One or more fields are invalid"
           },
+          "403": {
+            "description": "Authorization error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
           "404": {
             "description": "The specialty with the requested id was not found"
           },
@@ -1957,6 +2297,16 @@
         "responses": {
           "200": {
             "description": "Success"
+          },
+          "403": {
+            "description": "Authorization error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
           },
           "404": {
             "description": "The specialty with the requested id was not found"
@@ -1994,6 +2344,16 @@
                 "schema": {
                   "type": "string",
                   "format": "binary"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authorization error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
                 }
               }
             }
@@ -2041,6 +2401,16 @@
           "400": {
             "description": "One or more fields are missing or invalid"
           },
+          "403": {
+            "description": "Authorization error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
           "404": {
             "description": "The course instance with the requested id was not found"
           }
@@ -2067,6 +2437,16 @@
         "responses": {
           "200": {
             "description": "Success"
+          },
+          "403": {
+            "description": "Authorization error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
           },
           "404": {
             "description": "The lab report with the requested id was not found"
@@ -2103,6 +2483,16 @@
               "text/*": {
                 "schema": {
                   "$ref": "#/components/schemas/CourseInstanceResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Authorization error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
                 }
               }
             }
@@ -2150,6 +2540,16 @@
           "400": {
             "description": "One or more fields are missing or invalid"
           },
+          "403": {
+            "description": "Authorization error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
           "404": {
             "description": "The course instance with the requested id was not found"
           }
@@ -2176,6 +2576,16 @@
         "responses": {
           "200": {
             "description": "Success"
+          },
+          "403": {
+            "description": "Authorization error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
           },
           "404": {
             "description": "The course instance with the requested id was not found"
@@ -2216,6 +2626,16 @@
               }
             }
           },
+          "403": {
+            "description": "Authorization error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
           "404": {
             "description": "The binding with the requested id was not found"
           }
@@ -2242,6 +2662,16 @@
         "responses": {
           "200": {
             "description": "Success"
+          },
+          "403": {
+            "description": "Authorization error",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
           },
           "404": {
             "description": "The binding with the requested id was not found"
