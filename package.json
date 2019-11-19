@@ -37,7 +37,7 @@
     "mysql2": "^1.5.3",
     "node": "^10.6.0",
     "redosy": "^1.0.2",
-    "sequelize": "^4.38.0",
+    "sequelize": "^5.15.1",
     "swagger-ui-express": "^3.0.10",
     "winston": "^3.0.0"
   },
